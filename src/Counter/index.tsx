@@ -1,4 +1,5 @@
 import React, { FC } from 'react'
+import styled from '@emotion/styled/macro'
 
 import { Dispatch } from 'Provider'
 import * as utils from 'utils'
@@ -37,6 +38,11 @@ export const Increment: Msg = {
 
 // V I E W
 
+const StyledCount = styled.span`
+  font-weight: bold;
+  font-size: 16px;
+`
+
 export const View: FC<{ model: Model; dispatch: Dispatch<Msg> }> = ({
   model,
   dispatch
@@ -46,7 +52,7 @@ export const View: FC<{ model: Model; dispatch: Dispatch<Msg> }> = ({
       -
     </button>
 
-    {model.count}
+    <StyledCount>{model.count}</StyledCount>
 
     <button type="button" onClick={() => dispatch(Increment)}>
       +
