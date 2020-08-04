@@ -15,7 +15,7 @@
     ]
   },
 
-  "extends": ["eslint:recommended"],
+  "extends": ["eslint:recommended", "react-app"],
 
   "globals": {},
 
