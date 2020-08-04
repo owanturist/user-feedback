@@ -103,7 +103,11 @@ const ViewItem: FC<{ item: api.Feedback }> = ({ item }) => (
   </StyledItem>
 )
 
-const StyledHeader = styled.th`
+const StyledHeaderCell = styled.div`
+  display: table-cell;
+`
+
+const StyledHeader = styled.div`
   display: none;
   color: #e5ecf2;
   background: #59636b;
@@ -111,7 +115,7 @@ const StyledHeader = styled.th`
   font-weight: bold;
   font-size: 18px;
 
-  td {
+  ${StyledHeaderCell} {
     min-width: 100px;
     padding: 26px 40px 20px;
   }
@@ -143,11 +147,11 @@ export const View: FC<{
 }> = ({ className, items }) => (
   <StyledRoot className={className}>
     <StyledHeader>
-      <td>Rating</td>
-      <td className="text-left">Comment</td>
-      <td>Browser</td>
-      <td>Device</td>
-      <td>Platform</td>
+      <StyledHeaderCell>Rating</StyledHeaderCell>
+      <StyledHeaderCell className="text-left">Comment</StyledHeaderCell>
+      <StyledHeaderCell>Browser</StyledHeaderCell>
+      <StyledHeaderCell>Device</StyledHeaderCell>
+      <StyledHeaderCell>Platform</StyledHeaderCell>
     </StyledHeader>
 
     {items.map(item => (
@@ -191,21 +195,21 @@ export const Skeleton: FC<{
 }> = ({ className, count = 1 }) => (
   <StyledRoot className={className}>
     <StyledHeader>
-      <td>
+      <StyledHeaderCell>
         <Skelet.Text />
-      </td>
-      <td className="text-left">
+      </StyledHeaderCell>
+      <StyledHeaderCell className="text-left">
         <Skelet.Text />
-      </td>
-      <td>
+      </StyledHeaderCell>
+      <StyledHeaderCell>
         <Skelet.Text />
-      </td>
-      <td>
+      </StyledHeaderCell>
+      <StyledHeaderCell>
         <Skelet.Text />
-      </td>
-      <td>
+      </StyledHeaderCell>
+      <StyledHeaderCell>
         <Skelet.Text />
-      </td>
+      </StyledHeaderCell>
     </StyledHeader>
 
     {count > 0

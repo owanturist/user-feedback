@@ -158,6 +158,7 @@
         "react/prop-types": "off",
         "react/no-unescaped-entities": "off",
         "react/jsx-curly-brace-presence": "error",
+        "react/display-name": "off",
         "padding-line-between-statements": ["error", { "blankLine": "always", "prev": "*", "next": "return" }]
       }
     }
