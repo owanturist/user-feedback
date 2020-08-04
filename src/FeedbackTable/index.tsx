@@ -1,5 +1,6 @@
 import React, { FC, ReactNode } from 'react'
 import styled from '@emotion/styled/macro'
+import * as Skeleton from 'Skeleton'
 
 import * as api from 'api'
 
@@ -15,10 +16,13 @@ const StyledItemProperty = styled.div`
   padding: 10px;
   min-width: 100px;
 
+  @media (min-width: 481px) {
+    text-align: center;
+  }
+
   @media (min-width: 1025px) {
     display: table-cell;
     vertical-align: middle;
-    text-align: center;
     padding: 26px 40px;
   }
 `
@@ -27,17 +31,16 @@ const StyledItemComment = styled(StyledItemProperty)`
   order: 10; /* move comment to the end */
 
   @media (min-width: 481px) {
+    text-align: left;
     width: 100%;
   }
 
   @media (min-width: 1025px) {
-    text-align: left;
   }
 `
 
 const ViewItemProperty: FC<{
-  label: string
-  children: ReactNode
+  label: ReactNode
 }> = ({ label, children }) => (
   <StyledItemProperty>
     <StyledLabel>{label}</StyledLabel>
@@ -124,6 +127,7 @@ const StyledHeader = styled.th`
 `
 
 const StyledRoot = styled.div`
+  width: 100%;
   word-break: break-word;
 
   @media (min-width: 1025px) {
@@ -134,9 +138,11 @@ const StyledRoot = styled.div`
   }
 `
 
-const Feedback: FC<{
+type ViewFeedbackProps = {
   items: Array<api.Feedback>
-}> = ({ items }) => (
+}
+
+const ViewFeedback: FC<ViewFeedbackProps> = ({ items }) => (
   <StyledRoot>
     <StyledHeader>
       <td>Rating</td>
@@ -152,4 +158,72 @@ const Feedback: FC<{
   </StyledRoot>
 )
 
+const Feedback: FC<
+  | (SkeletonProps & { skeleton: true })
+  | (ViewFeedbackProps & { skeleton?: false })
+> = props => {
+  if (props.skeleton) {
+    return <SkeletonFeedback count={props.count} />
+  }
+
+  return <ViewFeedback items={props.items} />
+}
+
 export default Feedback
+
+// S K E L E T O N
+
+const SkeletonItemProperty: FC = () => (
+  <ViewItemProperty label={<Skeleton.Text />}>
+    <Skeleton.Text />
+  </ViewItemProperty>
+)
+
+const SkeletonItem: FC = () => (
+  <StyledItem>
+    <SkeletonItemProperty />
+
+    <StyledItemComment>
+      <StyledLabel>
+        <Skeleton.Text />
+      </StyledLabel>
+      <Skeleton.Text />
+    </StyledItemComment>
+
+    <SkeletonItemProperty />
+
+    <SkeletonItemProperty />
+
+    <SkeletonItemProperty />
+  </StyledItem>
+)
+
+type SkeletonProps = {
+  count?: number
+}
+
+const SkeletonFeedback: FC<SkeletonProps> = ({ count = 1 }) => (
+  <StyledRoot>
+    <StyledHeader>
+      <td>
+        <Skeleton.Text />
+      </td>
+      <td className="text-left">
+        <Skeleton.Text />
+      </td>
+      <td>
+        <Skeleton.Text />
+      </td>
+      <td>
+        <Skeleton.Text />
+      </td>
+      <td>
+        <Skeleton.Text />
+      </td>
+    </StyledHeader>
+
+    {count > 0
+      ? new Array(count).fill(0).map((_, i) => <SkeletonItem key={i} />)
+      : null}
+  </StyledRoot>
+)

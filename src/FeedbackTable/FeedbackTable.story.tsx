@@ -34,7 +34,11 @@ export default {
   component: FeedbackTable
 }
 
-export const Initial: FC = () => <FeedbackTable items={feedbackItems} />
+export const Skeleton: FC = () => (
+  <FeedbackTable skeleton count={number('Count', 10)} />
+)
+
+export const Default: FC = () => <FeedbackTable items={feedbackItems} />
 
 export const Overflowed: FC = () => (
   <FeedbackTable

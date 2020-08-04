@@ -2,8 +2,8 @@ import React, { FC } from 'react'
 import { css, keyframes } from 'emotion/macro'
 import styled from '@emotion/styled/macro'
 
-const COLOR_BASE = '#c8c8c8'
-const COLOR_GLOW = '#f5f5f5'
+const COLOR_BASE = 'hsl(0 0% 86%)'
+const COLOR_GLOW = 'hsl(0 0% 96%)'
 
 const pxOrLen = (value: number | string): string => {
   if (typeof value === 'string') {
@@ -55,16 +55,14 @@ export const Text: FC<{ count?: number }> = ({ count = 1 }) => {
 }
 
 type StyledBlockProp = {
-  radius: string
+  circle?: boolean
 }
 
 const StyledBlock = styled.span<StyledBlockProp>`
   display: block;
   font-size: 0;
-  border-radius: ${props => props.radius};
+  border-radius: ${props => (props.circle ? '50%' : '3px')};
   line-height: 1;
-
-  ${background};
 `
 
 export const Rect: FC<{ width: number | string; height: number | string }> = ({
@@ -73,7 +71,6 @@ export const Rect: FC<{ width: number | string; height: number | string }> = ({
 }) => (
   <StyledBlock
     className={background}
-    radius="3px"
     style={{
       width: pxOrLen(width),
       height: pxOrLen(height)
@@ -84,7 +81,7 @@ export const Rect: FC<{ width: number | string; height: number | string }> = ({
 export const Circle: FC<{ size: number | string }> = ({ size }) => (
   <StyledBlock
     className={background}
-    radius="50%"
+    circle
     style={{
       width: pxOrLen(size),
       height: pxOrLen(size)
