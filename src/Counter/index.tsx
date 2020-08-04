@@ -17,7 +17,7 @@ export const initial: Model = {
 
 export type Msg = utils.Msg<[Model], Model>
 
-const Decrement: Msg = {
+export const Decrement: Msg = {
   update(model: Model): Model {
     return {
       ...model,
@@ -26,7 +26,7 @@ const Decrement: Msg = {
   }
 }
 
-const Increment: Msg = {
+export const Increment: Msg = {
   update(model: Model): Model {
     return {
       ...model,
