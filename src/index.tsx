@@ -1,17 +1,28 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import './index.css'
+
+import React from 'react'
+import ReactDOM from 'react-dom'
+
+import { Cmd, Sub } from 'frctl'
+import Provider from 'Provider'
+import * as App from './App'
+
+const init: [App.Model, Cmd<App.Msg>] = [App.initial, Cmd.none]
+
+const update = (msg: App.Msg, model: App.Model): [App.Model, Cmd<App.Msg>] => {
+  return [msg.update(model), Cmd.none]
+}
+
+const subscription = (): Sub<App.Msg> => Sub.none
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Provider
+      init={init}
+      update={update}
+      view={App.View}
+      subscription={subscription}
+    />
   </React.StrictMode>,
   document.getElementById('root')
-);
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+)
