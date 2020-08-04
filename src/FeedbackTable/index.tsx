@@ -1,11 +1,14 @@
 import React, { FC, ReactNode } from 'react'
 import styled from '@emotion/styled/macro'
-import * as Skeleton from 'Skeleton'
 
+import * as Skelet from 'Skeleton'
+import * as Rating from 'Rating'
 import * as api from 'api'
 
 const StyledLabel = styled.div`
+  margin-bottom: 8px;
   font-weight: 600;
+  font-size: 18px;
 
   @media (min-width: 1025px) {
     display: none;
@@ -16,14 +19,11 @@ const StyledItemProperty = styled.div`
   padding: 10px;
   min-width: 100px;
 
-  @media (min-width: 481px) {
-    text-align: center;
-  }
-
   @media (min-width: 1025px) {
     display: table-cell;
-    vertical-align: middle;
     padding: 26px 40px;
+    vertical-align: middle;
+    text-align: center;
   }
 `
 
@@ -59,7 +59,6 @@ const StyledItem = styled.div`
 
   @media (min-width: 481px) {
     flex-flow: row wrap;
-    justify-content: space-between;
   }
 
   @media (min-width: 1025px) {
@@ -83,7 +82,9 @@ const StyledItem = styled.div`
 
 const ViewItem: FC<{ item: api.Feedback }> = ({ item }) => (
   <StyledItem>
-    <ViewItemProperty label="Rating">{item.rating}</ViewItemProperty>
+    <ViewItemProperty label="Rating">
+      <Rating.Static rating={item.rating} />
+    </ViewItemProperty>
 
     <StyledItemComment>
       <StyledLabel>Comment</StyledLabel>
@@ -138,11 +139,9 @@ const StyledRoot = styled.div`
   }
 `
 
-type ViewFeedbackProps = {
+export const View: FC<{
   items: Array<api.Feedback>
-}
-
-const ViewFeedback: FC<ViewFeedbackProps> = ({ items }) => (
+}> = ({ items }) => (
   <StyledRoot>
     <StyledHeader>
       <td>Rating</td>
@@ -158,36 +157,25 @@ const ViewFeedback: FC<ViewFeedbackProps> = ({ items }) => (
   </StyledRoot>
 )
 
-const Feedback: FC<
-  | (SkeletonProps & { skeleton: true })
-  | (ViewFeedbackProps & { skeleton?: false })
-> = props => {
-  if (props.skeleton) {
-    return <SkeletonFeedback count={props.count} />
-  }
-
-  return <ViewFeedback items={props.items} />
-}
-
-export default Feedback
-
 // S K E L E T O N
 
 const SkeletonItemProperty: FC = () => (
-  <ViewItemProperty label={<Skeleton.Text />}>
-    <Skeleton.Text />
+  <ViewItemProperty label={<Skelet.Text />}>
+    <Skelet.Text />
   </ViewItemProperty>
 )
 
 const SkeletonItem: FC = () => (
   <StyledItem>
-    <SkeletonItemProperty />
+    <ViewItemProperty label={<Skelet.Text />}>
+      <Rating.Skeleton />
+    </ViewItemProperty>
 
     <StyledItemComment>
       <StyledLabel>
-        <Skeleton.Text />
+        <Skelet.Text />
       </StyledLabel>
-      <Skeleton.Text />
+      <Skelet.Text count={2} />
     </StyledItemComment>
 
     <SkeletonItemProperty />
@@ -198,27 +186,25 @@ const SkeletonItem: FC = () => (
   </StyledItem>
 )
 
-type SkeletonProps = {
+export const Skeleton: FC<{
   count?: number
-}
-
-const SkeletonFeedback: FC<SkeletonProps> = ({ count = 1 }) => (
+}> = ({ count = 1 }) => (
   <StyledRoot>
     <StyledHeader>
       <td>
-        <Skeleton.Text />
+        <Skelet.Text />
       </td>
       <td className="text-left">
-        <Skeleton.Text />
+        <Skelet.Text />
       </td>
       <td>
-        <Skeleton.Text />
+        <Skelet.Text />
       </td>
       <td>
-        <Skeleton.Text />
+        <Skelet.Text />
       </td>
       <td>
-        <Skeleton.Text />
+        <Skelet.Text />
       </td>
     </StyledHeader>
 

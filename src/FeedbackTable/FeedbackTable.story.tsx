@@ -2,7 +2,7 @@ import React, { FC } from 'react'
 import { number, text } from '@storybook/addon-knobs'
 
 import * as api from 'api'
-import FeedbackTable from './index'
+import * as FeedbackTable from './index'
 
 const feedbackItems: Array<api.Feedback> = [
   {
@@ -30,18 +30,17 @@ const feedbackItems: Array<api.Feedback> = [
 ]
 
 export default {
-  title: 'FeedbackTable',
-  component: FeedbackTable
+  title: 'FeedbackTable'
 }
 
 export const Skeleton: FC = () => (
-  <FeedbackTable skeleton count={number('Count', 10)} />
+  <FeedbackTable.Skeleton count={number('Count', 10)} />
 )
 
-export const Default: FC = () => <FeedbackTable items={feedbackItems} />
+export const Normal: FC = () => <FeedbackTable.View items={feedbackItems} />
 
 export const Overflowed: FC = () => (
-  <FeedbackTable
+  <FeedbackTable.View
     items={[
       ...feedbackItems,
       {

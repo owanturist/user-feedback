@@ -55,22 +55,25 @@ export const Text: FC<{ count?: number }> = ({ count = 1 }) => {
 }
 
 type StyledBlockProp = {
+  block?: boolean
   circle?: boolean
 }
 
 const StyledBlock = styled.span<StyledBlockProp>`
-  display: block;
+  display: ${props => (props.block ? 'block' : 'inline-block')};
   font-size: 0;
   border-radius: ${props => (props.circle ? '50%' : '3px')};
   line-height: 1;
 `
 
-export const Rect: FC<{ width: number | string; height: number | string }> = ({
-  width,
-  height
-}) => (
+export const Rect: FC<{
+  block?: boolean
+  width: number | string
+  height: number | string
+}> = ({ block, width, height }) => (
   <StyledBlock
     className={background}
+    block={block}
     style={{
       width: pxOrLen(width),
       height: pxOrLen(height)
@@ -78,10 +81,14 @@ export const Rect: FC<{ width: number | string; height: number | string }> = ({
   />
 )
 
-export const Circle: FC<{ size: number | string }> = ({ size }) => (
+export const Circle: FC<{ block?: boolean; size: number | string }> = ({
+  block,
+  size
+}) => (
   <StyledBlock
     className={background}
     circle
+    block={block}
     style={{
       width: pxOrLen(size),
       height: pxOrLen(size)
