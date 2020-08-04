@@ -35,57 +35,51 @@ export const background = css`
   );
 `
 
-type StyledTextProps = {
-  block?: boolean
-}
-
-const StyledText = styled.span<StyledTextProps>`
-  display: ${props => (props.block ? 'block' : 'inline-block')};
-`
-
-const StyledTextLine = styled.span`
+const StyledText = styled.span`
   display: inline-block;
   width: 100%;
   border-radius: 3px;
   line-height: 1;
+  user-select: none;
 `
 
 export const Text: FC<{
-  className?: string
-  block?: boolean
   count?: number
-}> = ({ className, block, count = 1 }) => (
-  <StyledText className={className} block={block}>
-    {new Array(Math.max(0, count)).fill(0).map((_, i) => (
-      <StyledTextLine key={i} className={background}>
-        &zwnj;
-      </StyledTextLine>
-    ))}
-  </StyledText>
-)
+}> = ({ count = 1 }) =>
+  count > 0 ? (
+    <>
+      {new Array(count).fill(0).map((_, i) => (
+        <StyledText key={i} className={background}>
+          &zwnj;
+        </StyledText>
+      ))}
+    </>
+  ) : null
 
 type StyledBlockProp = {
   className?: string
-  block?: boolean
+  inline?: boolean
   circle?: boolean
 }
 
 const StyledBlock = styled.span<StyledBlockProp>`
-  display: ${props => (props.block ? 'block' : 'inline-block')};
+  display: ${props => (props.inline ? 'inline-block' : 'block')};
   font-size: 0;
   border-radius: ${props => (props.circle ? '50%' : '3px')};
   line-height: 1;
+  vertical-align: top;
+  user-select: none;
 `
 
 export const Rect: FC<{
   className?: string
-  block?: boolean
+  inline?: boolean
   width: number | string
   height: number | string
-}> = ({ className, block, width, height }) => (
+}> = ({ className, inline, width, height }) => (
   <StyledBlock
     className={cx(background, className)}
-    block={block}
+    inline={inline}
     style={{
       width: pxOrLen(width),
       height: pxOrLen(height)
@@ -95,13 +89,13 @@ export const Rect: FC<{
 
 export const Circle: FC<{
   className?: string
-  block?: boolean
+  inline?: boolean
   size: number | string
-}> = ({ className, block, size }) => (
+}> = ({ className, inline, size }) => (
   <StyledBlock
     className={cx(background, className)}
     circle
-    block={block}
+    inline={inline}
     style={{
       width: pxOrLen(size),
       height: pxOrLen(size)

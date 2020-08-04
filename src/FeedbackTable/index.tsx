@@ -34,9 +34,6 @@ const StyledItemComment = styled(StyledItemProperty)`
     text-align: left;
     width: 100%;
   }
-
-  @media (min-width: 1025px) {
-  }
 `
 
 const ViewItemProperty: FC<{
@@ -59,6 +56,7 @@ const StyledItem = styled.div`
 
   @media (min-width: 481px) {
     flex-flow: row wrap;
+    justify-content: space-between;
   }
 
   @media (min-width: 1025px) {
@@ -140,9 +138,10 @@ const StyledRoot = styled.div`
 `
 
 export const View: FC<{
+  className?: string
   items: Array<api.Feedback>
-}> = ({ items }) => (
-  <StyledRoot>
+}> = ({ className, items }) => (
+  <StyledRoot className={className}>
     <StyledHeader>
       <td>Rating</td>
       <td className="text-left">Comment</td>
@@ -168,7 +167,7 @@ const SkeletonItemProperty: FC = () => (
 const SkeletonItem: FC = () => (
   <StyledItem>
     <ViewItemProperty label={<Skelet.Text />}>
-      <Rating.Skeleton />
+      <Rating.Skeleton inline />
     </ViewItemProperty>
 
     <StyledItemComment>
@@ -187,9 +186,10 @@ const SkeletonItem: FC = () => (
 )
 
 export const Skeleton: FC<{
+  className?: string
   count?: number
-}> = ({ count = 1 }) => (
-  <StyledRoot>
+}> = ({ className, count = 1 }) => (
+  <StyledRoot className={className}>
     <StyledHeader>
       <td>
         <Skelet.Text />

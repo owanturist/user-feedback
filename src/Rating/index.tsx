@@ -19,6 +19,7 @@ const StyledRoot = styled.span`
   background: #1ea0be;
   font-weight: 600;
   font-size: 22px;
+  font-family: inherit;
   line-height: 36px; /* centers vertically */
   text-align: center;
   user-select: none;
@@ -67,4 +68,7 @@ export const Interactive: FC<{
 
 export const Skeleton: FC<{
   className?: string
-}> = ({ className }) => <Skelet.Circle className={className} size="40px" />
+  inline?: boolean
+}> = ({ className, inline }) => (
+  <Skelet.Circle className={className} inline={inline} size="40px" />
+)

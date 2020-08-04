@@ -11,7 +11,7 @@ import * as Rating from 'Rating'
 
 // M O D E L
 
-type Model = {
+export type Model = {
   search: string
   ratings: Set<api.Rating>
 }
@@ -40,6 +40,8 @@ const cssRating = css`
 `
 
 const StyledRatings = styled.span`
+  display: flex;
+  flex-flow: row nowrap;
   margin-left: 24px;
 `
 
@@ -83,10 +85,11 @@ const StyledRoot = styled.div`
 `
 
 export const View: FC<{
+  className?: string
   model: Model
   dispatch: Dispatch<Msg>
-}> = ({ model, dispatch }) => (
-  <StyledRoot>
+}> = ({ className, model, dispatch }) => (
+  <StyledRoot className={className}>
     <StyledInput
       autoFocus
       tabIndex={0}
@@ -101,8 +104,10 @@ export const View: FC<{
 
 // S K E L E T O N
 
-export const Skeleton: FC = () => (
-  <StyledRoot>
+export const Skeleton: FC<{
+  className?: string
+}> = ({ className }) => (
+  <StyledRoot className={className}>
     <Skelet.Rect width="224px" height="40px" />
 
     <StyledRatings>

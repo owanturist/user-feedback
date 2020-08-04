@@ -1,20 +1,22 @@
 import React, { FC } from 'react'
 import styled from '@emotion/styled/macro'
+import { css } from 'emotion/macro'
 import { Cmd } from 'frctl'
-import RemoteData from 'frctl/RemoteData'
 
-import * as api from 'api'
 import { Dispatch } from 'Provider'
+import * as api from 'api'
+import * as Filters from 'Filters'
+import * as FeedbackTable from 'FeedbackTable'
 import * as utils from 'utils'
 
 // M O D E L
 
 export type Model = {
-  feedback: RemoteData<string, Array<api.Feedback>>
+  filters: Filters.Model
 }
 
 export const initial: Model = {
-  feedback: RemoteData.Loading
+  filters: Filters.initial
 }
 
 // U P D A T E
@@ -23,12 +25,60 @@ export type Msg = utils.Msg<[Model], [Model, Cmd<Msg>]>
 
 // V I E W
 
+const cssFeedbackTable = css`
+  margin-top: 25px;
+`
+
+const StyledContent = styled.div`
+  box-sizing: border-box;
+  margin: 30px auto 0;
+  padding: 0 16px 16px;
+  width: 100%;
+  max-width: 1454px;
+`
+
 const StyledIcon = styled.span`
+  position: relative;
   box-sizing: border-box;
   border: 3px solid;
   border-radius: 50%;
   width: 27px;
   height: 27px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 4px;
+    left: 0;
+    margin: auto;
+    width: 0;
+    height: 0;
+    border-width: 0 2px 10px;
+    border-style: solid;
+    border-color: transparent transparent currentColor;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 0;
+    left: 0;
+    margin: auto;
+    border-radius: 50%;
+    width: 3px;
+    height: 3px;
+    background: currentColor;
+    box-shadow: -5px 2px 0 0 currentColor, 5px 2px 0 0 currentColor;
+  }
+`
+
+const StyledPageTitle = styled.h1`
+  margin: 0 0 0 16px;
+  font-weight: 600;
+  font-size: 26px;
+  letter-spacing: 0.02em;
 `
 
 const StyledHeader = styled.header`
@@ -43,12 +93,13 @@ const StyledHeader = styled.header`
   user-select: none;
 `
 
-const StyledPageTitle = styled.h1`
-  margin: 0 0 0 15px;
-  font-weight: 600;
-  font-size: 26px;
-  letter-spacing: 0.02em;
-`
+const ViewHeader: FC = () => (
+  <StyledHeader>
+    {/* @TODO Add svg icon */}
+    <StyledIcon />
+    <StyledPageTitle>Dashboard</StyledPageTitle>
+  </StyledHeader>
+)
 
 const StyledRoot = styled.div`
   display: flex;
@@ -58,14 +109,36 @@ const StyledRoot = styled.div`
 `
 
 export const View: FC<{
+  feedback: Array<api.Feedback>
   model: Model
   dispatch: Dispatch<Msg>
-}> = ({ model }) => (
+}> = ({ feedback, model }) => (
   <StyledRoot>
-    <StyledHeader>
-      {/* @TODO Add svg icon */}
-      <StyledIcon />
-      <StyledPageTitle>Dashboard</StyledPageTitle>
-    </StyledHeader>
+    <ViewHeader />
+
+    <StyledContent>
+      <Filters.View
+        model={model.filters}
+        dispatch={() => {
+          /* noop */
+        }}
+      />
+
+      <FeedbackTable.View className={cssFeedbackTable} items={feedback} />
+    </StyledContent>
+  </StyledRoot>
+)
+
+// S K E L E T O N
+
+export const Skeleton: FC = () => (
+  <StyledRoot>
+    <ViewHeader />
+
+    <StyledContent>
+      <Filters.Skeleton />
+
+      <FeedbackTable.Skeleton className={cssFeedbackTable} count={20} />
+    </StyledContent>
   </StyledRoot>
 )
