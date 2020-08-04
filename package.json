@@ -17,10 +17,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": [
-        "yarn test -- --watchAll=false",
-        "yarn cy:run"
-      ],
+      "pre-push": "yarn test -- --watchAll=false & yarn cy:run",
       "pre-commit": "lint-staged"
     }
   },
