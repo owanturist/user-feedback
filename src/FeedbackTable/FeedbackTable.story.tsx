@@ -42,7 +42,7 @@ export const Overflowed: FC = () => (
       ...feedbackItems,
       {
         id: '3',
-        rating: number('rating', 10000000),
+        rating: number('Rating', 10000000),
         comment: text(
           'Comment',
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas at mauris gravida, scelerisque nibh id, dapibus turpis. Mauris et vestibulum lacus, vitae ultricies augue. Phasellus id sapien vel ligula posuere pretium. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Ut posuere est ut risus ullamcorper, molestie ullamcorper nulla tempor. Duis semper sed tortor sed fermentum. Integer accumsan fringilla rhoncus.'

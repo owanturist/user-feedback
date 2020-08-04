@@ -1,18 +1,20 @@
 import React, { FC } from 'react'
 import styled from '@emotion/styled/macro'
 import { Cmd } from 'frctl'
+import RemoteData from 'frctl/RemoteData'
 
+import * as api from 'api'
 import { Dispatch } from 'Provider'
 import * as utils from 'utils'
 
 // M O D E L
 
 export type Model = {
-  foo: number
+  feedback: RemoteData<string, Array<api.Feedback>>
 }
 
 export const initial: Model = {
-  foo: 0
+  feedback: RemoteData.Loading
 }
 
 // U P D A T E
