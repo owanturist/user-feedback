@@ -12,6 +12,7 @@ const StyledRoot = styled.span`
   display: inline-block;
   width: 40px;
   height: 40px;
+  padding: 0;
   border-radius: 50%;
   border: 2px solid #1ea0be;
   color: #e5ecf2;
@@ -27,13 +28,21 @@ type StyledInteractiveRootProps = {
   active?: boolean
 }
 
-const StyledInteractiveRoot = styled(StyledRoot)<StyledInteractiveRootProps>`
+const StyledInteractiveRoot = styled(StyledRoot.withComponent('button'))<
+  StyledInteractiveRootProps
+>`
   outline: none;
   cursor: pointer;
   color: ${props => !props.active && '#ddd'};
   background: ${props => !props.active && 'transparent'};
   border-color: ${props => !props.active && '#ddd'};
   transition: all 0.2s ease-in-out;
+
+  &:focus {
+    box-shadow: 0 0 0 2px
+      ${props =>
+        props.active ? 'rgb(30, 160, 190, 0.5)' : 'rgb(221, 221, 221, 0.6)'};
+  }
 `
 
 export const Static: FC<{
@@ -41,11 +50,13 @@ export const Static: FC<{
 }> = ({ rating }) => <StyledRoot>{limitRating(rating)}</StyledRoot>
 
 export const Interactive: FC<{
+  className?: string
   rating: api.Rating
   active: boolean
   onChange(active: boolean): void
-}> = ({ rating, active, onChange }) => (
+}> = ({ className, rating, active, onChange }) => (
   <StyledInteractiveRoot
+    className={className}
     tabIndex={0}
     active={active}
     onClick={() => onChange(!active)}
@@ -54,4 +65,6 @@ export const Interactive: FC<{
   </StyledInteractiveRoot>
 )
 
-export const Skeleton: FC = () => <Skelet.Circle size="40px" />
+export const Skeleton: FC<{
+  className?: string
+}> = ({ className }) => <Skelet.Circle className={className} size="40px" />

@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { css, keyframes } from 'emotion/macro'
+import { css, cx, keyframes } from 'emotion/macro'
 import styled from '@emotion/styled/macro'
 
 const COLOR_BASE = 'hsl(0 0% 86%)'
@@ -35,26 +35,37 @@ export const background = css`
   );
 `
 
-const StyledText = styled.span`
+type StyledTextProps = {
+  block?: boolean
+}
+
+const StyledText = styled.span<StyledTextProps>`
+  display: ${props => (props.block ? 'block' : 'inline-block')};
+`
+
+const StyledTextLine = styled.span`
   display: inline-block;
   width: 100%;
   border-radius: 3px;
   line-height: 1;
 `
 
-export const Text: FC<{ count?: number }> = ({ count = 1 }) => {
-  return count > 0 ? (
-    <>
-      {new Array(count).fill(0).map((_, i) => (
-        <StyledText key={i} className={background}>
-          &zwnj;
-        </StyledText>
-      ))}
-    </>
-  ) : null
-}
+export const Text: FC<{
+  className?: string
+  block?: boolean
+  count?: number
+}> = ({ className, block, count = 1 }) => (
+  <StyledText className={className} block={block}>
+    {new Array(Math.max(0, count)).fill(0).map((_, i) => (
+      <StyledTextLine key={i} className={background}>
+        &zwnj;
+      </StyledTextLine>
+    ))}
+  </StyledText>
+)
 
 type StyledBlockProp = {
+  className?: string
   block?: boolean
   circle?: boolean
 }
@@ -67,12 +78,13 @@ const StyledBlock = styled.span<StyledBlockProp>`
 `
 
 export const Rect: FC<{
+  className?: string
   block?: boolean
   width: number | string
   height: number | string
-}> = ({ block, width, height }) => (
+}> = ({ className, block, width, height }) => (
   <StyledBlock
-    className={background}
+    className={cx(background, className)}
     block={block}
     style={{
       width: pxOrLen(width),
@@ -81,12 +93,13 @@ export const Rect: FC<{
   />
 )
 
-export const Circle: FC<{ block?: boolean; size: number | string }> = ({
-  block,
-  size
-}) => (
+export const Circle: FC<{
+  className?: string
+  block?: boolean
+  size: number | string
+}> = ({ className, block, size }) => (
   <StyledBlock
-    className={background}
+    className={cx(background, className)}
     circle
     block={block}
     style={{
