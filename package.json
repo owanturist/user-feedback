@@ -8,7 +8,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint ./ --config=.eslintrc.prod.json --ext=js,ts,tsx",
-    "prettify": "prettier \"{src,cypress}/**/*.{js,ts,tsx,json,md}\" --write"
+    "prettify": "prettier \"{src,cypress}/**/*.{js,ts,tsx,json,md}\" --write",
+    "analyze": "source-map-explorer 'build/static/js/**/*.js' --gzip"
   },
   "husky": {
     "hooks": {
@@ -16,16 +17,17 @@
     }
   },
   "lint-staged": {
-    "{src,cypress}/**/*.{js,ts,tsx,json,md}": [
+    "{src}/**/*.{js,ts,tsx,json,md}": [
       "prettier --write"
     ],
-    "{src,cypress}/**/*.{js,ts,tsx}": [
+    "{src}/**/*.{js,ts,tsx}": [
       "eslint ./ --config=.eslintrc.prod.json --fix"
     ]
   },
   "dependencies": {
     "@types/react": "^16.9.44",
     "@types/react-dom": "^16.9.8",
+    "frctl": "^2.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
   },
@@ -45,6 +47,7 @@
     "lint-staged": "^10.2.11",
     "prettier": "^2.0.5",
     "react-scripts": "^3.4.1",
+    "source-map-explorer": "^2.4.2",
     "typescript": "^3.9.7"
   }
 }
