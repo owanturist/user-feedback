@@ -18,8 +18,6 @@ export const Initial: FC = () => (
   <App.View model={initial} dispatch={action('dispatch')} />
 )
 
-// Http.Error.
-
 export const FailureNetworkError: FC = () => (
   <App.View
     model={{

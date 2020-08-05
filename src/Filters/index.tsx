@@ -3,7 +3,7 @@ import styled from '@emotion/styled/macro'
 import { css } from 'emotion/macro'
 import Set from 'frctl/Set'
 
-import { Dispatch, memoWithDispatch } from 'Provider'
+import { Dispatch } from 'Provider'
 import * as utils from 'utils'
 import * as api from 'api'
 import * as Skelet from 'Skeleton'
@@ -87,7 +87,7 @@ const StyledRatings = styled.span`
 const ViewRatings: FC<{
   selected: Set<api.Rating>
   dispatch: Dispatch<Msg>
-}> = memoWithDispatch(({ selected, dispatch }) => (
+}> = React.memo(({ selected, dispatch }) => (
   <StyledRatings>
     {RATINGS_RANGE.map(rating => (
       <Rating.Interactive
@@ -130,7 +130,7 @@ export const View: FC<{
   className?: string
   model: Model
   dispatch: Dispatch<Msg>
-}> = memoWithDispatch(({ className, model, dispatch }) => (
+}> = React.memo(({ className, model, dispatch }) => (
   <StyledRoot className={className}>
     <StyledInput
       data-cy="filters__search-input"

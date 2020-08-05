@@ -6,7 +6,7 @@ import RemoteData from 'frctl/RemoteData'
 import Either from 'frctl/Either'
 
 import * as api from 'api'
-import { Dispatch } from 'Provider'
+import { Dispatch, composeDispatch } from 'Provider'
 import * as Dashboard from 'Dashboard'
 import * as utils from 'utils'
 
@@ -29,7 +29,7 @@ export const init: [Model, Cmd<Msg>] = [
 
 export type Msg = utils.Msg<[Model], [Model, Cmd<Msg>]>
 
-const LoadFeedbac: Msg = {
+const LoadFeedback: Msg = {
   update(model: Model): [Model, Cmd<Msg>] {
     return [
       {
@@ -241,22 +241,21 @@ const ViewError: FC<{ error: Http.Error; onTryAgain(): void }> = ({
   </StyledError>
 )
 
-export const View: FC<{ model: Model; dispatch: Dispatch<Msg> }> = ({
-  model,
-  dispatch
-}) =>
-  model.feedback.cata({
-    Loading: () => <Dashboard.Skeleton />,
+export const View: FC<{ model: Model; dispatch: Dispatch<Msg> }> = React.memo(
+  ({ model, dispatch }) =>
+    model.feedback.cata({
+      Loading: () => <Dashboard.Skeleton />,
 
-    Failure: error => (
-      <ViewError error={error} onTryAgain={() => dispatch(LoadFeedbac)} />
-    ),
+      Failure: error => (
+        <ViewError error={error} onTryAgain={() => dispatch(LoadFeedback)} />
+      ),
 
-    Succeed: feedback => (
-      <Dashboard.View
-        feedback={feedback}
-        model={model.dashboard}
-        dispatch={msg => dispatch(DashboardMsg(msg))}
-      />
-    )
-  })
+      Succeed: feedback => (
+        <Dashboard.View
+          feedback={feedback}
+          model={model.dashboard}
+          dispatch={composeDispatch(dispatch, DashboardMsg)}
+        />
+      )
+    })
+)

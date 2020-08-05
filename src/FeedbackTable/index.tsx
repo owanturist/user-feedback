@@ -155,6 +155,13 @@ const StyledEmpty = styled.div`
   text-align: center;
 `
 
+const ViewEmpty: FC<{ className?: string }> = React.memo(({ className }) => (
+  <StyledEmpty className={className}>
+    <StyledEmptyTableIcon />
+    No Data
+  </StyledEmpty>
+))
+
 const StyledRoot = styled.div`
   width: 100%;
   word-break: break-word;
@@ -180,10 +187,7 @@ export const View: FC<{
       ))}
     </StyledRoot>
   ) : (
-    <StyledEmpty className={className}>
-      <StyledEmptyTableIcon />
-      No Data
-    </StyledEmpty>
+    <ViewEmpty className={className} />
   )
 )
 

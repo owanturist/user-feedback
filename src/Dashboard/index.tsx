@@ -3,7 +3,7 @@ import styled from '@emotion/styled/macro'
 import { css } from 'emotion/macro'
 import { Cmd } from 'frctl'
 
-import { Dispatch, memoWithDispatch } from 'Provider'
+import { Dispatch, composeDispatch } from 'Provider'
 import * as api from 'api'
 import * as Filters from 'Filters'
 import * as FeedbackTable from 'FeedbackTable'
@@ -97,7 +97,7 @@ export const View: FC<{
   feedback: Array<api.Feedback>
   model: Model
   dispatch: Dispatch<Msg>
-}> = memoWithDispatch(({ feedback, model, dispatch }) => {
+}> = React.memo(({ feedback, model, dispatch }) => {
   const items = React.useMemo(
     () => feedback.filter(item => Filters.isPass(model.filters, item)),
     [feedback, model.filters]
@@ -110,7 +110,7 @@ export const View: FC<{
       <StyledContent>
         <Filters.View
           model={model.filters}
-          dispatch={msg => dispatch(FiltersMsg(msg))}
+          dispatch={composeDispatch(dispatch, FiltersMsg)}
         />
 
         <FeedbackTable.View className={cssFeedbackTable} items={items} />
