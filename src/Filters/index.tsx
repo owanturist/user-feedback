@@ -128,49 +128,41 @@ const StyledRoot = styled.div`
   flex-flow: row nowrap;
 `
 
-export const View: React.ForwardRefExoticComponent<
-  {
-    className?: string
-    model: Model
-    dispatch: Dispatch<Msg>
-  } & React.RefAttributes<HTMLDivElement>
-> = React.memo(
-  React.forwardRef(({ className, model, dispatch }, ref) => (
-    <StyledRoot className={className} ref={ref}>
-      <StyledInput
-        data-cy="filters__search-input"
-        autoFocus
-        tabIndex={0}
-        type="search"
-        placeholder="Search here!"
-        value={model.search}
-        onChange={React.useCallback(
-          event => dispatch(ChangeSearch(event.target.value)),
-          [dispatch]
-        )}
-      />
+export const View: FC<{
+  className?: string
+  model: Model
+  dispatch: Dispatch<Msg>
+}> = React.memo(({ className, model, dispatch }) => (
+  <StyledRoot className={className}>
+    <StyledInput
+      data-cy="filters__search-input"
+      autoFocus
+      tabIndex={0}
+      type="search"
+      placeholder="Search here!"
+      value={model.search}
+      onChange={React.useCallback(
+        event => dispatch(ChangeSearch(event.target.value)),
+        [dispatch]
+      )}
+    />
 
-      <ViewRatings selected={model.ratings} dispatch={dispatch} />
-    </StyledRoot>
-  ))
-)
+    <ViewRatings selected={model.ratings} dispatch={dispatch} />
+  </StyledRoot>
+))
 
 // S K E L E T O N
 
-export const Skeleton: React.ForwardRefExoticComponent<
-  {
-    className?: string
-  } & React.RefAttributes<HTMLDivElement>
-> = React.memo(
-  React.forwardRef(({ className }, ref) => (
-    <StyledRoot className={className} ref={ref}>
-      <Skelet.Rect width="224px" height="40px" />
+export const Skeleton: FC<{
+  className?: string
+}> = React.memo(({ className }) => (
+  <StyledRoot className={className}>
+    <Skelet.Rect width="224px" height="40px" />
 
-      <StyledRatings>
-        {RATINGS_RANGE.map(rating => (
-          <Rating.Skeleton key={rating} className={cssRating} />
-        ))}
-      </StyledRatings>
-    </StyledRoot>
-  ))
-)
+    <StyledRatings>
+      {RATINGS_RANGE.map(rating => (
+        <Rating.Skeleton key={rating} className={cssRating} />
+      ))}
+    </StyledRatings>
+  </StyledRoot>
+))

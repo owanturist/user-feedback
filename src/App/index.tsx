@@ -137,7 +137,6 @@ const StyledErrorPre = styled.pre`
 const StyledErrorPanel = styled.div`
   box-sizing: border-box;
   max-width: 560px;
-  max-height: 100%;
   padding: 50px;
   border-radius: 3px;
   color: #59636b;
