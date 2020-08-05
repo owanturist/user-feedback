@@ -3,7 +3,7 @@ import styled from '@emotion/styled/macro'
 import { css } from 'emotion/macro'
 import { Cmd } from 'frctl'
 
-import { Dispatch } from 'Provider'
+import { Dispatch, memoWithDispatch } from 'Provider'
 import * as api from 'api'
 import * as Filters from 'Filters'
 import * as FeedbackTable from 'FeedbackTable'
@@ -22,6 +22,22 @@ export const initial: Model = {
 // U P D A T E
 
 export type Msg = utils.Msg<[Model], [Model, Cmd<Msg>]>
+
+const FiltersMsg = utils.cons(
+  class FiltersMsg implements Msg {
+    public constructor(private readonly msg: Filters.Msg) {}
+
+    public update(model: Model): [Model, Cmd<Msg>] {
+      return [
+        {
+          ...model,
+          filters: this.msg.update(model.filters)
+        },
+        Cmd.none
+      ]
+    }
+  }
+)
 
 // V I E W
 
@@ -93,13 +109,13 @@ const StyledHeader = styled.header`
   user-select: none;
 `
 
-const ViewHeader: FC = () => (
+const ViewHeader: FC = React.memo(() => (
   <StyledHeader>
     {/* @TODO Add svg icon */}
     <StyledIcon />
     <StyledPageTitle>Dashboard</StyledPageTitle>
   </StyledHeader>
-)
+))
 
 const StyledRoot = styled.div`
   display: flex;
@@ -112,26 +128,24 @@ export const View: FC<{
   feedback: Array<api.Feedback>
   model: Model
   dispatch: Dispatch<Msg>
-}> = ({ feedback, model }) => (
+}> = memoWithDispatch(({ feedback, model, dispatch }) => (
   <StyledRoot>
     <ViewHeader />
 
     <StyledContent>
       <Filters.View
         model={model.filters}
-        dispatch={() => {
-          /* noop */
-        }}
+        dispatch={msg => dispatch(FiltersMsg(msg))}
       />
 
       <FeedbackTable.View className={cssFeedbackTable} items={feedback} />
     </StyledContent>
   </StyledRoot>
-)
+))
 
 // S K E L E T O N
 
-export const Skeleton: FC = () => (
+export const Skeleton: FC = React.memo(() => (
   <StyledRoot>
     <ViewHeader />
 
@@ -141,4 +155,4 @@ export const Skeleton: FC = () => (
       <FeedbackTable.Skeleton className={cssFeedbackTable} count={20} />
     </StyledContent>
   </StyledRoot>
-)
+))

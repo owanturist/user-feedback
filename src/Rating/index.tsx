@@ -1,7 +1,8 @@
 import React, { FC } from 'react'
 import styled from '@emotion/styled/macro'
-import * as Skelet from 'Skeleton'
+import { shallowEqual } from 'shallow-equal-object'
 
+import * as Skelet from 'Skeleton'
 import * as api from 'api'
 
 const limitRating = (rating: number): string =>
@@ -48,27 +49,31 @@ const StyledInteractiveRoot = styled(StyledRoot.withComponent('button'))<
 
 export const Static: FC<{
   rating: api.Rating
-}> = ({ rating }) => <StyledRoot>{limitRating(rating)}</StyledRoot>
+}> = React.memo(({ rating }) => <StyledRoot>{limitRating(rating)}</StyledRoot>)
 
 export const Interactive: FC<{
   className?: string
   rating: api.Rating
   active: boolean
   onChange(active: boolean): void
-}> = ({ className, rating, active, onChange }) => (
-  <StyledInteractiveRoot
-    className={className}
-    tabIndex={0}
-    active={active}
-    onClick={() => onChange(!active)}
-  >
-    {limitRating(rating)}
-  </StyledInteractiveRoot>
+}> = React.memo(
+  ({ className, rating, active, onChange }) => (
+    <StyledInteractiveRoot
+      className={className}
+      tabIndex={0}
+      active={active}
+      onClick={() => onChange(!active)}
+    >
+      {limitRating(rating)}
+    </StyledInteractiveRoot>
+  ),
+  ({ onChange: _, ...prev }, { onChange: __, ...next }) =>
+    shallowEqual(prev, next)
 )
 
 export const Skeleton: FC<{
   className?: string
   inline?: boolean
-}> = ({ className, inline }) => (
+}> = React.memo(({ className, inline }) => (
   <Skelet.Circle className={className} inline={inline} size="40px" />
-)
+))

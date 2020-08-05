@@ -3,7 +3,7 @@ import styled from '@emotion/styled/macro'
 import { css } from 'emotion/macro'
 import Set from 'frctl/Set'
 
-import { Dispatch } from 'Provider'
+import { Dispatch, memoWithDispatch } from 'Provider'
 import * as utils from 'utils'
 import * as api from 'api'
 import * as Skelet from 'Skeleton'
@@ -18,12 +18,44 @@ export type Model = {
 
 export const initial: Model = {
   search: '',
-  ratings: Set.empty as Set<api.Rating>
+  ratings: Set.fromList([
+    api.Rating.One,
+    api.Rating.Two,
+    api.Rating.Three,
+    api.Rating.Four,
+    api.Rating.Five
+  ])
 }
 
 // U P D A T E
 
 export type Msg = utils.Msg<[Model], Model>
+
+const ChangeSearch = utils.cons(
+  class ChangeSearch implements Msg {
+    public constructor(private readonly input: string) {}
+
+    public update(model: Model): Model {
+      return {
+        ...model,
+        search: this.input
+      }
+    }
+  }
+)
+
+const ToggleRating = utils.cons(
+  class ToggleRating implements Msg {
+    public constructor(private readonly rating: api.Rating) {}
+
+    public update(model: Model): Model {
+      return {
+        ...model,
+        ratings: model.ratings.toggle(this.rating)
+      }
+    }
+  }
+)
 
 // V I E W
 
@@ -48,7 +80,7 @@ const StyledRatings = styled.span`
 const ViewRatings: FC<{
   selected: Set<api.Rating>
   dispatch: Dispatch<Msg>
-}> = ({ selected }) => (
+}> = memoWithDispatch(({ selected, dispatch }) => (
   <StyledRatings>
     {RATINGS_RANGE.map(rating => (
       <Rating.Interactive
@@ -56,13 +88,11 @@ const ViewRatings: FC<{
         className={cssRating}
         active={selected.member(rating)}
         rating={rating}
-        onChange={() => {
-          /* noop */
-        }}
+        onChange={() => dispatch(ToggleRating(rating))}
       />
     ))}
   </StyledRatings>
-)
+))
 
 const StyledInput = styled.input`
   box-sizing: border-box;
@@ -77,6 +107,11 @@ const StyledInput = styled.input`
   letter-spacing: 0.02em;
   font-family: inherit;
   outline: none;
+  transition: box-shadow 0.2s ease-in-out;
+
+  &:focus {
+    box-shadow: 0 0 0 2px rgb(221, 221, 221, 0.6);
+  }
 `
 
 const StyledRoot = styled.div`
@@ -88,7 +123,7 @@ export const View: FC<{
   className?: string
   model: Model
   dispatch: Dispatch<Msg>
-}> = ({ className, model, dispatch }) => (
+}> = memoWithDispatch(({ className, model, dispatch }) => (
   <StyledRoot className={className}>
     <StyledInput
       autoFocus
@@ -96,17 +131,18 @@ export const View: FC<{
       type="search"
       placeholder="Search here!"
       value={model.search}
+      onChange={event => dispatch(ChangeSearch(event.target.value))}
     />
 
     <ViewRatings selected={model.ratings} dispatch={dispatch} />
   </StyledRoot>
-)
+))
 
 // S K E L E T O N
 
 export const Skeleton: FC<{
   className?: string
-}> = ({ className }) => (
+}> = React.memo(({ className }) => (
   <StyledRoot className={className}>
     <Skelet.Rect width="224px" height="40px" />
 
@@ -116,4 +152,4 @@ export const Skeleton: FC<{
       ))}
     </StyledRatings>
   </StyledRoot>
-)
+))

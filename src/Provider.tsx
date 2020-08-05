@@ -1,7 +1,28 @@
-import React from 'react'
+import React, { FC, PropsWithChildren, NamedExoticComponent } from 'react'
 import { Program, Worker, Cmd, Sub } from 'frctl'
+import { shallowEqual } from 'shallow-equal-object'
 
 export type Dispatch<Msg> = (msg: Msg) => void
+
+type Memo = <Msg, P extends { dispatch: Dispatch<Msg> }>(
+  Component: FC<P>,
+  propsAreEqual?: (
+    prevProps: Readonly<PropsWithChildren<Omit<P, 'dispatch'>>>,
+    nextProps: Readonly<PropsWithChildren<Omit<P, 'dispatch'>>>
+  ) => boolean
+) => NamedExoticComponent<P>
+
+export const memoWithDispatch: Memo = (Component, propsAreEqual) =>
+  React.memo(
+    Component,
+    ({ dispatch: _, ...prev }, { dispatch: __, ...next }) => {
+      if (typeof propsAreEqual === 'undefined') {
+        return shallowEqual(prev, next)
+      }
+
+      return propsAreEqual(prev, next)
+    }
+  )
 
 export type Props<Model, Msg> = {
   view: React.ComponentType<{

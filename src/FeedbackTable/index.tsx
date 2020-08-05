@@ -78,7 +78,7 @@ const StyledItem = styled.div`
   }
 `
 
-const ViewItem: FC<{ item: api.Feedback }> = ({ item }) => (
+const ViewItem: FC<{ item: api.Feedback }> = React.memo(({ item }) => (
   <StyledItem>
     <ViewItemProperty label="Rating">
       <Rating.Static rating={item.rating} />
@@ -101,7 +101,7 @@ const ViewItem: FC<{ item: api.Feedback }> = ({ item }) => (
       {item.browser.platform}
     </ViewItemProperty>
   </StyledItem>
-)
+))
 
 const StyledHeaderCell = styled.div`
   display: table-cell;
@@ -144,7 +144,7 @@ const StyledRoot = styled.div`
 export const View: FC<{
   className?: string
   items: Array<api.Feedback>
-}> = ({ className, items }) => (
+}> = React.memo(({ className, items }) => (
   <StyledRoot className={className}>
     <StyledHeader>
       <StyledHeaderCell>Rating</StyledHeaderCell>
@@ -158,7 +158,7 @@ export const View: FC<{
       <ViewItem key={item.id} item={item} />
     ))}
   </StyledRoot>
-)
+))
 
 // S K E L E T O N
 
@@ -168,7 +168,7 @@ const SkeletonItemProperty: FC = () => (
   </ViewItemProperty>
 )
 
-const SkeletonItem: FC = () => (
+const SkeletonItem: FC = React.memo(() => (
   <StyledItem>
     <ViewItemProperty label={<Skelet.Text />}>
       <Rating.Skeleton inline />
@@ -187,12 +187,12 @@ const SkeletonItem: FC = () => (
 
     <SkeletonItemProperty />
   </StyledItem>
-)
+))
 
 export const Skeleton: FC<{
   className?: string
   count?: number
-}> = ({ className, count = 1 }) => (
+}> = React.memo(({ className, count = 1 }) => (
   <StyledRoot className={className}>
     <StyledHeader>
       <StyledHeaderCell>
@@ -216,4 +216,4 @@ export const Skeleton: FC<{
       ? new Array(count).fill(0).map((_, i) => <SkeletonItem key={i} />)
       : null}
   </StyledRoot>
-)
+))

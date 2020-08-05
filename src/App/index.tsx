@@ -46,6 +46,24 @@ const LoadFeedbackDone = utils.cons(
   }
 )
 
+const DashboardMsg = utils.cons(
+  class DashboardMsg_ implements Msg {
+    public constructor(private readonly msg: Dashboard.Msg) {}
+
+    public update(model: Model): [Model, Cmd<Msg>] {
+      const [nextDashboard, cmd] = this.msg.update(model.dashboard)
+
+      return [
+        {
+          ...model,
+          dashboard: nextDashboard
+        },
+        cmd.map(DashboardMsg)
+      ]
+    }
+  }
+)
+
 // V I E W
 
 export const View: FC<{ model: Model; dispatch: Dispatch<Msg> }> = ({
@@ -61,9 +79,7 @@ export const View: FC<{ model: Model; dispatch: Dispatch<Msg> }> = ({
       <Dashboard.View
         feedback={feedback}
         model={model.dashboard}
-        dispatch={() => {
-          /** */
-        }}
+        dispatch={msg => dispatch(DashboardMsg(msg))}
       />
     )
   })
