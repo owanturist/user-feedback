@@ -8,6 +8,7 @@ import * as api from 'api'
 import * as Filters from 'Filters'
 import * as FeedbackTable from 'FeedbackTable'
 import * as utils from 'utils'
+import { ReactComponent as TachometerIcon } from './tachometer.svg'
 
 // M O D E L
 
@@ -53,41 +54,9 @@ const StyledContent = styled.div`
   max-width: 1454px;
 `
 
-const StyledIcon = styled.span`
-  position: relative;
-  box-sizing: border-box;
-  border: 3px solid;
-  border-radius: 50%;
+const StyledIcon = styled(TachometerIcon)`
   width: 27px;
   height: 27px;
-
-  &::before {
-    content: '';
-    position: absolute;
-    right: 0;
-    bottom: 4px;
-    left: 0;
-    margin: auto;
-    width: 0;
-    height: 0;
-    border-width: 0 2px 10px;
-    border-style: solid;
-    border-color: transparent transparent currentColor;
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 2px;
-    right: 0;
-    left: 0;
-    margin: auto;
-    border-radius: 50%;
-    width: 3px;
-    height: 3px;
-    background: currentColor;
-    box-shadow: -5px 2px 0 0 currentColor, 5px 2px 0 0 currentColor;
-  }
 `
 
 const StyledPageTitle = styled.h1`
