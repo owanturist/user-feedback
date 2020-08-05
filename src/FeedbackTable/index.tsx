@@ -80,7 +80,7 @@ const StyledItem = styled.div`
 `
 
 const ViewItem: FC<{ item: api.Feedback }> = React.memo(({ item }) => (
-  <StyledItem>
+  <StyledItem data-cy="feedback-table__item">
     <ViewItemProperty label="Rating">
       <Rating.Static rating={item.rating} />
     </ViewItemProperty>
