@@ -153,7 +153,7 @@ export const View: FC<{
 // S K E L E T O N
 
 export const Skeleton: FC = React.memo(() => (
-  <StyledRoot>
+  <StyledRoot data-cy="dashboard__skeleton">
     <ViewHeader />
 
     <StyledContent>
