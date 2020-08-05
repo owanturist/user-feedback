@@ -4,6 +4,7 @@ import styled from '@emotion/styled/macro'
 import * as Skelet from 'Skeleton'
 import * as Rating from 'Rating'
 import * as api from 'api'
+import { ReactComponent as EmptyTableIcon } from './empty-table.svg'
 
 const StyledLabel = styled.div`
   margin-bottom: 8px;
@@ -16,7 +17,7 @@ const StyledLabel = styled.div`
 `
 
 const StyledItemProperty = styled.div`
-  padding: 10px;
+  padding: 20px;
   min-width: 100px;
 
   @media (min-width: 1025px) {
@@ -139,6 +140,21 @@ const ViewHeader: FC = React.memo(() => (
   </StyledHeader>
 ))
 
+const StyledEmptyTableIcon = styled(EmptyTableIcon)`
+  display: block;
+  margin: 0 auto 5px;
+  width: 80px;
+`
+
+const StyledEmpty = styled.div`
+  padding: 50px;
+  background: #fff;
+  border-radius: 5px;
+  color: #59636b;
+  box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);
+  text-align: center;
+`
+
 const StyledRoot = styled.div`
   width: 100%;
   word-break: break-word;
@@ -154,15 +170,22 @@ const StyledRoot = styled.div`
 export const View: FC<{
   className?: string
   items: Array<api.Feedback>
-}> = React.memo(({ className, items }) => (
-  <StyledRoot className={className}>
-    <ViewHeader />
+}> = React.memo(({ className, items }) =>
+  items.length > 0 ? (
+    <StyledRoot className={className}>
+      <ViewHeader />
 
-    {items.map(item => (
-      <ViewItem key={item.id} item={item} />
-    ))}
-  </StyledRoot>
-))
+      {items.map(item => (
+        <ViewItem key={item.id} item={item} />
+      ))}
+    </StyledRoot>
+  ) : (
+    <StyledEmpty className={className}>
+      <StyledEmptyTableIcon />
+      No Data
+    </StyledEmpty>
+  )
+)
 
 // S K E L E T O N
 

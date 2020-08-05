@@ -37,6 +37,26 @@ export const Skeleton: FC = () => (
   <FeedbackTable.Skeleton count={number('Count', 10)} />
 )
 
+export const Empty: FC = () => <FeedbackTable.View items={[]} />
+
+export const CSRF: FC = () => (
+  <FeedbackTable.View
+    items={[
+      {
+        id: '0',
+        rating: 2,
+        comment: '<script>alert("You are hacked!")</script>',
+        browser: {
+          name: 'Chrome',
+          version: '32.0',
+          device: 'Desktop',
+          platform: 'MacOSX'
+        }
+      }
+    ]}
+  />
+)
+
 export const Normal: FC = () => <FeedbackTable.View items={feedbackItems} />
 
 export const Overflowed: FC = () => (

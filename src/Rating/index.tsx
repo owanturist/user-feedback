@@ -1,6 +1,5 @@
 import React, { FC } from 'react'
 import styled from '@emotion/styled/macro'
-import { shallowEqual } from 'shallow-equal-object'
 
 import * as Skelet from 'Skeleton'
 import * as api from 'api'
@@ -56,20 +55,16 @@ export const Interactive: FC<{
   rating: api.Rating
   active: boolean
   onChange(active: boolean): void
-}> = React.memo(
-  ({ className, rating, active, onChange }) => (
-    <StyledInteractiveRoot
-      className={className}
-      tabIndex={0}
-      active={active}
-      onClick={() => onChange(!active)}
-    >
-      {limitRating(rating)}
-    </StyledInteractiveRoot>
-  ),
-  ({ onChange: _, ...prev }, { onChange: __, ...next }) =>
-    shallowEqual(prev, next)
-)
+}> = React.memo(({ className, rating, active, onChange }) => (
+  <StyledInteractiveRoot
+    className={className}
+    tabIndex={0}
+    active={active}
+    onClick={() => onChange(!active)}
+  >
+    {limitRating(rating)}
+  </StyledInteractiveRoot>
+))
 
 export const Skeleton: FC<{
   className?: string
