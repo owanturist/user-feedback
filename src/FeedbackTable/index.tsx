@@ -129,6 +129,16 @@ const StyledHeader = styled.div`
   }
 `
 
+const ViewHeader: FC = React.memo(() => (
+  <StyledHeader>
+    <StyledHeaderCell>Rating</StyledHeaderCell>
+    <StyledHeaderCell className="text-left">Comment</StyledHeaderCell>
+    <StyledHeaderCell>Browser</StyledHeaderCell>
+    <StyledHeaderCell>Device</StyledHeaderCell>
+    <StyledHeaderCell>Platform</StyledHeaderCell>
+  </StyledHeader>
+))
+
 const StyledRoot = styled.div`
   width: 100%;
   word-break: break-word;
@@ -146,13 +156,7 @@ export const View: FC<{
   items: Array<api.Feedback>
 }> = React.memo(({ className, items }) => (
   <StyledRoot className={className}>
-    <StyledHeader>
-      <StyledHeaderCell>Rating</StyledHeaderCell>
-      <StyledHeaderCell className="text-left">Comment</StyledHeaderCell>
-      <StyledHeaderCell>Browser</StyledHeaderCell>
-      <StyledHeaderCell>Device</StyledHeaderCell>
-      <StyledHeaderCell>Platform</StyledHeaderCell>
-    </StyledHeader>
+    <ViewHeader />
 
     {items.map(item => (
       <ViewItem key={item.id} item={item} />

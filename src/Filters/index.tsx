@@ -27,6 +27,13 @@ export const initial: Model = {
   ])
 }
 
+export const isPass = (model: Model, feedback: api.Feedback): boolean => {
+  return (
+    model.ratings.member(feedback.rating) &&
+    feedback.comment.indexOf(model.search) >= 0
+  )
+}
+
 // U P D A T E
 
 export type Msg = utils.Msg<[Model], Model>

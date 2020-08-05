@@ -128,20 +128,27 @@ export const View: FC<{
   feedback: Array<api.Feedback>
   model: Model
   dispatch: Dispatch<Msg>
-}> = memoWithDispatch(({ feedback, model, dispatch }) => (
-  <StyledRoot>
-    <ViewHeader />
+}> = memoWithDispatch(({ feedback, model, dispatch }) => {
+  const items = React.useMemo(
+    () => feedback.filter(item => Filters.isPass(model.filters, item)),
+    [feedback, model.filters]
+  )
 
-    <StyledContent>
-      <Filters.View
-        model={model.filters}
-        dispatch={msg => dispatch(FiltersMsg(msg))}
-      />
+  return (
+    <StyledRoot>
+      <ViewHeader />
 
-      <FeedbackTable.View className={cssFeedbackTable} items={feedback} />
-    </StyledContent>
-  </StyledRoot>
-))
+      <StyledContent>
+        <Filters.View
+          model={model.filters}
+          dispatch={msg => dispatch(FiltersMsg(msg))}
+        />
+
+        <FeedbackTable.View className={cssFeedbackTable} items={items} />
+      </StyledContent>
+    </StyledRoot>
+  )
+})
 
 // S K E L E T O N
 
