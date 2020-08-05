@@ -135,7 +135,7 @@ export const View: FC<{
   )
 
   return (
-    <StyledRoot>
+    <StyledRoot data-cy="dashboard__root">
       <ViewHeader />
 
       <StyledContent>

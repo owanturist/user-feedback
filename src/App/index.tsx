@@ -104,7 +104,13 @@ const StyledTryAgain = styled.button`
 `
 
 const ViewTryAgain: FC<{ onTryAgain(): void }> = ({ onTryAgain }) => (
-  <StyledTryAgain autoFocus type="button" tabIndex={0} onClick={onTryAgain}>
+  <StyledTryAgain
+    data-cy="app__retry"
+    autoFocus
+    type="button"
+    tabIndex={0}
+    onClick={onTryAgain}
+  >
     Try Again
   </StyledTryAgain>
 )
