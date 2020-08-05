@@ -61,6 +61,7 @@ export const Interactive: FC<{
   onChange(active: boolean): void
 }> = React.memo(({ className, rating, active, onChange }) => (
   <StyledInteractiveRoot
+    data-cy={`rating__interactive_${rating}`}
     className={className}
     tabIndex={0}
     active={active}

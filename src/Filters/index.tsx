@@ -133,6 +133,7 @@ export const View: FC<{
 }> = memoWithDispatch(({ className, model, dispatch }) => (
   <StyledRoot className={className}>
     <StyledInput
+      data-cy="filters__search-input"
       autoFocus
       tabIndex={0}
       type="search"
