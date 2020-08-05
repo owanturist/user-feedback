@@ -3,7 +3,7 @@ import styled from '@emotion/styled/macro'
 import { css } from 'emotion/macro'
 import { Cmd } from 'frctl'
 
-import { Dispatch, composeDispatch } from 'Provider'
+import { Dispatch } from 'Provider'
 import * as api from 'api'
 import * as Filters from 'Filters'
 import * as FeedbackTable from 'FeedbackTable'
@@ -46,17 +46,28 @@ const cssFeedbackTable = css`
   margin-top: 25px;
 `
 
-const StyledContent = styled.div`
-  box-sizing: border-box;
-  margin: 30px auto 0;
-  padding: 0 16px 16px;
+const StyledContainer = styled.div`
+  margin: 0 auto;
   width: 100%;
-  max-width: 1454px;
+  max-width: 1422px;
+`
+
+const StyledHeaderContainer = styled(StyledContainer)`
+  display: flex;
+  justify-content: flex-end;
+`
+
+const StyledScroll = styled.div`
+  position: relative; /* allows query offsetTop realtive the element */
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 30px 16px 16px;
 `
 
 const StyledIcon = styled(TachometerIcon)`
   width: 27px;
-  height: 27px;
 `
 
 const StyledPageTitle = styled.h1`
@@ -66,23 +77,36 @@ const StyledPageTitle = styled.h1`
   letter-spacing: 0.02em;
 `
 
-const StyledHeader = styled.header`
+type StyledHeaderProps = { shift: boolean }
+
+const StyledMovableHeader = styled.div<StyledHeaderProps>`
   display: flex;
   flex-flow: row nowrap;
-  align-items: center;
-  justify-content: center;
-  padding: 19px 10px;
+  margin-right: ${props => (props.shift ? 0 : 50)}%;
+  transform: translate3d(${props => (props.shift ? 0 : 50)}%, 0, 0);
+  transition: all 0.6s ease-in-out;
+`
+
+const StyledHeader = styled.header<StyledHeaderProps>`
+  box-sizing: border-box;
+  position: relative; /* shadow overflow of content */
+  z-index: 2;
+  padding: 19px 16px;
   color: rgb(94, 98, 100);
   background: #fff;
-  box-shadow: 0 0 2px 2px #dadee0;
+  box-shadow: 0 0 ${props => (props.shift ? '8px 4px' : '2px 2px')} #dadee0;
+  transition: box-shadow 0.4s ease;
   user-select: none;
 `
 
-const ViewHeader: FC = React.memo(() => (
-  <StyledHeader>
-    {/* @TODO Add svg icon */}
-    <StyledIcon />
-    <StyledPageTitle>Dashboard</StyledPageTitle>
+const ViewHeader: FC<{ shift: boolean }> = React.memo(({ shift }) => (
+  <StyledHeader shift={shift}>
+    <StyledHeaderContainer>
+      <StyledMovableHeader shift={shift}>
+        <StyledIcon />
+        <StyledPageTitle>Dashboard</StyledPageTitle>
+      </StyledMovableHeader>
+    </StyledHeaderContainer>
   </StyledHeader>
 ))
 
@@ -93,42 +117,82 @@ const StyledRoot = styled.div`
   height: 100%;
 `
 
+const ViewRoot: FC<{ filtersRef: React.RefObject<HTMLDivElement> }> = ({
+  filtersRef,
+  children
+}) => {
+  const containerRef = React.useRef<HTMLDivElement>(null)
+  const [scrolled, setScrolled] = React.useState(false)
+
+  const toggleScrolled = React.useCallback(
+    (scrollTop: number, node: HTMLDivElement): void => {
+      if (node.offsetTop + node.scrollHeight < scrollTop !== scrolled) {
+        setScrolled(!scrolled)
+      }
+    },
+    [scrolled]
+  )
+
+  React.useEffect(() => {
+    if (containerRef.current && filtersRef.current) {
+      toggleScrolled(containerRef.current.scrollTop, filtersRef.current)
+    }
+  })
+
+  return (
+    <StyledRoot data-cy="dashboard__root">
+      <ViewHeader shift={scrolled} />
+
+      <StyledScroll
+        ref={containerRef}
+        onScroll={event =>
+          filtersRef.current &&
+          toggleScrolled(event.currentTarget.scrollTop, filtersRef.current)
+        }
+      >
+        <StyledContainer>{children}</StyledContainer>
+      </StyledScroll>
+    </StyledRoot>
+  )
+}
+
 export const View: FC<{
   feedback: Array<api.Feedback>
   model: Model
   dispatch: Dispatch<Msg>
 }> = React.memo(({ feedback, model, dispatch }) => {
+  const filtersRef = React.useRef<HTMLDivElement>(null)
+
   const items = React.useMemo(
     () => feedback.filter(item => Filters.isPass(model.filters, item)),
     [feedback, model.filters]
   )
 
   return (
-    <StyledRoot data-cy="dashboard__root">
-      <ViewHeader />
+    <ViewRoot filtersRef={filtersRef}>
+      <Filters.View
+        ref={filtersRef}
+        model={model.filters}
+        dispatch={React.useCallback(msg => dispatch(FiltersMsg(msg)), [
+          dispatch
+        ])}
+      />
 
-      <StyledContent>
-        <Filters.View
-          model={model.filters}
-          dispatch={composeDispatch(dispatch, FiltersMsg)}
-        />
-
-        <FeedbackTable.View className={cssFeedbackTable} items={items} />
-      </StyledContent>
-    </StyledRoot>
+      <FeedbackTable.View className={cssFeedbackTable} items={items} />
+    </ViewRoot>
   )
 })
 
 // S K E L E T O N
 
-export const Skeleton: FC = React.memo(() => (
-  <StyledRoot data-cy="dashboard__skeleton">
-    <ViewHeader />
+export const Skeleton: FC = React.memo(() => {
+  const filtersRef = React.useRef<HTMLDivElement>(null)
 
-    <StyledContent>
-      <Filters.Skeleton />
+  return (
+    <ViewRoot filtersRef={filtersRef}>
+      <Filters.Skeleton ref={filtersRef} />
 
       <FeedbackTable.Skeleton className={cssFeedbackTable} count={20} />
-    </StyledContent>
-  </StyledRoot>
-))
+    </ViewRoot>
+  )
+})

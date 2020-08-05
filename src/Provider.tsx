@@ -3,13 +3,6 @@ import { Program, Worker, Cmd, Sub } from 'frctl'
 
 export type Dispatch<Msg> = (msg: Msg) => void
 
-export const composeDispatch = <T, R>(
-  dispatch: Dispatch<T>,
-  tagger: (msg: R) => T
-): Dispatch<R> =>
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  React.useMemo(() => (msg: R) => dispatch(tagger(msg)), [dispatch, tagger])
-
 export type Props<Model, Msg> = {
   view: React.ComponentType<{
     model: Model

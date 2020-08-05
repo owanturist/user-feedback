@@ -65,7 +65,7 @@ export const Interactive: FC<{
     className={className}
     tabIndex={0}
     active={active}
-    onClick={() => onChange(!active)}
+    onClick={React.useCallback(() => onChange(!active), [active, onChange])}
   >
     {limitRating(rating)}
   </StyledInteractiveRoot>

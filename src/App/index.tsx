@@ -6,7 +6,7 @@ import RemoteData from 'frctl/RemoteData'
 import Either from 'frctl/Either'
 
 import * as api from 'api'
-import { Dispatch, composeDispatch } from 'Provider'
+import { Dispatch } from 'Provider'
 import * as Dashboard from 'Dashboard'
 import * as utils from 'utils'
 
@@ -247,14 +247,17 @@ export const View: FC<{ model: Model; dispatch: Dispatch<Msg> }> = React.memo(
       Loading: () => <Dashboard.Skeleton />,
 
       Failure: error => (
-        <ViewError error={error} onTryAgain={() => dispatch(LoadFeedback)} />
+        <ViewError
+          error={error}
+          onTryAgain={React.useCallback(() => dispatch(LoadFeedback), [])}
+        />
       ),
 
       Succeed: feedback => (
         <Dashboard.View
           feedback={feedback}
           model={model.dashboard}
-          dispatch={composeDispatch(dispatch, DashboardMsg)}
+          dispatch={React.useCallback(msg => dispatch(DashboardMsg(msg)), [])}
         />
       )
     })
