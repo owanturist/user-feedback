@@ -1,3 +1,5 @@
+import Maybe from 'frctl/Maybe'
+
 export type Msg<A extends Array<unknown>, R> = {
   update(...args: A): R
 }
@@ -20,21 +22,21 @@ const getLowChar = (index: number, input: string): string => {
 export const fragmentize = (
   pattern: string,
   input: string
-): Array<Fragment> => {
+): Maybe<Array<Fragment>> => {
   const P = pattern.length
   const I = input.length
 
   if (I === 0 || P > I) {
-    return []
+    return Maybe.Nothing
   }
 
   if (P === 0) {
-    return [
+    return Maybe.Just([
       {
         slice: input,
         matched: false
       }
-    ]
+    ])
   }
 
   const fragments: Array<Fragment> = []
@@ -78,5 +80,5 @@ export const fragmentize = (
     matched
   })
 
-  return fragments
+  return Maybe.Just(fragments)
 }
