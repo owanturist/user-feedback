@@ -56,11 +56,11 @@ describe('Initialising', () => {
         url: '**/example/apidemo.json',
         response: 'fixture:success',
         status: 500
-      }).as('getApiDemoSlow')
+      }).as('getApiDemo')
 
       cy.visit('/')
 
-      cy.wait('@getApiDemoSlow')
+      cy.wait('@getApiDemo')
 
       cy.contains('You are facing an unexpected Server side Error 500!').should(
         'be.visible'
@@ -74,11 +74,11 @@ describe('Initialising', () => {
         url: '**/example/apidemo.json',
         response: 'fixture:success',
         status: 400
-      }).as('getApiDemoSlow')
+      }).as('getApiDemo')
 
       cy.visit('/')
 
-      cy.wait('@getApiDemoSlow')
+      cy.wait('@getApiDemo')
 
       cy.contains('You are facing an unexpected Client side Error 400!').should(
         'be.visible'

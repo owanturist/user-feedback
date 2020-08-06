@@ -113,8 +113,8 @@ const StyledRoot = styled.div`
   height: 100%;
 `
 
-const ViewRoot: FC = ({ children }) => (
-  <StyledRoot data-cy="dashboard__root">
+const ViewRoot: FC = ({ children, ...props }) => (
+  <StyledRoot {...props}>
     <ViewHeader />
 
     <StyledScroller>
@@ -134,7 +134,7 @@ export const View: FC<{
   )
 
   return (
-    <ViewRoot>
+    <ViewRoot data-cy="dashboard__root">
       <Filters.View
         className={cssFilters}
         model={model.filters}
@@ -151,7 +151,7 @@ export const View: FC<{
 // S K E L E T O N
 
 export const Skeleton: FC = React.memo(() => (
-  <ViewRoot>
+  <ViewRoot data-cy="dashboard__skeleton">
     <Filters.Skeleton className={cssFilters} />
 
     <FeedbackTable.Skeleton count={20} />
