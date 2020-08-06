@@ -2,6 +2,7 @@ import React, { FC } from 'react'
 import styled from '@emotion/styled/macro'
 import { css } from 'emotion/macro'
 import { Cmd } from 'frctl'
+import { cons } from 'frctl/Basics'
 
 import { Dispatch } from 'Provider'
 import * as breakpoints from 'breakpoints'
@@ -25,7 +26,7 @@ export const initial: Model = {
 
 export type Msg = utils.Msg<[Model], [Model, Cmd<Msg>]>
 
-const FiltersMsg = utils.cons(
+const FiltersMsg = cons(
   class FiltersMsg implements Msg {
     public constructor(private readonly msg: Filters.Msg) {}
 

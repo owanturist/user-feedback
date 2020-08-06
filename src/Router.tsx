@@ -1,8 +1,10 @@
 import React, { FC, ReactNode } from 'react'
 import { Cmd } from 'frctl'
-import { Cata } from 'frctl/Basics'
 import { Url } from 'frctl/Url'
+import { Parser as UrlParser } from 'frctl/Url/Parser'
+import Maybe from 'frctl/Maybe'
 import { NavigationConsumer } from 'Provider'
+import * as api from 'api'
 
 export type Navigation = {
   replace(url: string): Cmd<never>
@@ -16,14 +18,64 @@ export type Navigation = {
   load(url: string): Cmd<never>
 }
 
-export type UrlRequestPattern<R> = Cata<{
-  Internal(url: Url): R
-  External(url: string): R
-}>
+export type Route =
+  | {
+      type: 'ToDashboard'
+      search: Maybe<string>
+      rating: Maybe<api.Rating>
+    }
+  | { type: 'ToFeedback'; feedbackId: string }
 
-export type UrlRequest = {
-  cata<R>(pattern: UrlRequestPattern<R>): R
+export const ToDashboard = (
+  search: Maybe<string>,
+  rating: Maybe<api.Rating>
+): Route => ({
+  type: 'ToDashboard',
+  search,
+  rating
+})
+
+export const ToFeedback = (feedbackId: string): Route => ({
+  type: 'ToFeedback',
+  feedbackId
+})
+
+const stringifyRoute = (route: Route): string => {
+  switch (route.type) {
+    case 'ToDashboard': {
+      const queries = [
+        route.search.map(s => `search=${s}`),
+        route.rating.map(r => `rating=${r}`)
+      ]
+        .map(m => m.getOrElse(''))
+        .filter(s => s !== '')
+
+      return queries.length === 0 ? '/' : `/?${queries.join('&')}`
+    }
+
+    case 'ToFeedback': {
+      return `/feedback/${route.feedbackId}`
+    }
+  }
 }
+
+const parser = UrlParser.oneOf([
+  UrlParser.oneOf([UrlParser.root, UrlParser.s('dashboard')])
+    .query('search')
+    .string.query('rating')
+    .enum([
+      ['1', api.Rating.One],
+      ['2', api.Rating.Two],
+      ['3', api.Rating.Three],
+      ['4', api.Rating.Four],
+      ['5', api.Rating.Five]
+    ])
+    .map(search => rating => ToDashboard(search, rating)),
+
+  UrlParser.s('feedback').slash.string.map(ToFeedback)
+])
+
+export const parse = (url: Url): Maybe<Route> => parser.parse(url)
 
 const ViewLink: FC<
   React.AnchorHTMLAttributes<HTMLAnchorElement> & {
@@ -45,11 +97,17 @@ const ViewLink: FC<
 
 export const Link: FC<
   React.AnchorHTMLAttributes<HTMLAnchorElement> & {
-    href: string
+    route: Route
     children: ReactNode
   }
 > = props => (
   <NavigationConsumer>
-    {onChangeUrl => <ViewLink {...props} onChangeUrl={onChangeUrl} />}
+    {onChangeUrl => (
+      <ViewLink
+        {...props}
+        href={stringifyRoute(props.route)}
+        onChangeUrl={onChangeUrl}
+      />
+    )}
   </NavigationConsumer>
 )

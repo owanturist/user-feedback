@@ -1,24 +1,57 @@
 import React, { FC } from 'react'
 import styled from '@emotion/styled/macro'
 import { Cmd } from 'frctl'
+import { cons } from 'frctl/Basics'
 import { Url } from 'frctl/Url'
 import * as Http from 'frctl/Http'
 import RemoteData from 'frctl/RemoteData'
 import Either from 'frctl/Either'
 
 import * as api from 'api'
-import { Dispatch } from 'Provider'
+import { Dispatch, UrlRequest } from 'Provider'
 import * as Router from 'Router'
 import * as Dashboard from 'Dashboard'
+import * as Counter from 'Counter'
 import * as utils from 'utils'
+
+// S C R E E N
+
+type Screen =
+  | { type: 'DashboardScreen'; dashboard: Dashboard.Model }
+  | { type: 'FeedbackScreen'; feedbackId: string; counter: Counter.Model }
+  | { type: 'NotFoundScreen' }
+
+const DashboardScreen = (dashboard: Dashboard.Model): Screen => ({
+  type: 'DashboardScreen',
+  dashboard
+})
+
+const FeedbackScreen = (
+  feedbackId: string,
+  counter: Counter.Model
+): Screen => ({ type: 'FeedbackScreen', feedbackId, counter })
+
+const NotFoundScreen: Screen = { type: 'NotFoundScreen' }
+
+const screenFromUrl = (url: Url): Screen => {
+  return Router.parse(url)
+    .map(route => {
+      switch (route.type) {
+        case 'ToDashboard':
+          return DashboardScreen(Dashboard.initial)
+        case 'ToFeedback':
+          return FeedbackScreen(route.feedbackId, Counter.initial)
+      }
+    })
+    .getOrElse(NotFoundScreen)
+}
 
 // M O D E L
 
 export type Model = {
-  url: Url
   navigation: Router.Navigation
   feedback: RemoteData<Http.Error, Array<api.Feedback>>
-  dashboard: Dashboard.Model
+  screen: Screen
 }
 
 export const init = (
@@ -26,10 +59,9 @@ export const init = (
   navigation: Router.Navigation
 ): [Model, Cmd<Msg>] => [
   {
-    url: initialUrl,
     navigation,
     feedback: RemoteData.Loading,
-    dashboard: Dashboard.initial
+    screen: screenFromUrl(initialUrl)
   },
   api.getFeedback.send(result => LoadFeedbackDone(result))
 ]
@@ -38,9 +70,9 @@ export const init = (
 
 export type Msg = utils.Msg<[Model], [Model, Cmd<Msg>]>
 
-export const onUrlRequest = utils.cons(
+export const onUrlRequest = cons(
   class RequestUrl implements Msg {
-    public constructor(private readonly urlRequest: Router.UrlRequest) {}
+    public constructor(private readonly urlRequest: UrlRequest) {}
 
     public update(model: Model): [Model, Cmd<Msg>] {
       return [
@@ -55,12 +87,12 @@ export const onUrlRequest = utils.cons(
   }
 )
 
-export const onUrlChange = utils.cons(
+export const onUrlChange = cons(
   class ChangeUrl implements Msg {
     public constructor(private readonly url: Url) {}
 
     public update(model: Model): [Model, Cmd<Msg>] {
-      return [{ ...model, url: this.url }, Cmd.none]
+      return [{ ...model, screen: screenFromUrl(this.url) }, Cmd.none]
     }
   }
 )
@@ -77,7 +109,7 @@ const LoadFeedback: Msg = {
   }
 }
 
-const LoadFeedbackDone = utils.cons(
+const LoadFeedbackDone = cons(
   class LoadFeedbackDone implements Msg {
     public constructor(
       private readonly result: Either<Http.Error, Array<api.Feedback>>
@@ -95,20 +127,28 @@ const LoadFeedbackDone = utils.cons(
   }
 )
 
-const DashboardMsg = utils.cons(
+const DashboardMsg = cons(
   class DashboardMsg_ implements Msg {
     public constructor(private readonly msg: Dashboard.Msg) {}
 
     public update(model: Model): [Model, Cmd<Msg>] {
-      const [nextDashboard, cmd] = this.msg.update(model.dashboard)
+      switch (model.screen.type) {
+        case 'DashboardScreen': {
+          const [nextDashboard, cmd] = this.msg.update(model.screen.dashboard)
 
-      return [
-        {
-          ...model,
-          dashboard: nextDashboard
-        },
-        cmd.map(DashboardMsg)
-      ]
+          return [
+            {
+              ...model,
+              screen: DashboardScreen(nextDashboard)
+            },
+            cmd.map(DashboardMsg)
+          ]
+        }
+
+        default: {
+          return [model, Cmd.none]
+        }
+      }
     }
   }
 )
@@ -288,12 +328,26 @@ export const View: FC<{ model: Model; dispatch: Dispatch<Msg> }> = React.memo(
         />
       ),
 
-      Succeed: feedback => (
-        <Dashboard.View
-          feedback={feedback}
-          model={model.dashboard}
-          dispatch={React.useCallback(msg => dispatch(DashboardMsg(msg)), [])}
-        />
-      )
+      Succeed: feedback => {
+        switch (model.screen.type) {
+          case 'DashboardScreen': {
+            return (
+              <Dashboard.View
+                feedback={feedback}
+                model={model.screen.dashboard}
+                dispatch={msg => dispatch(DashboardMsg(msg))}
+              />
+            )
+          }
+
+          case 'FeedbackScreen': {
+            return <div>{model.screen.feedbackId}</div>
+          }
+
+          case 'NotFoundScreen': {
+            return <div>Not Found</div>
+          }
+        }
+      }
     })
 )

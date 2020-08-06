@@ -1,13 +1,22 @@
 import React from 'react'
 import { Program, Cmd, Sub, Task } from 'frctl'
-import { cons } from 'frctl/Basics'
+import { Cata, cons } from 'frctl/Basics'
 import { Url } from 'frctl/Url'
 import Maybe from 'frctl/Maybe'
 import { createBrowserHistory } from 'history'
 
-import type { Navigation, UrlRequest, UrlRequestPattern } from 'Router'
+import type { Navigation } from 'Router'
 
 export type Dispatch<Msg> = (msg: Msg) => void
+
+export type UrlRequestPattern<R> = Cata<{
+  Internal(url: Url): R
+  External(url: string): R
+}>
+
+export type UrlRequest = {
+  cata<R>(pattern: UrlRequestPattern<R>): R
+}
 
 export type Props<Model, Msg> = {
   view: React.ComponentType<{
