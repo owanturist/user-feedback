@@ -3,16 +3,21 @@ import { text, number } from '@storybook/addon-knobs'
 import { action } from '@storybook/addon-actions'
 import RemoteData from 'frctl/RemoteData'
 import Decode from 'frctl/Json/Decode'
+import { Url } from 'frctl/Url'
 import * as Http from 'frctl/Http'
 
 import * as App from './index'
+import type { Navigation } from 'Router'
 
 export default {
   title: 'App',
   component: App.View
 }
 
-const initial = App.init[0]
+const fakeUrl = Url.cons(Url.Http, '')
+const fakeNavigation: Navigation = ({} as unknown) as Navigation
+
+const initial = App.init(fakeUrl, fakeNavigation)[0]
 
 export const Initial: FC = () => (
   <App.View model={initial} dispatch={action('dispatch')} />

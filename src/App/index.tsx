@@ -1,24 +1,33 @@
 import React, { FC } from 'react'
 import styled from '@emotion/styled/macro'
 import { Cmd } from 'frctl'
+import { Url } from 'frctl/Url'
 import * as Http from 'frctl/Http'
 import RemoteData from 'frctl/RemoteData'
 import Either from 'frctl/Either'
 
 import * as api from 'api'
 import { Dispatch } from 'Provider'
+import * as Router from 'Router'
 import * as Dashboard from 'Dashboard'
 import * as utils from 'utils'
 
 // M O D E L
 
 export type Model = {
+  url: Url
+  navigation: Router.Navigation
   feedback: RemoteData<Http.Error, Array<api.Feedback>>
   dashboard: Dashboard.Model
 }
 
-export const init: [Model, Cmd<Msg>] = [
+export const init = (
+  initialUrl: Url,
+  navigation: Router.Navigation
+): [Model, Cmd<Msg>] => [
   {
+    url: initialUrl,
+    navigation,
     feedback: RemoteData.Loading,
     dashboard: Dashboard.initial
   },
@@ -28,6 +37,33 @@ export const init: [Model, Cmd<Msg>] = [
 // U P D A T E
 
 export type Msg = utils.Msg<[Model], [Model, Cmd<Msg>]>
+
+export const onUrlRequest = utils.cons(
+  class RequestUrl implements Msg {
+    public constructor(private readonly urlRequest: Router.UrlRequest) {}
+
+    public update(model: Model): [Model, Cmd<Msg>] {
+      return [
+        model,
+        this.urlRequest.cata({
+          Internal: nextUrl => model.navigation.push(nextUrl.toString()),
+
+          External: href => model.navigation.load(href)
+        })
+      ]
+    }
+  }
+)
+
+export const onUrlChange = utils.cons(
+  class ChangeUrl implements Msg {
+    public constructor(private readonly url: Url) {}
+
+    public update(model: Model): [Model, Cmd<Msg>] {
+      return [{ ...model, url: this.url }, Cmd.none]
+    }
+  }
+)
 
 const LoadFeedback: Msg = {
   update(model: Model): [Model, Cmd<Msg>] {
