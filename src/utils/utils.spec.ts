@@ -22,6 +22,10 @@ describe('fragmentize', () => {
     expect(fragmentize('pattern pattern', 'pattern')).toEqual(Maybe.Nothing)
   })
 
+  it('Nothing when partial matching', () => {
+    expect(fragmentize('pattern', 'pat one more')).toEqual(Maybe.Nothing)
+  })
+
   it('single matched for equal input and pattern', () => {
     expect(fragmentize('input', 'input')).toEqual(
       Maybe.Just([

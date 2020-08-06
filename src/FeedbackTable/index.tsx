@@ -5,6 +5,7 @@ import * as Skelet from 'Skeleton'
 import * as Rating from 'Rating'
 import * as api from 'api'
 import * as breakpoints from 'breakpoints'
+import * as utils from 'utils'
 import { ReactComponent as EmptyTableIcon } from './empty-table.svg'
 
 const StyledLabel = styled.div`
@@ -47,6 +48,20 @@ const ViewItemProperty: FC<{
   </StyledItemProperty>
 )
 
+const ViewFragments: FC<{
+  fragments: Array<utils.Fragment>
+}> = ({ fragments }) => (
+  <>
+    {fragments.map((fragment, i) =>
+      fragment.matched ? (
+        <b key={i}>{fragment.slice}</b>
+      ) : (
+        <React.Fragment key={i}>{fragment.slice}</React.Fragment>
+      )
+    )}
+  </>
+)
+
 const StyledItem = styled.div`
   display: flex;
   flex-direction: column;
@@ -80,27 +95,32 @@ const StyledItem = styled.div`
   }
 `
 
-const ViewItem: FC<{ item: api.Feedback }> = React.memo(({ item }) => (
+const ViewItem: FC<{
+  fragments: Array<utils.Fragment>
+  feedback: api.Feedback
+}> = React.memo(({ fragments, feedback }) => (
   <StyledItem data-cy="feedback-table__item">
     <ViewItemProperty label="Rating">
-      <Rating.Static rating={item.rating} />
+      <Rating.Static rating={feedback.rating} />
     </ViewItemProperty>
 
     <StyledItemComment>
       <StyledLabel>Comment</StyledLabel>
-      {item.comment}
+      <ViewFragments fragments={fragments} />
     </StyledItemComment>
 
     <ViewItemProperty label="Browser">
-      {item.browser.name}
+      {feedback.browser.name}
       <br />
-      {item.browser.version}
+      {feedback.browser.version}
     </ViewItemProperty>
 
-    <ViewItemProperty label="Device">{item.browser.device}</ViewItemProperty>
+    <ViewItemProperty label="Device">
+      {feedback.browser.device}
+    </ViewItemProperty>
 
     <ViewItemProperty label="Platform">
-      {item.browser.platform}
+      {feedback.browser.platform}
     </ViewItemProperty>
   </StyledItem>
 ))
@@ -177,14 +197,14 @@ const StyledRoot = styled.div`
 
 export const View: FC<{
   className?: string
-  items: Array<api.Feedback>
+  items: Array<[Array<utils.Fragment>, api.Feedback]>
 }> = React.memo(({ className, items }) =>
   items.length > 0 ? (
     <StyledRoot className={className}>
       <ViewHeader />
 
-      {items.map(item => (
-        <ViewItem key={item.id} item={item} />
+      {items.map(([fragments, feedback]) => (
+        <ViewItem key={feedback.id} fragments={fragments} feedback={feedback} />
       ))}
     </StyledRoot>
   ) : (

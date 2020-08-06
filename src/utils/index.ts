@@ -41,10 +41,19 @@ export const fragmentize = (
 
   const fragments: Array<Fragment> = []
   let start = 0
+  let i = 0
   let matched = getLowChar(0, pattern) === getLowChar(0, input)
 
-  for (let p = 0, i = 0; i < I; i++) {
+  for (let p = 0; p < P; i++) {
+    // eof but pattern not entirely matched
+    if (i === I) {
+      return Maybe.Nothing
+    }
+
     const charMatched = getLowChar(p, pattern) === getLowChar(i, input)
+
+    // if char is matched so test next pattern char
+    p = charMatched ? p + 1 : p
 
     if (charMatched !== matched) {
       fragments.push({
@@ -55,30 +64,21 @@ export const fragmentize = (
       start = i
       matched = !matched
     }
-
-    // if char is matched so test next pattern char
-    p = charMatched ? p + 1 : p
-
-    if (p === P) {
-      // save fragment as if it sends in a middle
-      if (i + 1 < I) {
-        fragments.push({
-          slice: input.slice(start, i + 1),
-          matched
-        })
-
-        start = i + 1
-        matched = !matched
-      }
-
-      break
-    }
   }
 
+  // add last matched fragment
   fragments.push({
-    slice: input.slice(start),
+    slice: input.slice(start, i),
     matched
   })
+
+  // add unchecked fragment
+  if (i < I) {
+    fragments.push({
+      slice: input.slice(i),
+      matched: !matched
+    })
+  }
 
   return Maybe.Just(fragments)
 }

@@ -129,7 +129,18 @@ export const View: FC<{
   dispatch: Dispatch<Msg>
 }> = React.memo(({ feedback, model, dispatch }) => {
   const items = React.useMemo(
-    () => feedback.filter(item => Filters.isPass(model.filters, item)),
+    () =>
+      feedback.reduce<Array<[Array<utils.Fragment>, api.Feedback]>>(
+        (acc, item) =>
+          Filters.toFragments(model.filters, item)
+            .map(fragments => {
+              acc.push([fragments, item])
+
+              return acc
+            })
+            .getOrElse(acc),
+        []
+      ),
     [feedback, model.filters]
   )
 

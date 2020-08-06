@@ -2,6 +2,7 @@ import React, { FC } from 'react'
 import styled from '@emotion/styled/macro'
 import { css } from 'emotion/macro'
 import Set from 'frctl/Set'
+import Maybe from 'frctl/Maybe'
 
 import { Dispatch } from 'Provider'
 import * as utils from 'utils'
@@ -28,11 +29,15 @@ export const initial: Model = {
   ])
 }
 
-export const isPass = (model: Model, feedback: api.Feedback): boolean => {
-  return (
-    model.ratings.member(feedback.rating) &&
-    feedback.comment.indexOf(model.search) >= 0
-  )
+export const toFragments = (
+  model: Model,
+  feedback: api.Feedback
+): Maybe<Array<utils.Fragment>> => {
+  if (!model.ratings.member(feedback.rating)) {
+    return Maybe.Nothing
+  }
+
+  return utils.fragmentize(model.search, feedback.comment)
 }
 
 // U P D A T E
