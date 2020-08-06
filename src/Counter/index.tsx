@@ -59,5 +59,3 @@ export const View: FC<{ model: Model; dispatch: Dispatch<Msg> }> = ({
     </button>
   </div>
 )
-
-View.displayName = 'Counter'

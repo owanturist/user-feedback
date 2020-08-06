@@ -7,13 +7,12 @@ import { Cmd, Sub } from 'frctl'
 import Provider from 'Provider'
 import * as App from './App'
 
-const init: [App.Model, Cmd<App.Msg>] = [App.initial, Cmd.none]
+const init: [App.Model, Cmd<App.Msg>] = App.init
 
-const update = (msg: App.Msg, model: App.Model): [App.Model, Cmd<App.Msg>] => {
-  return [msg.update(model), Cmd.none]
-}
+const update = (msg: App.Msg, model: App.Model): [App.Model, Cmd<App.Msg>] =>
+  msg.update(model)
 
-const subscription = (): Sub<App.Msg> => Sub.none
+const subscriptions = (): Sub<App.Msg> => Sub.none
 
 ReactDOM.render(
   <React.StrictMode>
@@ -21,7 +20,7 @@ ReactDOM.render(
       init={init}
       update={update}
       view={App.View}
-      subscription={subscription}
+      subscriptions={subscriptions}
     />
   </React.StrictMode>,
   document.getElementById('root')
