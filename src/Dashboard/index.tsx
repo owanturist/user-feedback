@@ -1,6 +1,5 @@
 import React, { FC } from 'react'
 import styled from '@emotion/styled/macro'
-import { css } from 'emotion/macro'
 import { Cmd } from 'frctl'
 
 import { Dispatch } from 'Provider'
@@ -42,31 +41,51 @@ const FiltersMsg = utils.cons(
 
 // V I E W
 
-const cssFilters = css`
-  position: sticky;
-  z-index: 2;
-  top: 15px;
-`
-
-const cssFeedbackTable = css`
-  margin-top: 25px;
-`
-
 const StyledContainer = styled.div`
+  box-sizing: border-box;
   margin: 0 auto;
   width: 100%;
   max-width: 1422px;
 `
 
+const StyledFiltersContainer = styled(StyledContainer)`
+  /* position: fixed; */
+  /* top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0; */
+  position: sticky;
+  z-index: 2;
+  top: -36px;
+  margin-bottom: 16px;
+
+  @media (min-width: 520px) {
+    top: 14px;
+  }
+
+  @media (min-width: 769px) {
+    top: 14px;
+    margin-bottom: 25px;
+  }
+`
+
 const StyledContentContainer = styled(StyledContainer)`
   display: flex;
   flex-direction: column;
-  padding: 30px 16px 16px;
+  padding: 16px;
+
+  @media (min-width: 769px) {
+    padding-top: 30px;
+  }
 `
 
 const StyledHeaderContainer = styled(StyledContainer)`
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+
+  @media (min-width: 769px) {
+    justify-content: flex-end;
+  }
 
   @media (min-width: 1335px) {
     justify-content: center;
@@ -75,6 +94,7 @@ const StyledHeaderContainer = styled(StyledContainer)`
 
 const StyledIcon = styled(TachometerIcon)`
   width: 27px;
+  height: 27px;
 `
 
 const StyledPageTitle = styled.h1`
@@ -132,15 +152,16 @@ export const View: FC<{
 
   return (
     <ViewRoot>
-      <Filters.View
-        className={cssFilters}
-        model={model.filters}
-        dispatch={React.useCallback(msg => dispatch(FiltersMsg(msg)), [
-          dispatch
-        ])}
-      />
+      <StyledFiltersContainer>
+        <Filters.View
+          model={model.filters}
+          dispatch={React.useCallback(msg => dispatch(FiltersMsg(msg)), [
+            dispatch
+          ])}
+        />
+      </StyledFiltersContainer>
 
-      <FeedbackTable.View className={cssFeedbackTable} items={items} />
+      <FeedbackTable.View items={items} />
     </ViewRoot>
   )
 })
@@ -149,8 +170,10 @@ export const View: FC<{
 
 export const Skeleton: FC = React.memo(() => (
   <ViewRoot>
-    <Filters.Skeleton className={cssFilters} />
+    <StyledFiltersContainer>
+      <Filters.Skeleton />
+    </StyledFiltersContainer>
 
-    <FeedbackTable.Skeleton className={cssFeedbackTable} count={20} />
+    <FeedbackTable.Skeleton count={20} />
   </ViewRoot>
 ))

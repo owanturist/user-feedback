@@ -75,13 +75,28 @@ const RATINGS_RANGE = [
 ]
 
 const cssRating = css`
-  margin-left: 17px;
+  & + & {
+    margin-left: 10px;
+  }
+
+  @media (min-width: 769px) {
+    margin-left: 17px;
+  }
 `
 
 const StyledRatings = styled.span`
   display: flex;
-  flex-flow: row nowrap;
-  margin-left: 24px;
+  flex-flow: row wrap;
+  margin-top: 10px;
+
+  @media (min-width: 520px) {
+    margin-top: 0;
+    margin-left: 10px;
+  }
+
+  @media (min-width: 1335px) {
+    margin-left: 24px;
+  }
 `
 
 const ViewRatings: FC<{
@@ -103,10 +118,18 @@ const ViewRatings: FC<{
   </StyledRatings>
 ))
 
+const StyledInputContainer = styled.div`
+  width: 100%;
+
+  @media (min-width: 520px) {
+    width: 224px;
+  }
+`
+
 const StyledInput = styled.input`
   box-sizing: border-box;
   height: 40px;
-  width: 224px;
+  width: 100%;
   padding: 0 13px 2px;
   border-radius: 3px;
   border: 2px solid #ddd;
@@ -125,7 +148,11 @@ const StyledInput = styled.input`
 
 const StyledRoot = styled.div`
   display: flex;
-  flex-flow: row nowrap;
+  flex-direction: column;
+  flex-flow: row wrap;
+
+  @media (min-width: 769px) {
+  }
 `
 
 export const View: FC<{
@@ -134,18 +161,20 @@ export const View: FC<{
   dispatch: Dispatch<Msg>
 }> = React.memo(({ className, model, dispatch }) => (
   <StyledRoot className={className}>
-    <StyledInput
-      data-cy="filters__search-input"
-      autoFocus
-      tabIndex={0}
-      type="search"
-      placeholder="Search here!"
-      value={model.search}
-      onChange={React.useCallback(
-        event => dispatch(ChangeSearch(event.target.value)),
-        [dispatch]
-      )}
-    />
+    <StyledInputContainer>
+      <StyledInput
+        data-cy="filters__search-input"
+        autoFocus
+        tabIndex={0}
+        type="search"
+        placeholder="Search here!"
+        value={model.search}
+        onChange={React.useCallback(
+          event => dispatch(ChangeSearch(event.target.value)),
+          [dispatch]
+        )}
+      />
+    </StyledInputContainer>
 
     <ViewRatings selected={model.ratings} dispatch={dispatch} />
   </StyledRoot>
@@ -157,7 +186,9 @@ export const Skeleton: FC<{
   className?: string
 }> = React.memo(({ className }) => (
   <StyledRoot className={className}>
-    <Skelet.Rect width="224px" height="40px" />
+    <StyledInputContainer>
+      <Skelet.Rect width="100%" height="40px" />
+    </StyledInputContainer>
 
     <StyledRatings>
       {RATINGS_RANGE.map(rating => (
