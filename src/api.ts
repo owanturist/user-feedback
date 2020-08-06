@@ -44,7 +44,7 @@ export type Feedback = {
 const feedbackDecoder: Decode.Decoder<Feedback> = Decode.shape({
   id: Decode.field('id').string,
   rating: Decode.field('rating').of(ratingDecoder),
-  comment: Decode.field('comment').string,
+  comment: Decode.field('comment').string.map(str => str.trim()),
   browser: Decode.field('computed_browser').of(browserDecoder)
 })
 
