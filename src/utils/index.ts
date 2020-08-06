@@ -26,8 +26,12 @@ export const fragmentize = (
   const P = pattern.length
   const I = input.length
 
-  if (I === 0 || P > I) {
+  if (P > I) {
     return Maybe.Nothing
+  }
+
+  if (I === 0) {
+    return Maybe.Just([])
   }
 
   if (P === 0) {

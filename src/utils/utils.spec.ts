@@ -3,6 +3,10 @@ import Maybe from 'frctl/Maybe'
 import { fragmentize } from './index'
 
 describe('fragmentize', () => {
+  it('emmpty array for empty pattern and input', () => {
+    expect(fragmentize('', '')).toEqual(Maybe.Just([]))
+  })
+
   it('single no matched fragment for empty pattern', () => {
     expect(fragmentize('', 'input')).toEqual(
       Maybe.Just([

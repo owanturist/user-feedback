@@ -48,19 +48,34 @@ const ViewItemProperty: FC<{
   </StyledItemProperty>
 )
 
+const StyledEmptyComment = styled.span`
+  font-style: italic;
+  color: #aaa;
+`
+
+const StyledMatchedFragment = styled.span`
+  color: #000;
+  background: rgb(255, 253, 59);
+`
+
 const ViewFragments: FC<{
   fragments: Array<utils.Fragment>
-}> = ({ fragments }) => (
-  <>
-    {fragments.map((fragment, i) =>
-      fragment.matched ? (
-        <b key={i}>{fragment.slice}</b>
-      ) : (
-        <React.Fragment key={i}>{fragment.slice}</React.Fragment>
-      )
-    )}
-  </>
-)
+}> = ({ fragments }) =>
+  fragments.length === 0 ? (
+    <StyledEmptyComment>Empty comment</StyledEmptyComment>
+  ) : (
+    <>
+      {fragments.map((fragment, i) =>
+        fragment.matched ? (
+          <StyledMatchedFragment key={i}>
+            {fragment.slice}
+          </StyledMatchedFragment>
+        ) : (
+          <React.Fragment key={i}>{fragment.slice}</React.Fragment>
+        )
+      )}
+    </>
+  )
 
 const StyledItem = styled.div`
   display: flex;

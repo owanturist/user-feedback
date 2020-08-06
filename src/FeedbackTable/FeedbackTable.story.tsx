@@ -35,6 +35,17 @@ const feedbackItems: Array<api.Feedback> = [
       device: 'Desktop',
       platform: 'MacOSX'
     }
+  },
+  {
+    id: '2',
+    rating: 1,
+    comment: '',
+    browser: {
+      name: 'IE',
+      version: 'v9',
+      device: 'Desktop',
+      platform: 'WinXP'
+    }
   }
 ]
 
