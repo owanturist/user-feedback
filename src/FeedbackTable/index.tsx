@@ -4,6 +4,7 @@ import styled from '@emotion/styled/macro'
 import * as Skelet from 'Skeleton'
 import * as Rating from 'Rating'
 import * as api from 'api'
+import * as breakpoints from 'breakpoints'
 import { ReactComponent as EmptyTableIcon } from './empty-table.svg'
 
 const StyledLabel = styled.div`
@@ -11,7 +12,7 @@ const StyledLabel = styled.div`
   font-weight: 600;
   font-size: 18px;
 
-  @media (min-width: 1025px) {
+  @media ${breakpoints.big.minWidth} {
     display: none;
   }
 `
@@ -20,7 +21,7 @@ const StyledItemProperty = styled.div`
   padding: 20px;
   min-width: 100px;
 
-  @media (min-width: 1025px) {
+  @media ${breakpoints.big.minWidth} {
     display: table-cell;
     padding: 26px 40px;
     vertical-align: middle;
@@ -31,7 +32,7 @@ const StyledItemProperty = styled.div`
 const StyledItemComment = styled(StyledItemProperty)`
   order: 10; /* move comment to the end */
 
-  @media (min-width: 481px) {
+  @media ${breakpoints.small.minWidth} {
     text-align: left;
     width: 100%;
   }
@@ -55,12 +56,12 @@ const StyledItem = styled.div`
   box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);
   overflow: hidden;
 
-  @media (min-width: 481px) {
+  @media ${breakpoints.small.minWidth} {
     flex-flow: row wrap;
     justify-content: space-between;
   }
 
-  @media (min-width: 1025px) {
+  @media ${breakpoints.big.minWidth} {
     display: table-row;
     border-radius: 0;
     box-shadow: none;
@@ -70,7 +71,7 @@ const StyledItem = styled.div`
   & + & {
     margin-top: 20px;
 
-    @media (min-width: 1025px) {
+    @media ${breakpoints.big.minWidth} {
       ${StyledItemComment},
       ${StyledItemProperty} {
         border-top: 2px solid #f8f8f8;
@@ -125,7 +126,7 @@ const StyledHeader = styled.div`
     text-align: left;
   }
 
-  @media (min-width: 1025px) {
+  @media ${breakpoints.big.minWidth} {
     display: table-row;
   }
 `
@@ -166,7 +167,7 @@ const StyledRoot = styled.div`
   width: 100%;
   word-break: break-word;
 
-  @media (min-width: 1025px) {
+  @media ${breakpoints.big.minWidth} {
     display: table;
     border-radius: 5px;
     overflow: hidden;

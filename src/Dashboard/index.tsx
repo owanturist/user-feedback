@@ -1,8 +1,10 @@
 import React, { FC } from 'react'
 import styled from '@emotion/styled/macro'
+import { css } from 'emotion/macro'
 import { Cmd } from 'frctl'
 
 import { Dispatch } from 'Provider'
+import * as breakpoints from 'breakpoints'
 import * as api from 'api'
 import * as Filters from 'Filters'
 import * as FeedbackTable from 'FeedbackTable'
@@ -41,55 +43,32 @@ const FiltersMsg = utils.cons(
 
 // V I E W
 
-const StyledContainer = styled.div`
-  box-sizing: border-box;
-  margin: 0 auto;
-  width: 100%;
-  max-width: 1422px;
-`
-
-const StyledFiltersContainer = styled(StyledContainer)`
-  /* position: fixed; */
-  /* top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0; */
-  position: sticky;
-  z-index: 2;
-  top: -36px;
+const cssFilters = css`
   margin-bottom: 16px;
 
-  @media (min-width: 520px) {
-    top: 14px;
-  }
-
-  @media (min-width: 769px) {
-    top: 14px;
-    margin-bottom: 25px;
+  @media ${breakpoints.big.minWidth} {
+    margin-bottom: 28px;
   }
 `
 
-const StyledContentContainer = styled(StyledContainer)`
+const StyledContainer = styled.div`
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  margin: 0 auto;
   padding: 16px;
+  width: 100%;
+  max-width: 1454px;
 
-  @media (min-width: 769px) {
-    padding-top: 30px;
+  @media ${breakpoints.big.minWidth} {
+    padding-top: 28px;
   }
 `
 
-const StyledHeaderContainer = styled(StyledContainer)`
-  display: flex;
-  justify-content: center;
-
-  @media (min-width: 769px) {
-    justify-content: flex-end;
-  }
-
-  @media (min-width: 1335px) {
-    justify-content: center;
-  }
+const StyledScroller = styled.div`
+  flex: 1 1 auto;
+  overflow-y: auto;
+  scroll-behavior: smooth;
 `
 
 const StyledIcon = styled(TachometerIcon)`
@@ -106,9 +85,12 @@ const StyledPageTitle = styled.h1`
 
 const StyledHeader = styled.header`
   box-sizing: border-box;
-  position: sticky; /* shadow overflow of content */
-  top: 0;
+  position: relative; /* shadow overflow of content */
   z-index: 2;
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 19px 16px;
   color: rgb(94, 98, 100);
   background: #fff;
@@ -119,10 +101,8 @@ const StyledHeader = styled.header`
 
 const ViewHeader: FC = React.memo(() => (
   <StyledHeader>
-    <StyledHeaderContainer>
-      <StyledIcon />
-      <StyledPageTitle>Dashboard</StyledPageTitle>
-    </StyledHeaderContainer>
+    <StyledIcon />
+    <StyledPageTitle>Dashboard</StyledPageTitle>
   </StyledHeader>
 ))
 
@@ -130,13 +110,16 @@ const StyledRoot = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100%;
 `
 
 const ViewRoot: FC = ({ children }) => (
   <StyledRoot data-cy="dashboard__root">
     <ViewHeader />
 
-    <StyledContentContainer>{children}</StyledContentContainer>
+    <StyledScroller>
+      <StyledContainer>{children}</StyledContainer>
+    </StyledScroller>
   </StyledRoot>
 )
 
@@ -152,14 +135,13 @@ export const View: FC<{
 
   return (
     <ViewRoot>
-      <StyledFiltersContainer>
-        <Filters.View
-          model={model.filters}
-          dispatch={React.useCallback(msg => dispatch(FiltersMsg(msg)), [
-            dispatch
-          ])}
-        />
-      </StyledFiltersContainer>
+      <Filters.View
+        className={cssFilters}
+        model={model.filters}
+        dispatch={React.useCallback(msg => dispatch(FiltersMsg(msg)), [
+          dispatch
+        ])}
+      />
 
       <FeedbackTable.View items={items} />
     </ViewRoot>
@@ -170,9 +152,7 @@ export const View: FC<{
 
 export const Skeleton: FC = React.memo(() => (
   <ViewRoot>
-    <StyledFiltersContainer>
-      <Filters.Skeleton />
-    </StyledFiltersContainer>
+    <Filters.Skeleton className={cssFilters} />
 
     <FeedbackTable.Skeleton count={20} />
   </ViewRoot>

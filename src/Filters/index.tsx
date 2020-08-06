@@ -5,6 +5,7 @@ import Set from 'frctl/Set'
 
 import { Dispatch } from 'Provider'
 import * as utils from 'utils'
+import * as breakpoints from 'breakpoints'
 import * as api from 'api'
 import * as Skelet from 'Skeleton'
 import * as Rating from 'Rating'
@@ -75,11 +76,9 @@ const RATINGS_RANGE = [
 ]
 
 const cssRating = css`
-  & + & {
-    margin-left: 10px;
-  }
+  margin-left: 10px;
 
-  @media (min-width: 769px) {
+  @media ${breakpoints.small.minWidth} {
     margin-left: 17px;
   }
 `
@@ -88,13 +87,14 @@ const StyledRatings = styled.span`
   display: flex;
   flex-flow: row wrap;
   margin-top: 10px;
+  margin-left: -10px;
 
-  @media (min-width: 520px) {
+  @media ${breakpoints.small.minWidth} {
     margin-top: 0;
     margin-left: 10px;
   }
 
-  @media (min-width: 1335px) {
+  @media ${breakpoints.big.minWidth} {
     margin-left: 24px;
   }
 `
@@ -121,7 +121,7 @@ const ViewRatings: FC<{
 const StyledInputContainer = styled.div`
   width: 100%;
 
-  @media (min-width: 520px) {
+  @media ${breakpoints.small.minWidth} {
     width: 224px;
   }
 `
@@ -150,9 +150,6 @@ const StyledRoot = styled.div`
   display: flex;
   flex-direction: column;
   flex-flow: row wrap;
-
-  @media (min-width: 769px) {
-  }
 `
 
 export const View: FC<{
