@@ -1,8 +1,13 @@
 import { fragmentize } from './index'
 
 describe('fragmentize', () => {
-  it('no fragments for empty pattern', () => {
-    expect(fragmentize('', 'input')).toEqual([])
+  it('single no matched fragment for empty pattern', () => {
+    expect(fragmentize('', 'input')).toEqual([
+      {
+        slice: 'input',
+        matched: false
+      }
+    ])
   })
 
   it('no fragments for empty input', () => {

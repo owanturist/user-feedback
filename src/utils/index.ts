@@ -24,8 +24,17 @@ export const fragmentize = (
   const P = pattern.length
   const I = input.length
 
-  if (I === 0 || P === 0 || P > I) {
+  if (I === 0 || P > I) {
     return []
+  }
+
+  if (P === 0) {
+    return [
+      {
+        slice: input,
+        matched: false
+      }
+    ]
   }
 
   const fragments: Array<Fragment> = []
