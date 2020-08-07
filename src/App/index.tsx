@@ -1,7 +1,7 @@
 import React, { FC } from 'react'
 import styled from '@emotion/styled/macro'
 import { Cmd } from 'frctl'
-import { cons } from 'frctl/Basics'
+import { Cata, cons } from 'frctl/Basics'
 import { Url } from 'frctl/Url'
 import * as Http from 'frctl/Http'
 import RemoteData from 'frctl/RemoteData'
@@ -16,33 +16,62 @@ import * as utils from 'utils'
 
 // S C R E E N
 
-type Screen =
-  | { type: 'DashboardScreen'; dashboard: Dashboard.Model }
-  | { type: 'FeedbackScreen'; feedbackId: string; counter: Counter.Model }
-  | { type: 'NotFoundScreen' }
+type ScreenPattern<R> = Cata<{
+  DashboardScreen(dashboard: Dashboard.Model): R
+  FeedbackScreen(feedbackId: string, counter: Counter.Model): R
+  NotFoundScreen(): R
+}>
 
-const DashboardScreen = (dashboard: Dashboard.Model): Screen => ({
-  type: 'DashboardScreen',
-  dashboard
-})
+type Screen = {
+  cata<R>(pattern: ScreenPattern<R>): R
+}
 
-const FeedbackScreen = (
-  feedbackId: string,
-  counter: Counter.Model
-): Screen => ({ type: 'FeedbackScreen', feedbackId, counter })
+const DashboardScreen = cons<[Dashboard.Model], Screen>(
+  class DashboardScreen implements Screen {
+    public constructor(private readonly dashboard: Dashboard.Model) {}
 
-const NotFoundScreen: Screen = { type: 'NotFoundScreen' }
+    public cata<R>(pattern: ScreenPattern<R>): R {
+      return utils.callOrElse(
+        pattern._,
+        pattern.DashboardScreen,
+        this.dashboard
+      )
+    }
+  }
+)
+
+const FeedbackScreen = cons<[string, Counter.Model], Screen>(
+  class FeedbackScreen implements Screen {
+    public constructor(
+      private readonly feedbackId: string,
+      private readonly counter: Counter.Model
+    ) {}
+
+    public cata<R>(pattern: ScreenPattern<R>): R {
+      return utils.callOrElse(
+        pattern._,
+        pattern.FeedbackScreen,
+        this.feedbackId,
+        this.counter
+      )
+    }
+  }
+)
+
+const NotFoundScreen: Screen = {
+  cata<R>(pattern: ScreenPattern<R>): R {
+    return utils.callOrElse(pattern._, pattern.NotFoundScreen)
+  }
+}
 
 const screenFromUrl = (url: Url): Screen => {
   return Router.parse(url)
-    .map(route => {
-      switch (route.type) {
-        case 'ToDashboard':
-          return DashboardScreen(Dashboard.initial)
-        case 'ToFeedback':
-          return FeedbackScreen(route.feedbackId, Counter.initial)
-      }
-    })
+    .map(route =>
+      route.cata({
+        ToDashboard: () => DashboardScreen(Dashboard.initial),
+        ToFeedback: feedbackId => FeedbackScreen(feedbackId, Counter.initial)
+      })
+    )
     .getOrElse(NotFoundScreen)
 }
 
@@ -128,13 +157,13 @@ const LoadFeedbackDone = cons(
 )
 
 const DashboardMsg = cons(
-  class DashboardMsg_ implements Msg {
+  class implements Msg {
     public constructor(private readonly msg: Dashboard.Msg) {}
 
     public update(model: Model): [Model, Cmd<Msg>] {
-      switch (model.screen.type) {
-        case 'DashboardScreen': {
-          const [nextDashboard, cmd] = this.msg.update(model.screen.dashboard)
+      return model.screen.cata({
+        DashboardScreen: dashboard => {
+          const [nextDashboard, cmd] = this.msg.update(dashboard)
 
           return [
             {
@@ -143,12 +172,30 @@ const DashboardMsg = cons(
             },
             cmd.map(DashboardMsg)
           ]
-        }
+        },
 
-        default: {
-          return [model, Cmd.none]
-        }
-      }
+        _: () => [model, Cmd.none]
+      })
+    }
+  }
+)
+
+const FeedbackMsg = cons(
+  class implements Msg {
+    public constructor(private readonly msg: Counter.Msg) {}
+
+    public update(model: Model): [Model, Cmd<Msg>] {
+      return [
+        model.screen.cata({
+          FeedbackScreen: (feedbackId, counter) => ({
+            ...model,
+            screen: FeedbackScreen(feedbackId, this.msg.update(counter))
+          }),
+
+          _: () => model
+        }),
+        Cmd.none
+      ]
     }
   }
 )
@@ -328,26 +375,30 @@ export const View: FC<{ model: Model; dispatch: Dispatch<Msg> }> = React.memo(
         />
       ),
 
-      Succeed: feedback => {
-        switch (model.screen.type) {
-          case 'DashboardScreen': {
-            return (
-              <Dashboard.View
-                feedback={feedback}
-                model={model.screen.dashboard}
-                dispatch={msg => dispatch(DashboardMsg(msg))}
-              />
-            )
-          }
+      Succeed: feedback =>
+        model.screen.cata({
+          DashboardScreen: dashboard => (
+            <Dashboard.View
+              feedback={feedback}
+              model={dashboard}
+              dispatch={React.useCallback(
+                msg => dispatch(DashboardMsg(msg)),
+                []
+              )}
+            />
+          ),
 
-          case 'FeedbackScreen': {
-            return <div>{model.screen.feedbackId}</div>
-          }
+          FeedbackScreen: (feedbackId, counter) => (
+            <Counter.View
+              model={counter}
+              dispatch={React.useCallback(
+                msg => dispatch(FeedbackMsg(msg)),
+                []
+              )}
+            />
+          ),
 
-          case 'NotFoundScreen': {
-            return <div>Not Found</div>
-          }
-        }
-      }
+          _: () => <div>Not Found</div>
+        })
     })
 )

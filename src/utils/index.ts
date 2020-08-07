@@ -4,6 +4,14 @@ export type Msg<A extends Array<unknown>, R> = {
   update(...args: A): R
 }
 
+export const callOrElse = <A extends Array<unknown>, R>(
+  defaultFn: (() => R) | undefined,
+  fn: ((...args: A) => R) | undefined,
+  ...args: A
+): R => {
+  return typeof fn === 'function' ? fn(...args) : (defaultFn as () => R)()
+}
+
 export type Fragment = {
   slice: string
   matched: boolean
