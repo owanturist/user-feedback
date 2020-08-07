@@ -3,28 +3,67 @@ import styled from '@emotion/styled/macro'
 import { css } from 'emotion/macro'
 import { Cmd } from 'frctl'
 import { cons } from 'frctl/Basics'
+import * as Http from 'frctl/Http'
+import Either from 'frctl/Either'
+import RemoteData from 'frctl/RemoteData'
 
 import { Dispatch } from 'Provider'
 import * as breakpoints from 'breakpoints'
 import * as api from 'api'
+import * as utils from 'utils'
 import * as Filters from 'Filters'
 import * as FeedbackTable from 'FeedbackTable'
-import * as utils from 'utils'
+import HttpFailureReport from 'HttpFailureReport'
 import { ReactComponent as TachometerIcon } from './tachometer.svg'
 
 // M O D E L
 
 export type Model = {
+  feedback: RemoteData<Http.Error, Array<api.Feedback>>
   filters: Filters.Model
 }
 
-export const initial: Model = {
-  filters: Filters.initial
-}
+export const init: [Model, Cmd<Msg>] = [
+  {
+    feedback: RemoteData.Loading,
+    filters: Filters.initial
+  },
+  api.getFeedback.send(result => LoadFeedbackDone(result))
+]
 
 // U P D A T E
 
 export type Msg = utils.Msg<[Model], [Model, Cmd<Msg>]>
+
+const LoadFeedback: Msg = {
+  update(model: Model): [Model, Cmd<Msg>] {
+    return [
+      {
+        ...model,
+        feedback: RemoteData.Loading
+      },
+      api.getFeedback.send(result => LoadFeedbackDone(result))
+    ]
+  }
+}
+
+const LoadFeedbackDone = cons(
+  class LoadFeedbackDone implements Msg {
+    public constructor(
+      private readonly result: Either<Http.Error, Array<api.Feedback>>
+    ) {}
+
+    public update(model: Model): [Model, Cmd<Msg>] {
+      return [
+        {
+          ...model,
+          feedback: RemoteData.fromEither(this.result)
+        },
+        Cmd.none
+      ]
+    }
+  }
+)
 
 const FiltersMsg = cons(
   class FiltersMsg implements Msg {
@@ -124,35 +163,31 @@ const ViewRoot: FC = ({ children, ...props }) => (
   </StyledRoot>
 )
 
-export const View: FC<{
+const ViewSucceed: FC<{
   feedback: Array<api.Feedback>
-  model: Model
+  filters: Filters.Model
   dispatch: Dispatch<Msg>
-}> = React.memo(({ feedback, model, dispatch }) => {
-  const items = React.useMemo(
-    () =>
-      feedback.reduce<Array<[Array<utils.Fragment>, api.Feedback]>>(
-        (acc, item) =>
-          Filters.toFragments(model.filters, item)
-            .map(fragments => {
-              acc.push([fragments, item])
+}> = React.memo(({ feedback, filters, dispatch }) => {
+  const items = feedback.reduce<Array<[Array<utils.Fragment>, api.Feedback]>>(
+    (acc, item) => {
+      return Filters.toFragments(filters, item).fold(
+        () => acc,
+        fragments => {
+          acc.push([fragments, item])
 
-              return acc
-            })
-            .getOrElse(acc),
-        []
-      ),
-    [feedback, model.filters]
+          return acc
+        }
+      )
+    },
+    []
   )
 
   return (
     <ViewRoot data-cy="dashboard__root">
       <Filters.View
         className={cssFilters}
-        model={model.filters}
-        dispatch={React.useCallback(msg => dispatch(FiltersMsg(msg)), [
-          dispatch
-        ])}
+        model={filters}
+        dispatch={msg => dispatch(FiltersMsg(msg))}
       />
 
       <FeedbackTable.View items={items} />
@@ -160,9 +195,33 @@ export const View: FC<{
   )
 })
 
+export const View: FC<{
+  model: Model
+  dispatch: Dispatch<Msg>
+}> = React.memo(({ model, dispatch }) =>
+  model.feedback.cata({
+    Loading: () => <Skeleton />,
+
+    Failure: error => (
+      <HttpFailureReport
+        error={error}
+        onTryAgain={() => dispatch(LoadFeedback)}
+      />
+    ),
+
+    Succeed: feedback => (
+      <ViewSucceed
+        feedback={feedback}
+        filters={model.filters}
+        dispatch={dispatch}
+      />
+    )
+  })
+)
+
 // S K E L E T O N
 
-export const Skeleton: FC = React.memo(() => (
+const Skeleton: FC = React.memo(() => (
   <ViewRoot data-cy="dashboard__skeleton">
     <Filters.Skeleton className={cssFilters} />
 
