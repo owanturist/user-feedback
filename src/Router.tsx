@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react'
+import React, { FC } from 'react'
 import { Cmd } from 'frctl'
 import { Cata, cons } from 'frctl/Basics'
 import { Url } from 'frctl/Url'
@@ -98,6 +98,7 @@ const ViewLink: FC<
   }
 > = React.memo(({ onChangeUrl, children, ...props }) => (
   <a
+    rel={props.target === '_blank' ? 'noreferrer' : null}
     {...props}
     onClick={React.useCallback(
       event => {
@@ -112,16 +113,16 @@ const ViewLink: FC<
 ))
 
 export const Link: FC<
-  React.AnchorHTMLAttributes<HTMLAnchorElement> & {
-    route: Route
-    children: ReactNode
-  }
+  | (Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
+      route: Route
+    })
+  | (React.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string })
 > = props => (
   <NavigationConsumer>
     {onChangeUrl => (
       <ViewLink
         {...props}
-        href={props.route.stringify()}
+        href={'route' in props ? props.route.stringify() : props.href}
         onChangeUrl={onChangeUrl}
       />
     )}

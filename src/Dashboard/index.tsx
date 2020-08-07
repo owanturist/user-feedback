@@ -29,7 +29,7 @@ export const init: [Model, Cmd<Msg>] = [
     feedback: RemoteData.Loading,
     filters: Filters.initial
   },
-  api.getFeedback.send(result => LoadFeedbackDone(result))
+  api.getFeedbackList.send(result => LoadFeedbackDone(result))
 ]
 
 // U P D A T E
@@ -43,7 +43,7 @@ const LoadFeedback: Msg = {
         ...model,
         feedback: RemoteData.Loading
       },
-      api.getFeedback.send(result => LoadFeedbackDone(result))
+      api.getFeedbackList.send(result => LoadFeedbackDone(result))
     ]
   }
 }
@@ -132,7 +132,7 @@ const StyledHeader = styled.header`
   justify-content: center;
   align-items: center;
   padding: 19px 16px;
-  color: rgb(94, 98, 100);
+  color: #5e6264;
   background: #fff;
   box-shadow: 0 0 2px 2px #dadee0;
   transition: box-shadow 0.4s ease;
