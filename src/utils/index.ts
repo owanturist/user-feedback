@@ -4,11 +4,13 @@ export type Msg<A extends Array<unknown>, R> = {
   update(...args: A): R
 }
 
-export const inst = <T>(Constructor: new () => T): T => new Constructor()
-
-export const cons = <A extends Array<unknown>, T>(
-  Constructor: new (...args: A) => A extends [] ? never : T
-) => (...args: A): T => new Constructor(...args)
+export const callOrElse = <A extends Array<unknown>, R>(
+  defaultFn: (() => R) | undefined,
+  fn: ((...args: A) => R) | undefined,
+  ...args: A
+): R => {
+  return typeof fn === 'function' ? fn(...args) : (defaultFn as () => R)()
+}
 
 export type Fragment = {
   slice: string

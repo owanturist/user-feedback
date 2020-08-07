@@ -1,6 +1,7 @@
 import React, { FC } from 'react'
 import styled from '@emotion/styled/macro'
 import { css } from 'emotion/macro'
+import { cons } from 'frctl/Basics'
 import Set from 'frctl/Set'
 import Maybe from 'frctl/Maybe'
 
@@ -44,7 +45,7 @@ export const toFragments = (
 
 export type Msg = utils.Msg<[Model], Model>
 
-const ChangeSearch = utils.cons(
+const ChangeSearch = cons(
   class ChangeSearch implements Msg {
     public constructor(private readonly input: string) {}
 
@@ -57,7 +58,7 @@ const ChangeSearch = utils.cons(
   }
 )
 
-const ToggleRating = utils.cons(
+const ToggleRating = cons(
   class ToggleRating implements Msg {
     public constructor(private readonly rating: api.Rating) {}
 

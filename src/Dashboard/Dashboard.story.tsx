@@ -1,8 +1,12 @@
 import React, { FC } from 'react'
 import { action } from '@storybook/addon-actions'
 
+import * as Http from 'frctl/Http'
+import RemoteData from 'frctl/RemoteData'
 import * as api from 'api'
 import * as Dashboard from './index'
+
+const [initial] = Dashboard.init
 
 const feedbackItems: Array<api.Feedback> = new Array(20)
   .fill(0)
@@ -23,12 +27,26 @@ export default {
   component: Dashboard.View
 }
 
-export const Skeleton: FC = () => <Dashboard.Skeleton />
+export const Loading: FC = () => (
+  <Dashboard.View model={initial} dispatch={action('dispatch')} />
+)
 
-export const Initial: FC = () => (
+export const Failure: FC = () => (
   <Dashboard.View
-    feedback={feedbackItems}
-    model={Dashboard.initial}
+    model={{
+      ...initial,
+      feedback: RemoteData.Failure(Http.Error.Timeout)
+    }}
+    dispatch={action('dispatch')}
+  />
+)
+
+export const Success: FC = () => (
+  <Dashboard.View
+    model={{
+      ...initial,
+      feedback: RemoteData.Succeed(feedbackItems)
+    }}
     dispatch={action('dispatch')}
   />
 )

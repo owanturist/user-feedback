@@ -1,11 +1,12 @@
 import React, { FC, ReactNode } from 'react'
 import styled from '@emotion/styled/macro'
 
-import * as Skelet from 'Skeleton'
-import * as Rating from 'Rating'
 import * as api from 'api'
 import * as breakpoints from 'breakpoints'
 import * as utils from 'utils'
+import * as Skelet from 'Skeleton'
+import * as Rating from 'Rating'
+import * as Router from 'Router'
 import { ReactComponent as EmptyTableIcon } from './empty-table.svg'
 
 const StyledLabel = styled.div`
@@ -110,11 +111,23 @@ const StyledItem = styled.div`
   }
 `
 
+const StyledItemLink = styled(StyledItem)`
+  text-decoration: inherit;
+  color: inherit;
+
+  &:hover {
+    background: #fafafa;
+  }
+`.withComponent(Router.Link)
+
 const ViewItem: FC<{
   fragments: Array<utils.Fragment>
   feedback: api.Feedback
 }> = React.memo(({ fragments, feedback }) => (
-  <StyledItem data-cy="feedback-table__item">
+  <StyledItemLink
+    data-cy="feedback-table__item"
+    route={Router.ToFeedback(feedback.id)}
+  >
     <ViewItemProperty label="Rating">
       <Rating.Static rating={feedback.rating} />
     </ViewItemProperty>
@@ -137,7 +150,7 @@ const ViewItem: FC<{
     <ViewItemProperty label="Platform">
       {feedback.browser.platform}
     </ViewItemProperty>
-  </StyledItem>
+  </StyledItemLink>
 ))
 
 const StyledHeaderCell = styled.div`
