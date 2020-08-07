@@ -281,10 +281,10 @@ const StyledError = styled.div`
   overflow-y: auto;
 `
 
-const ViewError: FC<{ error: Http.Error; onTryAgain(): void }> = ({
-  error,
-  onTryAgain
-}) => (
+const ViewError: FC<{
+  error: Http.Error
+  dispatch: Dispatch<Msg>
+}> = React.memo(({ error, dispatch }) => (
   <StyledError>
     {error.cata({
       NetworkError: () => (
@@ -294,7 +294,7 @@ const ViewError: FC<{ error: Http.Error; onTryAgain(): void }> = ({
             Pleace check your Internet connection and try again.
           </StyledErrorDescription>
 
-          <ViewTryAgain onTryAgain={onTryAgain} />
+          <ViewTryAgain onTryAgain={() => dispatch(LoadFeedback)} />
         </StyledErrorPanel>
       ),
 
@@ -306,7 +306,7 @@ const ViewError: FC<{ error: Http.Error; onTryAgain(): void }> = ({
             connection and try again.
           </StyledErrorDescription>
 
-          <ViewTryAgain onTryAgain={onTryAgain} />
+          <ViewTryAgain onTryAgain={() => dispatch(LoadFeedback)} />
         </StyledErrorPanel>
       ),
 
@@ -361,40 +361,50 @@ const ViewError: FC<{ error: Http.Error; onTryAgain(): void }> = ({
       )
     })}
   </StyledError>
-)
+))
+
+const ViewDashboardScreen: FC<{
+  feedback: Array<api.Feedback>
+  dashboard: Dashboard.Model
+  dispatch: Dispatch<Msg>
+}> = React.memo(({ feedback, dashboard, dispatch }) => (
+  <Dashboard.View
+    feedback={feedback}
+    model={dashboard}
+    dispatch={msg => dispatch(DashboardMsg(msg))}
+  />
+))
+
+const ViewFeedbackScreen: FC<{
+  feedbackId: string
+  counter: Counter.Model
+  dispatch: Dispatch<Msg>
+}> = React.memo(({ counter, dispatch }) => (
+  <Counter.View model={counter} dispatch={msg => dispatch(FeedbackMsg(msg))} />
+))
 
 export const View: FC<{ model: Model; dispatch: Dispatch<Msg> }> = React.memo(
   ({ model, dispatch }) =>
     model.feedback.cata({
       Loading: () => <Dashboard.Skeleton />,
 
-      Failure: error => (
-        <ViewError
-          error={error}
-          onTryAgain={React.useCallback(() => dispatch(LoadFeedback), [])}
-        />
-      ),
+      Failure: error => <ViewError error={error} dispatch={dispatch} />,
 
       Succeed: feedback =>
         model.screen.cata({
           DashboardScreen: dashboard => (
-            <Dashboard.View
+            <ViewDashboardScreen
               feedback={feedback}
-              model={dashboard}
-              dispatch={React.useCallback(
-                msg => dispatch(DashboardMsg(msg)),
-                []
-              )}
+              dashboard={dashboard}
+              dispatch={dispatch}
             />
           ),
 
           FeedbackScreen: (feedbackId, counter) => (
-            <Counter.View
-              model={counter}
-              dispatch={React.useCallback(
-                msg => dispatch(FeedbackMsg(msg)),
-                []
-              )}
+            <ViewFeedbackScreen
+              feedbackId={feedbackId}
+              counter={counter}
+              dispatch={dispatch}
             />
           ),
 
