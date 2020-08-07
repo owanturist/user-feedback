@@ -69,10 +69,7 @@ const dayjsDecoder: Decode.Decoder<Dayjs> = Decode.oneOf([
   date.isValid() ? Decode.succeed(date) : Decode.fail('Date is invalid.')
 )
 
-export type LngLat = {
-  lng: number
-  lat: number
-}
+export type LngLat = [number, number]
 
 const lngLatDecoder: Decode.Decoder<LngLat> = Decode.oneOf([
   // lon/lat object notation
@@ -92,7 +89,7 @@ const lngLatDecoder: Decode.Decoder<LngLat> = Decode.oneOf([
     lng: Decode.index(0).float,
     lat: Decode.index(1).float
   })
-])
+]).map(({ lat, lng }) => [lat, lng])
 
 export type Geo = {
   country: string

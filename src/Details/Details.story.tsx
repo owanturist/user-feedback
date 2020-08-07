@@ -49,18 +49,18 @@ const screenKnob = (screen: api.Screen): api.Screen => ({
   availableTop: rangeKnob(`Screen Top`, 500, screen.availableTop)
 })
 
-const lngLatKnob = (label: string, lng: number, lat: number): api.LngLat => ({
-  lng: number(`${label} Lng`, lng, {
+const lngLatKnob = (label: string, lng: number, lat: number): api.LngLat => [
+  number(`${label} Lng`, lng, {
     min: -180,
     max: 180,
     step: 0.01
   }),
-  lat: number(`${label} Lat`, lat, {
+  number(`${label} Lat`, lat, {
     min: -90,
     max: 90,
     step: 0.01
   })
-})
+]
 
 export const Succeed: FC = () => (
   <Details.View
@@ -100,7 +100,7 @@ export const Succeed: FC = () => (
         geo: {
           country: text('Geo Country', 'FR'),
           city: text('Geo City', 'Paris'),
-          position: lngLatKnob('Geo Position', 48.8667, 2.3333)
+          position: lngLatKnob('Geo Position', 2.3333, 48.8667)
         }
       })
     }}

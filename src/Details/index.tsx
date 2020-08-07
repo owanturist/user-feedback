@@ -1,5 +1,6 @@
 import React, { FC, ReactNode } from 'react'
 import styled from '@emotion/styled/macro'
+import { Map as ReactMapboxGl, Marker } from 'react-mapbox-gl'
 import { css } from 'emotion/macro'
 import { Cmd } from 'frctl'
 import * as Http from 'frctl/Http'
@@ -10,6 +11,7 @@ import * as api from 'api'
 import * as utils from 'utils'
 import * as Router from 'Router'
 import * as Skeleton from 'Skeleton'
+import { ReactComponent as MarkerIcon } from './marker.svg'
 
 // M O D E L
 
@@ -30,11 +32,51 @@ export type Msg = utils.Msg<[Model], [Model, Cmd<Msg>]>
 
 // V I E W
 
+const VIEWPORT_WIDTH = 300
+
 const cssLink = css`
   color: #1ea0be;
 `
 
-const VIEWPORT_WIDTH = 300
+const StyledMap = styled(
+  ReactMapboxGl({
+    accessToken: process.env.REACT_APP_MAPBOX_TOKEN || ''
+  })
+)`
+  margin-top: 15px;
+`
+
+const StyledMarkerIcon = styled(MarkerIcon)`
+  height: 50px;
+  color: #be1ea0;
+`
+
+const ViewMapSection: FC<{
+  geo: api.Geo
+}> = React.memo(({ geo }) => (
+  <ViewSection title="Geo location">
+    <ViewPairs
+      items={[
+        ['Country', geo.country],
+        ['City', geo.city]
+      ]}
+    />
+
+    <StyledMap
+      style="mapbox://styles/mapbox/streets-v11"
+      containerStyle={{
+        width: '100%',
+        height: '300px'
+      }}
+      zoom={[14]}
+      center={geo.position}
+    >
+      <Marker coordinates={geo.position}>
+        <StyledMarkerIcon />
+      </Marker>
+    </StyledMap>
+  </ViewSection>
+))
 
 const StyledViewportMarker = styled.span`
   padding-bottom: 2px;
@@ -223,6 +265,8 @@ const ViewSucceed: FC<{ feedback: api.FeedbackDetailed }> = React.memo(
         viewport={feedback.viewport}
         screen={feedback.screen}
       />
+
+      <ViewMapSection geo={feedback.geo} />
     </StyledSections>
   )
 )

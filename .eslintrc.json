@@ -118,6 +118,7 @@
         "no-unused-vars": "off",
         "array-callback-return": "off",
         "consistent-return": "off",
+        "padding-line-between-statements": ["error", { "blankLine": "always", "prev": "*", "next": "return" }],
 
         // Typescript Eslint
         "@typescript-eslint/no-unused-vars": "warn",
@@ -161,7 +162,9 @@
         "react/no-unescaped-entities": "off",
         "react/jsx-curly-brace-presence": "error",
         "react/display-name": "off",
-        "padding-line-between-statements": ["error", { "blankLine": "always", "prev": "*", "next": "return" }]
+        "react/style-prop-object": ["warn", {
+          "allow": ["ViewMap", "StyledMap", "Map"]
+        }]
       }
     }
   ]
