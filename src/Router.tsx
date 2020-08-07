@@ -28,7 +28,7 @@ export type DashboardFilters = {
 
 export type RoutePattern<R> = Cata<{
   ToDashboard(filters: DashboardFilters): R
-  ToFeedback(feedbackId: string): R
+  ToDetails(feedbackId: string): R
 }>
 
 export type Route = {
@@ -37,7 +37,7 @@ export type Route = {
 }
 
 export const ToDashboard = cons(
-  class ToDashboard implements Route {
+  class implements Route {
     public constructor(private readonly filters: DashboardFilters) {}
 
     public stringify(): string {
@@ -55,16 +55,16 @@ export const ToDashboard = cons(
   }
 )
 
-export const ToFeedback = cons(
-  class ToFeedback implements Route {
+export const ToDetails = cons(
+  class implements Route {
     public constructor(private readonly feedbackId: string) {}
 
     public stringify(): string {
-      return `/feedback/${this.feedbackId}`
+      return `/details/${this.feedbackId}`
     }
 
     public cata<R>(pattern: RoutePattern<R>): R {
-      return utils.callOrElse(pattern._, pattern.ToFeedback, this.feedbackId)
+      return utils.callOrElse(pattern._, pattern.ToDetails, this.feedbackId)
     }
   }
 )
@@ -87,7 +87,7 @@ const parser = UrlParser.oneOf([
       })
     ),
 
-  UrlParser.s('feedback').slash.string.map(ToFeedback)
+  UrlParser.s('details').slash.string.map(ToDetails)
 ])
 
 export const parse = (url: Url): Maybe<Route> => parser.parse(url)
@@ -96,8 +96,7 @@ const ViewLink: FC<
   React.AnchorHTMLAttributes<HTMLAnchorElement> & {
     onChangeUrl(href: string): void
   }
-> = React.memo(({ onChangeUrl, ...props }) => (
-  // eslint-disable-next-line jsx-a11y/anchor-has-content
+> = React.memo(({ onChangeUrl, children, ...props }) => (
   <a
     {...props}
     onClick={React.useCallback(
@@ -107,7 +106,9 @@ const ViewLink: FC<
       },
       [onChangeUrl]
     )}
-  />
+  >
+    {children}
+  </a>
 ))
 
 export const Link: FC<

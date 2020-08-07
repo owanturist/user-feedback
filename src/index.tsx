@@ -16,7 +16,7 @@ import * as utils from 'utils'
 
 type ScreenPattern<R> = Cata<{
   DashboardScreen(dashboard: Dashboard.Model): R
-  FeedbackScreen(feedbackId: string, counter: Counter.Model): R
+  DetailsScreen(feedbackId: string, counter: Counter.Model): R
   NotFoundScreen(): R
 }>
 
@@ -38,8 +38,8 @@ const DashboardScreen = cons<[Dashboard.Model], Screen>(
   }
 )
 
-const FeedbackScreen = cons<[string, Counter.Model], Screen>(
-  class FeedbackScreen implements Screen {
+const DetailsScreen = cons<[string, Counter.Model], Screen>(
+  class DetailsScreen implements Screen {
     public constructor(
       private readonly feedbackId: string,
       private readonly counter: Counter.Model
@@ -48,7 +48,7 @@ const FeedbackScreen = cons<[string, Counter.Model], Screen>(
     public cata<R>(pattern: ScreenPattern<R>): R {
       return utils.callOrElse(
         pattern._,
-        pattern.FeedbackScreen,
+        pattern.DetailsScreen,
         this.feedbackId,
         this.counter
       )
@@ -74,8 +74,8 @@ const screenFromUrl = (url: Url): [Screen, Cmd<Msg>] => {
             initialCmd.map(DashboardMsg)
           ]
         },
-        ToFeedback: feedbackId => [
-          FeedbackScreen(feedbackId, Counter.initial),
+        ToDetails: feedbackId => [
+          DetailsScreen(feedbackId, Counter.initial),
           Cmd.none
         ]
       })
@@ -169,9 +169,9 @@ const FeedbackMsg = cons(
     public update(model: Model): [Model, Cmd<Msg>] {
       return [
         model.screen.cata({
-          FeedbackScreen: (feedbackId, counter) => ({
+          DetailsScreen: (feedbackId, counter) => ({
             ...model,
-            screen: FeedbackScreen(feedbackId, this.msg.update(counter))
+            screen: DetailsScreen(feedbackId, this.msg.update(counter))
           }),
 
           _: () => model
@@ -194,7 +194,7 @@ const ViewDashboardScreen: FC<{
   />
 ))
 
-const ViewFeedbackScreen: FC<{
+const ViewDetailsScreen: FC<{
   feedbackId: string
   counter: Counter.Model
   dispatch: Dispatch<Msg>
@@ -209,8 +209,8 @@ const View: FC<{ model: Model; dispatch: Dispatch<Msg> }> = React.memo(
         <ViewDashboardScreen dashboard={dashboard} dispatch={dispatch} />
       ),
 
-      FeedbackScreen: (feedbackId, counter) => (
-        <ViewFeedbackScreen
+      DetailsScreen: (feedbackId, counter) => (
+        <ViewDetailsScreen
           feedbackId={feedbackId}
           counter={counter}
           dispatch={dispatch}

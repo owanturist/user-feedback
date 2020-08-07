@@ -126,7 +126,7 @@ const ViewItem: FC<{
 }> = React.memo(({ fragments, feedback }) => (
   <StyledItemLink
     data-cy="feedback-table__item"
-    route={Router.ToFeedback(feedback.id)}
+    route={Router.ToDetails(feedback.id)}
   >
     <ViewItemProperty label="Rating">
       <Rating.Static rating={feedback.rating} />
