@@ -98,7 +98,8 @@ const ViewLink: FC<
   }
 > = React.memo(({ onChangeUrl, children, ...props }) => (
   <a
-    rel={props.target === '_blank' ? 'noreferrer' : null}
+    // eslint-disable-next-line no-undefined
+    rel={props.target === '_blank' ? 'noreferrer' : undefined}
     {...props}
     onClick={React.useCallback(
       event => {

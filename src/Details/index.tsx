@@ -70,8 +70,10 @@ const StyledViewportContainer = styled.div`
   position: relative;
 `
 
-type ViewScreenViewportSectionState = {
-  selected: 'none' | 'viewport' | 'screen'
+enum ViewportSelection {
+  None,
+  Viewport,
+  Screen
 }
 
 const ViewScreenViewportSection: FC<{
@@ -79,14 +81,12 @@ const ViewScreenViewportSection: FC<{
   screen: api.Screen
 }> = React.memo(({ viewport, screen }) => {
   const relativePx = VIEWPORT_WIDTH / viewport.width
-  const [{ selected }, setState] = React.useState<
-    ViewScreenViewportSectionState
-  >({
-    selected: 'none'
-  })
-  const selectViewport = (): void => setState({ selected: 'viewport' })
-  const selectScreen = (): void => setState({ selected: 'screen' })
-  const unselect = (): void => setState({ selected: 'none' })
+  const [selection, setSelection] = React.useState<ViewportSelection>(
+    ViewportSelection.None
+  )
+  const selectViewport = (): void => setSelection(ViewportSelection.Viewport)
+  const selectScreen = (): void => setSelection(ViewportSelection.Screen)
+  const unselect = (): void => setSelection(ViewportSelection.None)
 
   const titleView = (
     <>
@@ -107,7 +107,7 @@ const ViewScreenViewportSection: FC<{
     <ViewSection title={titleView}>
       <StyledViewportContainer>
         <StyledViewport
-          dim={selected === 'screen'}
+          dim={selection === ViewportSelection.Screen}
           style={{
             height: `${relativePx * viewport.height}px`
           }}
@@ -116,7 +116,7 @@ const ViewScreenViewportSection: FC<{
         />
 
         <StyledScreen
-          dim={selected === 'viewport'}
+          dim={selection === ViewportSelection.Viewport}
           style={{
             top: `${relativePx * screen.availableTop}px`,
             left: `${relativePx * screen.availableLeft}px`,
