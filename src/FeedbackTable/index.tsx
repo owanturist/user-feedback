@@ -111,7 +111,14 @@ const StyledItem = styled.div`
   }
 `
 
-const StyledItemLink = StyledItem.withComponent(Router.Link)
+const StyledItemLink = styled(StyledItem)`
+  text-decoration: inherit;
+  color: inherit;
+
+  &:hover {
+    background: #fafafa;
+  }
+`.withComponent(Router.Link)
 
 const ViewItem: FC<{
   fragments: Array<utils.Fragment>
