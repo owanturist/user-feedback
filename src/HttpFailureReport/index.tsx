@@ -57,7 +57,7 @@ const StyledPre = styled.pre`
   text-align: left;
 `
 
-const StyledPanel = styled.div`
+const StyledRoot = styled.div`
   box-sizing: border-box;
   max-width: 560px;
   padding: 50px;
@@ -70,36 +70,26 @@ const StyledPanel = styled.div`
   overflow-y: auto;
 `
 
-const StyledRoot = styled.div`
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 16px;
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
-`
-
 const FailureReport: FC<{
+  className?: string
   error: Http.Error
   onTryAgain(): void
-}> = React.memo(({ error, onTryAgain }) => (
-  <StyledRoot>
+}> = React.memo(({ className, error, onTryAgain }) => (
+  <StyledRoot className={className}>
     {error.cata({
       NetworkError: () => (
-        <StyledPanel>
+        <>
           <StyledTitle>You are facing a Network Error</StyledTitle>
           <StyledDescription>
             Pleace check your Internet connection and try again.
           </StyledDescription>
 
           <ViewTryAgain onTryAgain={onTryAgain} />
-        </StyledPanel>
+        </>
       ),
 
       Timeout: () => (
-        <StyledPanel>
+        <>
           <StyledTitle>You are facing a Timeout issue</StyledTitle>
           <StyledDescription>
             It takes too long to get a response so please check your Internect
@@ -107,17 +97,17 @@ const FailureReport: FC<{
           </StyledDescription>
 
           <ViewTryAgain onTryAgain={onTryAgain} />
-        </StyledPanel>
+        </>
       ),
 
       BadUrl: url => (
-        <StyledPanel>
+        <>
           <StyledTitle>Oops... we broke something...</StyledTitle>
           <StyledDescription>
             It looks like the app hits a wrong endpoint <code>{url}</code>.
           </StyledDescription>
           <StyledDescription>We are fixing the issue.</StyledDescription>
-        </StyledPanel>
+        </>
       ),
 
       BadStatus: ({ statusCode }) => {
@@ -125,7 +115,7 @@ const FailureReport: FC<{
           statusCode < 500 ? ['Client', 'frontend'] : ['Server', 'backend']
 
         return (
-          <StyledPanel>
+          <>
             <StyledTitle>
               You are facing an unexpected {side}&nbsp;side&nbsp;Error&nbsp;
               {statusCode}!
@@ -134,12 +124,12 @@ const FailureReport: FC<{
             <StyledDescription>
               Our {role} developers are fixing the issue.
             </StyledDescription>
-          </StyledPanel>
+          </>
         )
       },
 
       BadBody: decoderError => (
-        <StyledPanel>
+        <>
           <StyledTitle>
             You are facing an unexpected Response Body Error!
           </StyledTitle>
@@ -155,7 +145,7 @@ const FailureReport: FC<{
               .replace(/\s{2}\s+"/, '\n\n"')
               .replace(/\\n/g, '\n')}
           </StyledPre>
-        </StyledPanel>
+        </>
       )
     })}
   </StyledRoot>

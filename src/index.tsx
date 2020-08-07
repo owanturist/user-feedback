@@ -139,7 +139,7 @@ const ChangeUrl = cons(
 )
 
 const DashboardMsg = cons(
-  class implements Msg {
+  class DashboardMsg_ implements Msg {
     public constructor(private readonly msg: Dashboard.Msg) {}
 
     public update(model: Model): [Model, Cmd<Msg>] {
@@ -163,7 +163,7 @@ const DashboardMsg = cons(
 )
 
 const FeedbackMsg = cons(
-  class implements Msg {
+  class FeedbackMsg_ implements Msg {
     public constructor(private readonly msg: Counter.Msg) {}
 
     public update(model: Model): [Model, Cmd<Msg>] {

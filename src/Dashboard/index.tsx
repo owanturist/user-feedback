@@ -13,6 +13,7 @@ import * as api from 'api'
 import * as utils from 'utils'
 import * as Filters from 'Filters'
 import * as FeedbackTable from 'FeedbackTable'
+import Container from 'Container'
 import HttpFailureReport from 'HttpFailureReport'
 import { ReactComponent as TachometerIcon } from './tachometer.svg'
 
@@ -84,31 +85,30 @@ const FiltersMsg = cons(
 // V I E W
 
 const cssFilters = css`
-  margin-bottom: 16px;
+  margin: 16px 0;
 
   @media ${breakpoints.big.minWidth} {
-    margin-bottom: 28px;
+    margin: 28px 0;
   }
 `
 
-const StyledContainer = styled.div`
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  margin: 0 auto;
-  padding: 16px;
-  width: 100%;
-  max-width: 1454px;
-
-  @media ${breakpoints.big.minWidth} {
-    padding-top: 28px;
-  }
+const cssFeedbackTable = css`
+  margin-bottom: 16px;
 `
 
 const StyledScroller = styled.div`
   flex: 1 1 auto;
   overflow-y: auto;
   scroll-behavior: smooth;
+`
+
+const StyledErrorReportContainer = styled.div`
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  min-height: 100%;
 `
 
 const StyledIcon = styled(TachometerIcon)`
@@ -157,9 +157,7 @@ const ViewRoot: FC = ({ children, ...props }) => (
   <StyledRoot {...props}>
     <ViewHeader />
 
-    <StyledScroller>
-      <StyledContainer>{children}</StyledContainer>
-    </StyledScroller>
+    <StyledScroller>{children}</StyledScroller>
   </StyledRoot>
 )
 
@@ -184,13 +182,15 @@ const ViewSucceed: FC<{
 
   return (
     <ViewRoot data-cy="dashboard__root">
-      <Filters.View
-        className={cssFilters}
-        model={filters}
-        dispatch={msg => dispatch(FiltersMsg(msg))}
-      />
+      <Container>
+        <Filters.View
+          className={cssFilters}
+          model={filters}
+          dispatch={msg => dispatch(FiltersMsg(msg))}
+        />
 
-      <FeedbackTable.View items={items} />
+        <FeedbackTable.View className={cssFeedbackTable} items={items} />
+      </Container>
     </ViewRoot>
   )
 })
@@ -203,10 +203,14 @@ export const View: FC<{
     Loading: () => <Skeleton />,
 
     Failure: error => (
-      <HttpFailureReport
-        error={error}
-        onTryAgain={() => dispatch(LoadFeedback)}
-      />
+      <ViewRoot>
+        <StyledErrorReportContainer>
+          <HttpFailureReport
+            error={error}
+            onTryAgain={() => dispatch(LoadFeedback)}
+          />
+        </StyledErrorReportContainer>
+      </ViewRoot>
     ),
 
     Succeed: feedback => (
@@ -223,8 +227,10 @@ export const View: FC<{
 
 const Skeleton: FC = React.memo(() => (
   <ViewRoot data-cy="dashboard__skeleton">
-    <Filters.Skeleton className={cssFilters} />
+    <Container>
+      <Filters.Skeleton className={cssFilters} />
 
-    <FeedbackTable.Skeleton count={20} />
+      <FeedbackTable.Skeleton className={cssFeedbackTable} count={20} />
+    </Container>
   </ViewRoot>
 ))
