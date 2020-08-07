@@ -7,6 +7,7 @@ import * as Http from 'frctl/Http'
 import RemoteData from 'frctl/RemoteData'
 
 import { Dispatch } from 'Provider'
+import * as breakpoints from 'breakpoints'
 import * as api from 'api'
 import * as utils from 'utils'
 import * as Router from 'Router'
@@ -39,6 +40,38 @@ const cssLink = css`
   color: #1ea0be;
 `
 
+const StyledSectionTitle = styled.h3`
+  margin: 0;
+  color: #333;
+  font-weight: 600;
+  font-size: 18px;
+`
+
+const StyledSectionContent = styled.div`
+  margin: 16px 0 0;
+  color: #59636b;
+`
+
+const StyledSection = styled.section`
+  flex: 1 0 auto;
+  margin: 10px 0 0 10px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 3px;
+  box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);
+`
+
+const ViewSection: FC<{ title?: ReactNode }> = ({
+  title,
+  children,
+  ...props
+}) => (
+  <StyledSection {...props}>
+    {title && <StyledSectionTitle>{title}</StyledSectionTitle>}
+    <StyledSectionContent>{children}</StyledSectionContent>
+  </StyledSection>
+)
+
 const StyledMap = styled(
   ReactMapboxGl({
     accessToken: process.env.REACT_APP_MAPBOX_TOKEN || ''
@@ -65,7 +98,7 @@ const ViewMapSection: FC<{
       style="mapbox://styles/mapbox/streets-v11"
       containerStyle={{
         width: '100%',
-        height: '300px'
+        height: '450px'
       }}
       zoom={[14]}
       center={geo.position}
@@ -172,6 +205,54 @@ const ViewScreenViewportSection: FC<{
   )
 })
 
+const ViewBasicSection: FC<{ feedback: api.FeedbackDetailed }> = ({
+  feedback
+}) => (
+  <ViewSection>
+    <ViewPairs>
+      <ViewPair label="Rating">
+        <Rating.Static rating={feedback.rating} />
+      </ViewPair>
+
+      <ViewPair label="Creation Date">
+        {feedback.creationDate.format('HH:mm, dd.MM.YYYY')}
+      </ViewPair>
+
+      <ViewPair label="Contact email">
+        <a
+          className={cssLink}
+          href={`mailto:${feedback.email}`}
+          title="Write an email"
+        >
+          {feedback.email}
+        </a>
+      </ViewPair>
+
+      <ViewPair label="Source url">
+        <Router.Link
+          className={cssLink}
+          href={feedback.url}
+          title="Visit source url"
+          target="_blank"
+        >
+          {feedback.url}
+        </Router.Link>
+      </ViewPair>
+    </ViewPairs>
+  </ViewSection>
+)
+
+const ViewBrowserSection: FC<{ browser: api.Browser }> = ({ browser }) => (
+  <ViewSection title="Browser">
+    <ViewPairs>
+      <ViewPair label="Name">{browser.name}</ViewPair>
+      <ViewPair label="Version">{browser.version}</ViewPair>
+      <ViewPair label="Platform">{browser.platform}</ViewPair>
+      <ViewPair label="Device">{browser.device}</ViewPair>
+    </ViewPairs>
+  </ViewSection>
+)
+
 const StyledTable = styled.table`
   font-size: 14px;
 
@@ -197,88 +278,38 @@ const ViewPairs: FC = ({ children }) => (
   </StyledTable>
 )
 
-const StyledSectionTitle = styled.h3`
-  margin: 0;
-  color: #333;
-  font-weight: 600;
-  font-size: 18px;
-`
-
-const StyledSectionContent = styled.div`
-  margin: 16px 0 0;
-  color: #59636b;
-`
-
-const StyledSection = styled.section`
-  margin: 10px 0 0 10px;
-  padding: 20px;
-  background: #fff;
-  border-radius: 3px;
-  box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);
-`
-
-const ViewSection: FC<{ title?: ReactNode }> = ({ title, children }) => (
-  <StyledSection>
-    {title && <StyledSectionTitle>{title}</StyledSectionTitle>}
-    <StyledSectionContent>{children}</StyledSectionContent>
-  </StyledSection>
-)
-
 const StyledSections = styled.div`
   display: flex;
   flex-direction: column;
   margin: -10px 0 0 -10px;
+
+  @media ${breakpoints.big.minWidth} {
+    flex-flow: row nowrap;
+  }
+`
+
+const StyledCol = styled.div`
+  display: flex;
+  flex-flow: row wrap;
+
+  @media ${breakpoints.big.minWidth} {
+    flex-direction: column;
+  }
 `
 
 const ViewSucceed: FC<{ feedback: api.FeedbackDetailed }> = React.memo(
   ({ feedback }) => (
     <StyledSections>
-      <ViewSection>
-        <ViewPairs>
-          <ViewPair label="Rating">
-            <Rating.Static rating={feedback.rating} />
-          </ViewPair>
+      <StyledCol>
+        <ViewBasicSection feedback={feedback} />
 
-          <ViewPair label="Creation Date">
-            {feedback.creationDate.format('HH:mm, dd.MM.YYYY')}
-          </ViewPair>
+        <ViewBrowserSection browser={feedback.browser} />
 
-          <ViewPair label="Contact email">
-            <a
-              className={cssLink}
-              href={`mailto:${feedback.email}`}
-              title="Write an email"
-            >
-              {feedback.email}
-            </a>
-          </ViewPair>
-
-          <ViewPair label="Source url">
-            <Router.Link
-              className={cssLink}
-              href={feedback.url}
-              title="Visit source url"
-              target="_blank"
-            >
-              {feedback.url}
-            </Router.Link>
-          </ViewPair>
-        </ViewPairs>
-      </ViewSection>
-
-      <ViewSection title="Browser">
-        <ViewPairs>
-          <ViewPair label="Name">{feedback.browser.name}</ViewPair>
-          <ViewPair label="Version">{feedback.browser.version}</ViewPair>
-          <ViewPair label="Platform">{feedback.browser.platform}</ViewPair>
-          <ViewPair label="Device">{feedback.browser.device}</ViewPair>
-        </ViewPairs>
-      </ViewSection>
-
-      <ViewScreenViewportSection
-        viewport={feedback.viewport}
-        screen={feedback.screen}
-      />
+        <ViewScreenViewportSection
+          viewport={feedback.viewport}
+          screen={feedback.screen}
+        />
+      </StyledCol>
 
       <ViewMapSection geo={feedback.geo} />
     </StyledSections>
