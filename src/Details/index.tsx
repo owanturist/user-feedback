@@ -11,6 +11,7 @@ import * as api from 'api'
 import * as utils from 'utils'
 import * as Router from 'Router'
 import * as Skeleton from 'Skeleton'
+import * as Rating from 'Rating'
 import { ReactComponent as MarkerIcon } from './marker.svg'
 
 // M O D E L
@@ -55,12 +56,10 @@ const ViewMapSection: FC<{
   geo: api.Geo
 }> = React.memo(({ geo }) => (
   <ViewSection title="Geo location">
-    <ViewPairs
-      items={[
-        ['Country', geo.country],
-        ['City', geo.city]
-      ]}
-    />
+    <ViewPairs>
+      <ViewPair label="Country">{geo.country}</ViewPair>
+      <ViewPair label="City">{geo.city}</ViewPair>
+    </ViewPairs>
 
     <StyledMap
       style="mapbox://styles/mapbox/streets-v11"
@@ -174,22 +173,27 @@ const ViewScreenViewportSection: FC<{
 })
 
 const StyledTable = styled.table`
+  font-size: 14px;
+
   td {
-    padding: 2px 5px;
-    font-size: 14px;
+    padding: 2px;
+
+    + td {
+      padding-left: 20px;
+    }
   }
 `
 
-const ViewPairs: FC<{ items: Array<[string, ReactNode]> }> = ({ items }) => (
+const ViewPair: FC<{ label: ReactNode }> = ({ label, children }) => (
+  <tr>
+    <td>{label}</td>
+    <td>{children}</td>
+  </tr>
+)
+
+const ViewPairs: FC = ({ children }) => (
   <StyledTable>
-    <tbody>
-      {items.map(([label, content]) => (
-        <tr key={label}>
-          <td>{label}</td>
-          <td>{content}</td>
-        </tr>
-      ))}
-    </tbody>
+    <tbody>{children}</tbody>
   </StyledTable>
 )
 
@@ -213,9 +217,9 @@ const StyledSection = styled.section`
   box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);
 `
 
-const ViewSection: FC<{ title: ReactNode }> = ({ title, children }) => (
+const ViewSection: FC<{ title?: ReactNode }> = ({ title, children }) => (
   <StyledSection>
-    <StyledSectionTitle>{title}</StyledSectionTitle>
+    {title && <StyledSectionTitle>{title}</StyledSectionTitle>}
     <StyledSectionContent>{children}</StyledSectionContent>
   </StyledSection>
 )
@@ -229,36 +233,46 @@ const StyledSections = styled.div`
 const ViewSucceed: FC<{ feedback: api.FeedbackDetailed }> = React.memo(
   ({ feedback }) => (
     <StyledSections>
-      <ViewSection title="Contact email">
-        <a
-          className={cssLink}
-          href={`mailto:${feedback.email}`}
-          title="Write an email"
-        >
-          {feedback.email}
-        </a>
-      </ViewSection>
+      <ViewSection>
+        <ViewPairs>
+          <ViewPair label="Rating">
+            <Rating.Static rating={feedback.rating} />
+          </ViewPair>
 
-      <ViewSection title="Source URL">
-        <Router.Link
-          className={cssLink}
-          href={feedback.url}
-          title="Visit source url"
-          target="_blank"
-        >
-          {feedback.url}
-        </Router.Link>
+          <ViewPair label="Creation Date">
+            {feedback.creationDate.format('HH:mm, dd.MM.YYYY')}
+          </ViewPair>
+
+          <ViewPair label="Contact email">
+            <a
+              className={cssLink}
+              href={`mailto:${feedback.email}`}
+              title="Write an email"
+            >
+              {feedback.email}
+            </a>
+          </ViewPair>
+
+          <ViewPair label="Source url">
+            <Router.Link
+              className={cssLink}
+              href={feedback.url}
+              title="Visit source url"
+              target="_blank"
+            >
+              {feedback.url}
+            </Router.Link>
+          </ViewPair>
+        </ViewPairs>
       </ViewSection>
 
       <ViewSection title="Browser">
-        <ViewPairs
-          items={[
-            ['Name', feedback.browser.name],
-            ['Version', feedback.browser.version],
-            ['Platform', feedback.browser.platform],
-            ['Device', feedback.browser.device]
-          ]}
-        />
+        <ViewPairs>
+          <ViewPair label="Name">{feedback.browser.name}</ViewPair>
+          <ViewPair label="Version">{feedback.browser.version}</ViewPair>
+          <ViewPair label="Platform">{feedback.browser.platform}</ViewPair>
+          <ViewPair label="Device">{feedback.browser.device}</ViewPair>
+        </ViewPairs>
       </ViewSection>
 
       <ViewScreenViewportSection

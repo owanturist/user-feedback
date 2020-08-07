@@ -86,7 +86,9 @@ export const Succeed: FC = () => (
         // detailed
         email: text('Email', 'test@mail.com'),
         url: text('Url', 'https://google.com'),
-        creationDate: dayjs(date('Creation Date', new Date(2020, 7, 7))),
+        creationDate: dayjs(
+          date('Creation Date', new Date(2020, 7, 7, 11, 48))
+        ),
         viewport: viewportKnob({
           width: 1583,
           height: 865
