@@ -105,19 +105,22 @@ const ViewMapSection: FC<{
   </ViewSection>
 ))
 
-const StyledViewportMarker = styled.span`
+type StyledViewportMarkerProps = {
+  dim: boolean
+}
+
+const StyledViewportMarker = styled.span<StyledViewportMarkerProps>`
   padding-bottom: 2px;
   border-bottom: 2px solid #be1ea0;
   cursor: default;
+  opacity: ${props => props.dim && 0.4};
 `
 
 const StyledScreenMarker = styled(StyledViewportMarker)`
   border-color: #1ea0be;
 `
 
-type StyledViewportProps = {
-  dim: boolean
-}
+type StyledViewportProps = StyledViewportMarkerProps
 
 const StyledViewport = styled.div<StyledViewportProps>`
   position: relative;
@@ -159,11 +162,16 @@ const ViewScreenViewportSection: FC<{
 
   const titleView = (
     <>
-      <StyledScreenMarker onMouseEnter={selectScreen} onMouseLeave={unselect}>
+      <StyledScreenMarker
+        dim={selection === ViewportSelection.Viewport}
+        onMouseEnter={selectScreen}
+        onMouseLeave={unselect}
+      >
         Screen
       </StyledScreenMarker>{' '}
       &{' '}
       <StyledViewportMarker
+        dim={selection === ViewportSelection.Screen}
         onMouseEnter={selectViewport}
         onMouseLeave={unselect}
       >
