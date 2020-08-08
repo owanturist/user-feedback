@@ -117,7 +117,7 @@ const ViewSucceed: FC<{
   )
 
   return (
-    <>
+    <div data-cy="dashboard__root">
       <Filters.View
         className={cssFilters}
         model={filters}
@@ -125,7 +125,7 @@ const ViewSucceed: FC<{
       />
 
       <FeedbackTable.View items={items} />
-    </>
+    </div>
   )
 })
 
@@ -176,9 +176,9 @@ export const Header: FC = React.memo(() => (
 // S K E L E T O N
 
 const Skeleton: FC = React.memo(() => (
-  <>
+  <div data-cy="dashboard__skeleton">
     <Filters.Skeleton className={cssFilters} />
 
     <FeedbackTable.Skeleton count={20} />
-  </>
+  </div>
 ))
