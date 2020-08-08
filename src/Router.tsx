@@ -97,35 +97,37 @@ const StyledLink = styled.a`
   color: #1ea0be;
 `
 
-const assignNoReferrer = (
-  props: React.AnchorHTMLAttributes<HTMLAnchorElement>
-): React.AnchorHTMLAttributes<HTMLAnchorElement> => {
-  if (props.target === '_blank' && typeof props.rel === 'undefined') {
-    return {
-      ...props,
-      rel: 'noreferrer'
-    }
-  }
-
-  return props
-}
-
 const ViewLink: FC<
   React.AnchorHTMLAttributes<HTMLAnchorElement> & {
     onChangeUrl(href: string): void
   }
-> = React.memo(({ onChangeUrl, ...props }) => (
-  <StyledLink
-    {...props}
-    onClick={React.useCallback(
-      event => {
+> = React.memo(({ onChangeUrl, ...props }) => {
+  const hasTarget = typeof props.target !== 'undefined'
+  const hasDownload = typeof props.download !== 'undefined'
+
+  const onClick = React.useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>): void => {
+      if (
+        event.button < 1 &&
+        !event.ctrlKey &&
+        !event.metaKey &&
+        !event.shiftKey &&
+        !hasTarget &&
+        !hasDownload
+      ) {
         onChangeUrl(event.currentTarget.href)
         event.preventDefault()
-      },
-      [onChangeUrl]
-    )}
-  />
-))
+      }
+    },
+    [hasDownload, hasTarget, onChangeUrl]
+  )
+
+  if (props.target === '_blank' && typeof props.rel === 'undefined') {
+    return <StyledLink {...props} rel="noreferrer" onClick={onClick} />
+  }
+
+  return <StyledLink {...props} onClick={onClick} />
+})
 
 export const Link: FC<
   | (Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
@@ -134,16 +136,12 @@ export const Link: FC<
   | (React.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string })
 > = props => (
   <NavigationConsumer>
-    {onChangeUrl =>
-      'route' in props ? (
-        <ViewLink
-          {...assignNoReferrer(props)}
-          href={props.route.stringify()}
-          onChangeUrl={onChangeUrl}
-        />
-      ) : (
-        <StyledLink {...assignNoReferrer(props)} />
-      )
-    }
+    {onChangeUrl => (
+      <ViewLink
+        {...props}
+        href={'route' in props ? props.route.stringify() : props.href}
+        onChangeUrl={onChangeUrl}
+      />
+    )}
   </NavigationConsumer>
 )
