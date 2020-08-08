@@ -81,6 +81,7 @@ const LoadFeedbackDone = cons(
 // V I E W
 
 const cssMap = css`
+  flex: 1 0 auto;
   margin-top: 15px;
 `
 
@@ -103,14 +104,11 @@ const StyledSection = styled.section`
   background: #fff;
   border-radius: 3px;
   box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);
+  word-break: break-word;
 `
 
-const ViewSection: FC<{ title?: ReactNode }> = ({
-  title,
-  children,
-  ...props
-}) => (
-  <StyledSection {...props}>
+const ViewSection: FC<{ title?: ReactNode }> = ({ title, children }) => (
+  <StyledSection>
     {title && <StyledSectionTitle>{title}</StyledSectionTitle>}
     <StyledSectionContent>{children}</StyledSectionContent>
   </StyledSection>
@@ -125,30 +123,45 @@ const StyledMarkerIcon = styled(MarkerIcon)`
   color: #be1ea0;
 `
 
+const StyledMapSection = styled(StyledSection)`
+  display: flex;
+  flex-direction: column;
+`
+
+const StyledMapSectionContent = styled(StyledSectionContent)`
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+`
+
 const ViewMapSection: FC<{
   geo: api.Geo
 }> = React.memo(({ geo }) => (
-  <ViewSection title="Geo location">
-    <ViewPairs>
-      <ViewPair label="Country">{geo.country}</ViewPair>
-      <ViewPair label="City">{geo.city}</ViewPair>
-    </ViewPairs>
+  <StyledMapSection>
+    <StyledSectionTitle>Geo location</StyledSectionTitle>
 
-    <ViewMap
-      className={cssMap}
-      style="mapbox://styles/mapbox/streets-v11"
-      containerStyle={{
-        width: '100%',
-        height: '450px'
-      }}
-      zoom={[14]}
-      center={geo.position}
-    >
-      <Marker coordinates={geo.position}>
-        <StyledMarkerIcon />
-      </Marker>
-    </ViewMap>
-  </ViewSection>
+    <StyledMapSectionContent>
+      <ViewPairs>
+        <ViewPair label="Country">{geo.country}</ViewPair>
+        <ViewPair label="City">{geo.city}</ViewPair>
+      </ViewPairs>
+
+      <ViewMap
+        className={cssMap}
+        style="mapbox://styles/mapbox/streets-v11"
+        containerStyle={{
+          width: '100%',
+          height: '450px'
+        }}
+        zoom={[14]}
+        center={geo.position}
+      >
+        <Marker coordinates={geo.position}>
+          <StyledMarkerIcon />
+        </Marker>
+      </ViewMap>
+    </StyledMapSectionContent>
+  </StyledMapSection>
 ))
 
 type StyledViewportMarkerProps = {
@@ -210,10 +223,6 @@ const ViewScreenViewportSection: FC<{
   )
 })
 
-const StyledUrl = styled.span`
-  word-break: break-all;
-`
-
 const ViewBasicSection: FC<{ feedback: api.FeedbackDetailed }> = ({
   feedback
 }) => (
@@ -237,7 +246,7 @@ const ViewBasicSection: FC<{ feedback: api.FeedbackDetailed }> = ({
 
       <ViewPair label="Source url">
         <Router.Link href={feedback.url} title={feedback.url} target="_blank">
-          <StyledUrl>{ellipsisString(50, feedback.url)}</StyledUrl>
+          {ellipsisString(50, feedback.url)}
         </Router.Link>
       </ViewPair>
     </ViewPairs>
@@ -294,6 +303,7 @@ const StyledRoot = styled.div`
 const StyledInfo = styled.div`
   display: flex;
   flex-flow: row wrap;
+  flex: 1 1 0;
 
   @media ${breakpoints.big.minWidth} {
     flex-direction: column;
@@ -307,6 +317,8 @@ const ViewSucceed: FC<{ feedback: api.FeedbackDetailed }> = React.memo(
         <ViewBasicSection feedback={feedback} />
 
         <ViewBrowserSection browser={feedback.browser} />
+
+        <ViewSection title="Comment">{feedback.comment}</ViewSection>
 
         <ViewScreenViewportSection
           viewport={feedback.viewport}
