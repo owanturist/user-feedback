@@ -161,26 +161,26 @@ const StyledScreenMarker = styled(StyledViewportMarker)`
   border-color: #1ea0be;
 `
 
-type StyledViewportProps = StyledViewportMarkerProps
+type StyledViewportProps = {
+  screen?: boolean
+  dim: boolean
+  dominate: boolean
+}
 
 const StyledViewport = styled.div<StyledViewportProps>`
-  position: relative;
+  position: ${props => (props.dominate ? 'relative' : 'absolute')};
   z-index: ${props => (props.dim ? 1 : 2)};
-  background: #be1ea0;
-  border-radius: 2px;
-  width: ${VIEWPORT_WIDTH}px;
-  opacity: ${props => (props.dim ? 0.4 : 0.7)};
-`
-
-const StyledScreen = styled(StyledViewport)`
-  position: absolute;
   top: 0;
   left: 0;
-  background: #1ea0be;
+  background: ${props => (props.screen ? '#1ea0be' : '#be1ea0')};
+  border-radius: 2px;
+  opacity: ${props => (props.dim ? 0.4 : 0.7)};
 `
 
 const StyledViewportContainer = styled.div`
   position: relative;
+  padding-top: 1px;
+  width: ${VIEWPORT_WIDTH}px;
 `
 
 enum ViewportSelection {
@@ -193,7 +193,6 @@ const ViewScreenViewportSection: FC<{
   viewport: api.Viewport
   screen: api.Screen
 }> = React.memo(({ viewport, screen }) => {
-  const relativePx = VIEWPORT_WIDTH / viewport.width
   const [selection, setSelection] = React.useState<ViewportSelection>(
     ViewportSelection.None
   )
@@ -221,25 +220,36 @@ const ViewScreenViewportSection: FC<{
     </>
   )
 
+  const viewportIsDominating =
+    viewport.height > screen.availableTop + screen.availableHeight
+  const relativePx =
+    viewport.width > screen.availableLeft + screen.availableWidth
+      ? VIEWPORT_WIDTH / viewport.width
+      : VIEWPORT_WIDTH / screen.availableWidth
+
   return (
     <ViewSection title={titleView}>
       <StyledViewportContainer>
         <StyledViewport
+          dominate={viewportIsDominating}
           dim={selection === ViewportSelection.Screen}
           style={{
-            height: `${relativePx * viewport.height}px`
+            width: Math.round(relativePx * viewport.width),
+            height: Math.round(relativePx * viewport.height)
           }}
           onMouseEnter={selectViewport}
           onMouseLeave={unselect}
         />
 
-        <StyledScreen
+        <StyledViewport
+          screen
+          dominate={!viewportIsDominating}
           dim={selection === ViewportSelection.Viewport}
           style={{
-            top: `${relativePx * screen.availableTop}px`,
-            left: `${relativePx * screen.availableLeft}px`,
-            width: `${relativePx * screen.availableWidth}px`,
-            height: `${relativePx * screen.availableHeight}px`
+            marginTop: Math.round(relativePx * screen.availableTop),
+            marginLeft: Math.round(relativePx * screen.availableLeft),
+            width: Math.round(relativePx * screen.availableWidth),
+            height: Math.round(relativePx * screen.availableHeight)
           }}
           onMouseEnter={selectScreen}
           onMouseLeave={unselect}
@@ -355,27 +365,22 @@ const ViewSucceed: FC<{ feedback: api.FeedbackDetailed }> = React.memo(
   )
 )
 
-const StyledRoot = styled.div``
-
 export const View: FC<{
   feedbackId: string
   model: Model
   dispatch: Dispatch<Msg>
-}> = ({ feedbackId, model, dispatch, ...props }) => (
-  <StyledRoot {...props}>
-    {model.feedback.cata({
-      Loading: () => <Skeleton.Text />,
+}> = ({ feedbackId, model, dispatch, ...props }) =>
+  model.feedback.cata({
+    Loading: () => <Skeleton.Text />,
 
-      Failure: error => (
-        <HttpFailureReport
-          error={error}
-          onTryAgain={() => dispatch(LoadFeedback(feedbackId))}
-        />
-      ),
+    Failure: error => (
+      <HttpFailureReport
+        error={error}
+        onTryAgain={() => dispatch(LoadFeedback(feedbackId))}
+      />
+    ),
 
-      Succeed: feedback => <ViewSucceed feedback={feedback} />
-    })}
-  </StyledRoot>
-)
+    Succeed: feedback => <ViewSucceed feedback={feedback} />
+  })
 
 // S K E L E T O N

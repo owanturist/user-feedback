@@ -151,15 +151,16 @@ const findDetailedFeedbackByIdDecoder = (
   index: number,
   feedbackId: string
 ): Decode.Decoder<FeedbackDetailed> => {
-  return Decode.lazy(() => Decode.index(index).field('id').string).chain(
-    testFeedbackId => {
-      if (feedbackId === testFeedbackId) {
-        return Decode.index(index).of(feedbackDetailedDecoder)
-      }
-
-      return findDetailedFeedbackByIdDecoder(index + 1, feedbackId)
+  return Decode.lazy(
+    // it uses lazy to keep array context after [index].id probe
+    () => Decode.index(index).field('id').string
+  ).chain(testFeedbackId => {
+    if (feedbackId === testFeedbackId) {
+      return Decode.index(index).of(feedbackDetailedDecoder)
     }
-  )
+
+    return findDetailedFeedbackByIdDecoder(index + 1, feedbackId)
+  })
 }
 
 export const getFeedbackById = (
