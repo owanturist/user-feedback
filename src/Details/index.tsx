@@ -19,6 +19,10 @@ import HttpFailureReport from 'HttpFailureReport'
 import * as ViewportScreen from './ViewportScreen'
 import { ReactComponent as MarkerIcon } from './marker.svg'
 
+const ellipsisString = (maxLengh: number, input: string): string => {
+  return input.length > maxLengh ? input.slice(0, maxLengh) + '...' : input
+}
+
 // M O D E L
 
 export type Model = {
@@ -93,7 +97,7 @@ const StyledSectionContent = styled.div`
 `
 
 const StyledSection = styled.section`
-  flex: 1 0 auto;
+  flex: 1 1 auto;
   margin: 10px 0 0 10px;
   padding: 20px;
   background: #fff;
@@ -206,28 +210,34 @@ const ViewScreenViewportSection: FC<{
   )
 })
 
+const StyledUrl = styled.span`
+  word-break: break-all;
+`
+
 const ViewBasicSection: FC<{ feedback: api.FeedbackDetailed }> = ({
   feedback
 }) => (
   <ViewSection>
     <ViewPairs>
       <ViewPair label="Creation Date">
-        {feedback.creationDate.format('HH:mm, dd.MM.YYYY')}
+        {feedback.creationDate.format('HH:mm, DD.MM.YYYY')}
       </ViewPair>
 
-      <ViewPair label="Contact email">
-        <Router.Link href={`mailto:${feedback.email}`} title="Write an email">
-          {feedback.email}
-        </Router.Link>
-      </ViewPair>
+      {feedback.email.cata({
+        Nothing: () => null,
+
+        Just: email => (
+          <ViewPair label="Contact email">
+            <Router.Link href={`mailto:${email}`} title="Write an email">
+              {email}
+            </Router.Link>
+          </ViewPair>
+        )
+      })}
 
       <ViewPair label="Source url">
-        <Router.Link
-          href={feedback.url}
-          title="Visit source url"
-          target="_blank"
-        >
-          {feedback.url}
+        <Router.Link href={feedback.url} title={feedback.url} target="_blank">
+          <StyledUrl>{ellipsisString(50, feedback.url)}</StyledUrl>
         </Router.Link>
       </ViewPair>
     </ViewPairs>

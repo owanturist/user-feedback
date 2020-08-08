@@ -5,6 +5,7 @@ import { action } from '@storybook/addon-actions'
 
 import * as Http from 'frctl/Http'
 import RemoteData from 'frctl/RemoteData'
+import { nonEmptyString } from 'utils'
 import * as api from 'api'
 import * as Details from './index'
 
@@ -53,7 +54,7 @@ const feedbackKnob = (): api.FeedbackDetailed => ({
   },
 
   // detailed
-  email: text('Email', 'test@mail.com'),
+  email: nonEmptyString(text('Email', 'test@mail.com')),
   url: text('Url', 'https://google.com'),
   creationDate: dayjs(date('Creation Date', new Date(2020, 7, 7, 11, 48))),
   viewport: viewportKnob({

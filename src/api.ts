@@ -1,6 +1,8 @@
 import dayjs, { Dayjs } from 'dayjs'
+import Maybe from 'frctl/Maybe'
 import Decode from 'frctl/Json/Decode'
 import * as Http from 'frctl/Http'
+import { nonEmptyString } from 'utils'
 
 const API_URL = process.env.REACT_APP_API_URL || ''
 
@@ -57,7 +59,7 @@ const dayjsDecoder: Decode.Decoder<Dayjs> = Decode.oneOf([
   Decode.string.map(dayjs),
 
   Decode.int.map(ts => {
-    if (ts.toString().length > 11) {
+    if (ts.toString().length < 11) {
       // assume we cought timestamp in seconds
       // https://stackoverflow.com/a/23982005/4582383
       return dayjs(ts * 1000)
@@ -128,8 +130,8 @@ const screenDecoder: Decode.Decoder<Screen> = Decode.shape({
 })
 
 export type FeedbackDetailed = Feedback & {
-  email: string
   url: string
+  email: Maybe<string>
   creationDate: Dayjs
   viewport: Viewport
   screen: Screen
@@ -138,8 +140,10 @@ export type FeedbackDetailed = Feedback & {
 
 const feedbackDetailedDecoder: Decode.Decoder<FeedbackDetailed> = Decode.shape({
   basic: feedbackDecoder,
-  email: Decode.field('email').string,
   url: Decode.field('url').string,
+  email: Decode.field('email').optional.string.map(email =>
+    email.chain(nonEmptyString)
+  ),
   creationDate: Decode.field('creation_date').of(dayjsDecoder),
   viewport: Decode.field('viewport').of(viewportDecoder),
   screen: Decode.field('screen').of(screenDecoder),
