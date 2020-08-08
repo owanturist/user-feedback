@@ -9,6 +9,7 @@ import * as breakpoints from 'breakpoints'
 import * as Router from 'Router'
 import * as Dashboard from 'Dashboard'
 import * as Details from 'Details'
+import * as Page404 from 'Page404'
 import * as utils from 'utils'
 
 // S C R E E N
@@ -294,8 +295,8 @@ export const View: FC<{ model: Model; dispatch: Dispatch<Msg> }> = React.memo(
       ),
 
       _: () => (
-        <ViewScreen header="404">
-          <div>Page 404</div>
+        <ViewScreen header={<Page404.Header />}>
+          <Page404.View />
         </ViewScreen>
       )
     })

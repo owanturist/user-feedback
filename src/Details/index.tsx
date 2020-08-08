@@ -322,7 +322,7 @@ const ViewSucceed: FC<{ feedback: api.FeedbackDetailed }> = React.memo(
       <StyledInfo>
         <StyledBackLink>
           <Router.Link
-            data-cy="details__link-to-dashboard"
+            data-cy="details__link-dashboard"
             route={Router.ToDashboard()}
           >
             ← Back to Dashboard

@@ -52,7 +52,7 @@ describe('Details', () => {
     cy.wait('@getApiDemoById')
     cy.getcy('details__root').should('be.visible')
 
-    cy.getcy('details__link-to-dashboard').should('be.visible').click()
+    cy.getcy('details__link-dashboard').should('be.visible').click()
     cy.wait('@getApiDemo')
     cy.getcy('dashboard__root').should('be.visible')
   })
