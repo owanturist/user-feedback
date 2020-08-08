@@ -89,7 +89,7 @@ const lngLatDecoder: Decode.Decoder<LngLat> = Decode.oneOf([
     lng: Decode.index(0).float,
     lat: Decode.index(1).float
   })
-]).map(({ lat, lng }) => [lat, lng])
+]).map(({ lng, lat }) => [lng, lat])
 
 export type Geo = {
   country: string
@@ -151,15 +151,15 @@ const findDetailedFeedbackByIdDecoder = (
   index: number,
   feedbackId: string
 ): Decode.Decoder<FeedbackDetailed> => {
-  return Decode.index(index)
-    .field('id')
-    .string.chain(currentFeedbackId => {
-      if (feedbackId === currentFeedbackId) {
-        return feedbackDetailedDecoder
+  return Decode.lazy(() => Decode.index(index).field('id').string).chain(
+    testFeedbackId => {
+      if (feedbackId === testFeedbackId) {
+        return Decode.index(index).of(feedbackDetailedDecoder)
       }
 
       return findDetailedFeedbackByIdDecoder(index + 1, feedbackId)
-    })
+    }
+  )
 }
 
 export const getFeedbackById = (

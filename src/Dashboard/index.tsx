@@ -13,7 +13,6 @@ import * as api from 'api'
 import * as utils from 'utils'
 import * as Filters from 'Filters'
 import * as FeedbackTable from 'FeedbackTable'
-import Container from 'Container'
 import HttpFailureReport from 'HttpFailureReport'
 import { ReactComponent as TachometerIcon } from './tachometer.svg'
 
@@ -96,12 +95,6 @@ const cssFeedbackTable = css`
   margin-bottom: 16px;
 `
 
-const StyledScroller = styled.div`
-  flex: 1 1 auto;
-  overflow-y: auto;
-  scroll-behavior: smooth;
-`
-
 const StyledErrorReportContainer = styled.div`
   box-sizing: border-box;
   display: flex;
@@ -110,56 +103,6 @@ const StyledErrorReportContainer = styled.div`
   padding: 16px;
   min-height: 100%;
 `
-
-const StyledIcon = styled(TachometerIcon)`
-  width: 27px;
-  height: 27px;
-`
-
-const StyledPageTitle = styled.h1`
-  margin: 0 0 0 16px;
-  font-weight: 600;
-  font-size: 26px;
-  letter-spacing: 0.02em;
-`
-
-const StyledHeader = styled.header`
-  box-sizing: border-box;
-  position: relative; /* shadow overflow of content */
-  z-index: 2;
-  flex: 0 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 19px 16px;
-  color: #5e6264;
-  background: #fff;
-  box-shadow: 0 0 2px 2px #dadee0;
-  transition: box-shadow 0.4s ease;
-  user-select: none;
-`
-
-const ViewHeader: FC = React.memo(() => (
-  <StyledHeader>
-    <StyledIcon />
-    <StyledPageTitle>Dashboard</StyledPageTitle>
-  </StyledHeader>
-))
-
-const StyledRoot = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-`
-
-const ViewRoot: FC = ({ children, ...props }) => (
-  <StyledRoot {...props}>
-    <ViewHeader />
-
-    <StyledScroller>{children}</StyledScroller>
-  </StyledRoot>
-)
 
 const ViewSucceed: FC<{
   feedback: Array<api.Feedback>
@@ -181,17 +124,15 @@ const ViewSucceed: FC<{
   )
 
   return (
-    <ViewRoot data-cy="dashboard__root">
-      <Container>
-        <Filters.View
-          className={cssFilters}
-          model={filters}
-          dispatch={msg => dispatch(FiltersMsg(msg))}
-        />
+    <>
+      <Filters.View
+        className={cssFilters}
+        model={filters}
+        dispatch={msg => dispatch(FiltersMsg(msg))}
+      />
 
-        <FeedbackTable.View className={cssFeedbackTable} items={items} />
-      </Container>
-    </ViewRoot>
+      <FeedbackTable.View className={cssFeedbackTable} items={items} />
+    </>
   )
 })
 
@@ -203,14 +144,12 @@ export const View: FC<{
     Loading: () => <Skeleton />,
 
     Failure: error => (
-      <ViewRoot>
-        <StyledErrorReportContainer>
-          <HttpFailureReport
-            error={error}
-            onTryAgain={() => dispatch(LoadFeedback)}
-          />
-        </StyledErrorReportContainer>
-      </ViewRoot>
+      <StyledErrorReportContainer>
+        <HttpFailureReport
+          error={error}
+          onTryAgain={() => dispatch(LoadFeedback)}
+        />
+      </StyledErrorReportContainer>
     ),
 
     Succeed: feedback => (
@@ -223,14 +162,26 @@ export const View: FC<{
   })
 )
 
+// H E A D E R
+
+const StyledHeaderIcon = styled(TachometerIcon)`
+  margin-right: 16px;
+  width: 27px;
+  height: 27px;
+`
+
+export const Header: FC = React.memo(() => (
+  <>
+    <StyledHeaderIcon /> Dashboard
+  </>
+))
+
 // S K E L E T O N
 
 const Skeleton: FC = React.memo(() => (
-  <ViewRoot data-cy="dashboard__skeleton">
-    <Container>
-      <Filters.Skeleton className={cssFilters} />
+  <>
+    <Filters.Skeleton className={cssFilters} />
 
-      <FeedbackTable.Skeleton className={cssFeedbackTable} count={20} />
-    </Container>
-  </ViewRoot>
+    <FeedbackTable.Skeleton className={cssFeedbackTable} count={20} />
+  </>
 ))

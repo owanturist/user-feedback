@@ -8,8 +8,6 @@ import RemoteData from 'frctl/RemoteData'
 import * as api from 'api'
 import * as Details from './index'
 
-const [initial] = Details.init
-
 export default {
   title: 'Details',
   component: Details.View
@@ -18,7 +16,7 @@ export default {
 export const Loading: FC = () => (
   <Details.View
     feedbackId={text('Feedback ID', 'some_id')}
-    model={initial}
+    model={Details.initial}
     dispatch={action('dispatch')}
   />
 )
@@ -27,7 +25,7 @@ export const Failure: FC = () => (
   <Details.View
     feedbackId={text('Feedback ID', 'some_id')}
     model={{
-      ...initial,
+      ...Details.initial,
       feedback: RemoteData.Failure(Http.Error.Timeout)
     }}
     dispatch={action('dispatch')}
@@ -66,7 +64,7 @@ export const Succeed: FC = () => (
   <Details.View
     feedbackId={text('Feedback ID', 'some_id')}
     model={{
-      ...initial,
+      ...Details.initial,
       feedback: RemoteData.Succeed({
         id: '0',
         rating: number('Rating', 2, {

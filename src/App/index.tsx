@@ -1,4 +1,5 @@
-import React, { FC } from 'react'
+import React, { FC, ReactNode } from 'react'
+import styled from '@emotion/styled/macro'
 import { Cmd } from 'frctl'
 import { Cata, cons } from 'frctl/Basics'
 import { Url } from 'frctl/Url'
@@ -6,14 +7,14 @@ import { Url } from 'frctl/Url'
 import { Dispatch, UrlRequest } from 'Provider'
 import * as Router from 'Router'
 import * as Dashboard from 'Dashboard'
-import * as Counter from 'Counter'
+import * as Details from 'Details'
 import * as utils from 'utils'
 
 // S C R E E N
 
 type ScreenPattern<R> = Cata<{
   DashboardScreen(dashboard: Dashboard.Model): R
-  DetailsScreen(feedbackId: string, counter: Counter.Model): R
+  DetailsScreen(feedbackId: string, details: Details.Model): R
   NotFoundScreen(): R
 }>
 
@@ -35,11 +36,11 @@ const DashboardScreen = cons<[Dashboard.Model], Screen>(
   }
 )
 
-const DetailsScreen = cons<[string, Counter.Model], Screen>(
+const DetailsScreen = cons<[string, Details.Model], Screen>(
   class DetailsScreen implements Screen {
     public constructor(
       private readonly feedbackId: string,
-      private readonly counter: Counter.Model
+      private readonly details: Details.Model
     ) {}
 
     public cata<R>(pattern: ScreenPattern<R>): R {
@@ -47,7 +48,7 @@ const DetailsScreen = cons<[string, Counter.Model], Screen>(
         pattern._,
         pattern.DetailsScreen,
         this.feedbackId,
-        this.counter
+        this.details
       )
     }
   }
@@ -71,10 +72,14 @@ const screenFromUrl = (url: Url): [Screen, Cmd<Msg>] => {
             initialCmd.map(DashboardMsg)
           ]
         },
-        ToDetails: feedbackId => [
-          DetailsScreen(feedbackId, Counter.initial),
-          Cmd.none
-        ]
+        ToDetails: feedbackId => {
+          const [initialDetails, initialCmd] = Details.init(feedbackId)
+
+          return [
+            DetailsScreen(feedbackId, initialDetails),
+            initialCmd.map(DetailsMsg)
+          ]
+        }
       })
     )
     .getOrElse([NotFoundScreen, Cmd.none])
@@ -159,45 +164,112 @@ const DashboardMsg = cons(
   }
 )
 
-const FeedbackMsg = cons(
-  class FeedbackMsg_ implements Msg {
-    public constructor(private readonly msg: Counter.Msg) {}
+const DetailsMsg = cons(
+  class DetailsMsg_ implements Msg {
+    public constructor(private readonly msg: Details.Msg) {}
 
     public update(model: Model): [Model, Cmd<Msg>] {
-      return [
-        model.screen.cata({
-          DetailsScreen: (feedbackId, counter) => ({
-            ...model,
-            screen: DetailsScreen(feedbackId, this.msg.update(counter))
-          }),
+      return model.screen.cata({
+        DetailsScreen: (feedbackId, details) => {
+          const [nextDetails, cmd] = this.msg.update(details)
 
-          _: () => model
-        }),
-        Cmd.none
-      ]
+          return [
+            {
+              ...model,
+              screen: DetailsScreen(feedbackId, nextDetails)
+            },
+            cmd.map(DetailsMsg)
+          ]
+        },
+
+        _: () => [model, Cmd.none]
+      })
     }
   }
 )
 
 // V I E W
 
+const StyledHeader = styled.header`
+  position: relative; /* shadow overflow of content */
+  z-index: 2;
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 19px 16px;
+  margin: 0;
+  color: #5e6264;
+  background: #fff;
+  box-shadow: 0 0 2px 2px #dadee0;
+  font-weight: 600;
+  font-size: 26px;
+  letter-spacing: 0.02em;
+  user-select: none;
+`
+
+const StyledContainer = styled.div`
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 0 16px;
+  width: 100%;
+  max-width: 1454px;
+`
+
+const StyledScroller = styled.div`
+  flex: 1 1 auto;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+`
+
+const StyledRoot = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+`
+
+const ViewScreen: FC<{ header: ReactNode }> = ({
+  header,
+  children,
+  ...props
+}) => (
+  <StyledRoot {...props}>
+    <StyledHeader>{header}</StyledHeader>
+
+    <StyledScroller>
+      <StyledContainer>{children}</StyledContainer>
+    </StyledScroller>
+  </StyledRoot>
+)
+
 const ViewDashboardScreen: FC<{
   dashboard: Dashboard.Model
   dispatch: Dispatch<Msg>
-}> = React.memo(({ dashboard, dispatch }) => (
-  <Dashboard.View
-    model={dashboard}
-    dispatch={msg => dispatch(DashboardMsg(msg))}
-  />
-))
+}> = ({ dashboard, dispatch }) => (
+  <ViewScreen header={<Dashboard.Header />}>
+    <Dashboard.View
+      model={dashboard}
+      dispatch={React.useCallback(msg => dispatch(DashboardMsg(msg)), [
+        dispatch
+      ])}
+    />
+  </ViewScreen>
+)
 
 const ViewDetailsScreen: FC<{
   feedbackId: string
-  counter: Counter.Model
+  details: Details.Model
   dispatch: Dispatch<Msg>
-}> = React.memo(({ counter, dispatch }) => (
-  <Counter.View model={counter} dispatch={msg => dispatch(FeedbackMsg(msg))} />
-))
+}> = ({ feedbackId, details, dispatch }) => (
+  <ViewScreen header="Counter">
+    <Details.View
+      feedbackId={feedbackId}
+      model={details}
+      dispatch={React.useCallback(msg => dispatch(DetailsMsg(msg)), [dispatch])}
+    />
+  </ViewScreen>
+)
 
 export const View: FC<{ model: Model; dispatch: Dispatch<Msg> }> = React.memo(
   ({ model, dispatch }) => {
@@ -206,15 +278,19 @@ export const View: FC<{ model: Model; dispatch: Dispatch<Msg> }> = React.memo(
         <ViewDashboardScreen dashboard={dashboard} dispatch={dispatch} />
       ),
 
-      DetailsScreen: (feedbackId, counter) => (
+      DetailsScreen: (feedbackId, details) => (
         <ViewDetailsScreen
           feedbackId={feedbackId}
-          counter={counter}
+          details={details}
           dispatch={dispatch}
         />
       ),
 
-      _: () => <div>Page 404</div>
+      _: () => (
+        <ViewScreen header="404">
+          <div>Page 404</div>
+        </ViewScreen>
+      )
     })
   }
 )

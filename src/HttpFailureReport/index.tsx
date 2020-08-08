@@ -71,84 +71,81 @@ const StyledRoot = styled.div`
 `
 
 const FailureReport: FC<{
-  className?: string
   error: Http.Error
   onTryAgain(): void
-}> = React.memo(({ className, error, onTryAgain }) => (
-  <StyledRoot className={className}>
-    {error.cata({
-      NetworkError: () => (
-        <>
-          <StyledTitle>You are facing a Network Error</StyledTitle>
-          <StyledDescription>
-            Pleace check your Internet connection and try again.
-          </StyledDescription>
+}> = React.memo(({ error, onTryAgain, ...props }) =>
+  error.cata({
+    NetworkError: () => (
+      <StyledRoot {...props}>
+        <StyledTitle>You are facing a Network Error</StyledTitle>
+        <StyledDescription>
+          Pleace check your Internet connection and try again.
+        </StyledDescription>
 
-          <ViewTryAgain onTryAgain={onTryAgain} />
-        </>
-      ),
+        <ViewTryAgain onTryAgain={onTryAgain} />
+      </StyledRoot>
+    ),
 
-      Timeout: () => (
-        <>
-          <StyledTitle>You are facing a Timeout issue</StyledTitle>
-          <StyledDescription>
-            It takes too long to get a response so please check your Internect
-            connection and try again.
-          </StyledDescription>
+    Timeout: () => (
+      <StyledRoot {...props}>
+        <StyledTitle>You are facing a Timeout issue</StyledTitle>
+        <StyledDescription>
+          It takes too long to get a response so please check your Internect
+          connection and try again.
+        </StyledDescription>
 
-          <ViewTryAgain onTryAgain={onTryAgain} />
-        </>
-      ),
+        <ViewTryAgain onTryAgain={onTryAgain} />
+      </StyledRoot>
+    ),
 
-      BadUrl: url => (
-        <>
-          <StyledTitle>Oops... we broke something...</StyledTitle>
-          <StyledDescription>
-            It looks like the app hits a wrong endpoint <code>{url}</code>.
-          </StyledDescription>
-          <StyledDescription>We are fixing the issue.</StyledDescription>
-        </>
-      ),
+    BadUrl: url => (
+      <StyledRoot {...props}>
+        <StyledTitle>Oops... we broke something...</StyledTitle>
+        <StyledDescription>
+          It looks like the app hits a wrong endpoint <code>{url}</code>.
+        </StyledDescription>
+        <StyledDescription>We are fixing the issue.</StyledDescription>
+      </StyledRoot>
+    ),
 
-      BadStatus: ({ statusCode }) => {
-        const [side, role] =
-          statusCode < 500 ? ['Client', 'frontend'] : ['Server', 'backend']
+    BadStatus: ({ statusCode }) => {
+      const [side, role] =
+        statusCode < 500 ? ['Client', 'frontend'] : ['Server', 'backend']
 
-        return (
-          <>
-            <StyledTitle>
-              You are facing an unexpected {side}&nbsp;side&nbsp;Error&nbsp;
-              {statusCode}!
-            </StyledTitle>
-
-            <StyledDescription>
-              Our {role} developers are fixing the issue.
-            </StyledDescription>
-          </>
-        )
-      },
-
-      BadBody: decoderError => (
-        <>
+      return (
+        <StyledRoot {...props}>
           <StyledTitle>
-            You are facing an unexpected Response Body Error!
+            You are facing an unexpected {side}&nbsp;side&nbsp;Error&nbsp;
+            {statusCode}!
           </StyledTitle>
 
           <StyledDescription>
-            Something went wrong and our apps seems don't communicate well...
+            Our {role} developers are fixing the issue.
           </StyledDescription>
-
-          <StyledPre>
-            {decoderError
-              .stringify(4)
-              .replace(/\\"/g, '"')
-              .replace(/\s{2}\s+"/, '\n\n"')
-              .replace(/\\n/g, '\n')}
-          </StyledPre>
-        </>
+        </StyledRoot>
       )
-    })}
-  </StyledRoot>
-))
+    },
+
+    BadBody: decoderError => (
+      <StyledRoot {...props}>
+        <StyledTitle>
+          You are facing an unexpected Response Body Error!
+        </StyledTitle>
+
+        <StyledDescription>
+          Something went wrong and our apps seems don't communicate well...
+        </StyledDescription>
+
+        <StyledPre>
+          {decoderError
+            .stringify(4)
+            .replace(/\\"/g, '"')
+            .replace(/\s{2}\s+"/, '\n\n"')
+            .replace(/\\n/g, '\n')}
+        </StyledPre>
+      </StyledRoot>
+    )
+  })
+)
 
 export default FailureReport

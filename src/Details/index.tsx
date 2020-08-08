@@ -2,7 +2,9 @@ import React, { FC, ReactNode } from 'react'
 import styled from '@emotion/styled/macro'
 import { Map as ReactMapboxGl, Marker } from 'react-mapbox-gl'
 import { Cmd } from 'frctl'
+import { cons } from 'frctl/Basics'
 import * as Http from 'frctl/Http'
+import Either from 'frctl/Either'
 import RemoteData from 'frctl/RemoteData'
 
 import { Dispatch } from 'Provider'
@@ -12,6 +14,7 @@ import * as utils from 'utils'
 import * as Router from 'Router'
 import * as Skeleton from 'Skeleton'
 import * as Rating from 'Rating'
+import HttpFailureReport from 'HttpFailureReport'
 import { ReactComponent as MarkerIcon } from './marker.svg'
 
 // M O D E L
@@ -20,16 +23,54 @@ export type Model = {
   feedback: RemoteData<Http.Error, api.FeedbackDetailed>
 }
 
-export const init: [Model, Cmd<Msg>] = [
-  {
-    feedback: RemoteData.Loading
-  },
-  Cmd.none
+export const initial: Model = {
+  feedback: RemoteData.Loading
+}
+
+export const init = (feedbackId: string): [Model, Cmd<Msg>] => [
+  initial,
+  api.getFeedbackById(feedbackId).send(result => LoadFeedbackDone(result))
 ]
 
 // U P D A T E
 
 export type Msg = utils.Msg<[Model], [Model, Cmd<Msg>]>
+
+const LoadFeedback = cons(
+  class LoadFeedback implements Msg {
+    public constructor(private readonly feedbackId: string) {}
+
+    public update(model: Model): [Model, Cmd<Msg>] {
+      return [
+        {
+          ...model,
+          feedback: RemoteData.Loading
+        },
+        api
+          .getFeedbackById(this.feedbackId)
+          .send(result => LoadFeedbackDone(result))
+      ]
+    }
+  }
+)
+
+const LoadFeedbackDone = cons(
+  class LoadFeedbackDone implements Msg {
+    public constructor(
+      private readonly result: Either<Http.Error, api.FeedbackDetailed>
+    ) {}
+
+    public update(model: Model): [Model, Cmd<Msg>] {
+      return [
+        {
+          ...model,
+          feedback: RemoteData.fromEither(this.result)
+        },
+        Cmd.none
+      ]
+    }
+  }
+)
 
 // V I E W
 
@@ -317,16 +358,20 @@ const ViewSucceed: FC<{ feedback: api.FeedbackDetailed }> = React.memo(
 const StyledRoot = styled.div``
 
 export const View: FC<{
-  className?: string
   feedbackId: string
   model: Model
   dispatch: Dispatch<Msg>
-}> = ({ className, model }) => (
-  <StyledRoot className={className}>
+}> = ({ feedbackId, model, dispatch, ...props }) => (
+  <StyledRoot {...props}>
     {model.feedback.cata({
       Loading: () => <Skeleton.Text />,
 
-      Failure: () => null,
+      Failure: error => (
+        <HttpFailureReport
+          error={error}
+          onTryAgain={() => dispatch(LoadFeedback(feedbackId))}
+        />
+      ),
 
       Succeed: feedback => <ViewSucceed feedback={feedback} />
     })}
