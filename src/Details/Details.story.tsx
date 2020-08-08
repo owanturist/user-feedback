@@ -8,30 +8,6 @@ import RemoteData from 'frctl/RemoteData'
 import * as api from 'api'
 import * as Details from './index'
 
-export default {
-  title: 'Details',
-  component: Details.View
-}
-
-export const Loading: FC = () => (
-  <Details.View
-    feedbackId={text('Feedback ID', 'some_id')}
-    model={Details.initial}
-    dispatch={action('dispatch')}
-  />
-)
-
-export const Failure: FC = () => (
-  <Details.View
-    feedbackId={text('Feedback ID', 'some_id')}
-    model={{
-      ...Details.initial,
-      feedback: RemoteData.Failure(Http.Error.Timeout)
-    }}
-    dispatch={action('dispatch')}
-  />
-)
-
 const rangeKnob = (label: string, max: number, start: number): number =>
   number(label, start, { range: true, min: 0, max, step: 1 })
 
@@ -60,49 +36,95 @@ const lngLatKnob = (label: string, lng: number, lat: number): api.LngLat => [
   })
 ]
 
+const feedbackKnob = (): api.FeedbackDetailed => ({
+  id: '0',
+  rating: number('Rating', 2, {
+    range: true,
+    min: 1,
+    max: 5,
+    step: 1
+  }),
+  comment: text('Comment', 'belle offre de services'),
+  browser: {
+    name: text('Browser Name', 'Chrome'),
+    version: text('Browser Version', '32.0'),
+    device: text('Browser Device', 'Desktop'),
+    platform: text('Browser Platform', 'MacOSX')
+  },
+
+  // detailed
+  email: text('Email', 'test@mail.com'),
+  url: text('Url', 'https://google.com'),
+  creationDate: dayjs(date('Creation Date', new Date(2020, 7, 7, 11, 48))),
+  viewport: viewportKnob({
+    width: 1583,
+    height: 865
+  }),
+  screen: screenKnob({
+    availableWidth: 1440,
+    availableHeight: 874,
+    availableTop: 22,
+    availableLeft: 0
+  }),
+  geo: {
+    country: text('Geo Country', 'FR'),
+    city: text('Geo City', 'Paris'),
+    position: lngLatKnob('Geo Position', 2.3333, 48.8667)
+  }
+})
+
+export default {
+  title: 'Details',
+  component: Details.View
+}
+
+export const HeaderLoading: FC = () => (
+  <Details.Header model={Details.initial} />
+)
+
+export const HeaderFailure: FC = () => (
+  <Details.Header
+    model={{
+      ...Details.initial,
+      feedback: RemoteData.Failure(Http.Error.Timeout)
+    }}
+  />
+)
+
+export const HeaderSucceed: FC = () => (
+  <Details.Header
+    model={{
+      ...Details.initial,
+      feedback: RemoteData.Succeed(feedbackKnob())
+    }}
+  />
+)
+
+export const Loading: FC = () => (
+  <Details.View
+    feedbackId={text('Feedback ID', 'some_id')}
+    model={Details.initial}
+    dispatch={action('dispatch')}
+  />
+)
+
+export const Failure: FC = () => (
+  <Details.View
+    feedbackId={text('Feedback ID', 'some_id')}
+    model={{
+      ...Details.initial,
+      feedback: RemoteData.Failure(Http.Error.Timeout)
+    }}
+    dispatch={action('dispatch')}
+  />
+)
+
 export const Succeed: FC = () => (
   <Details.View
     feedbackId={text('Feedback ID', 'some_id')}
     model={{
       ...Details.initial,
-      feedback: RemoteData.Succeed({
-        id: '0',
-        rating: number('Rating', 2, {
-          range: true,
-          min: 1,
-          max: 5,
-          step: 1
-        }),
-        comment: text('Comment', 'belle offre de services'),
-        browser: {
-          name: text('Browser Name', 'Chrome'),
-          version: text('Browser Version', '32.0'),
-          device: text('Browser Device', 'Desktop'),
-          platform: text('Browser Platform', 'MacOSX')
-        },
-
-        // detailed
-        email: text('Email', 'test@mail.com'),
-        url: text('Url', 'https://google.com'),
-        creationDate: dayjs(
-          date('Creation Date', new Date(2020, 7, 7, 11, 48))
-        ),
-        viewport: viewportKnob({
-          width: 1583,
-          height: 865
-        }),
-        screen: screenKnob({
-          availableWidth: 1440,
-          availableHeight: 874,
-          availableTop: 22,
-          availableLeft: 0
-        }),
-        geo: {
-          country: text('Geo Country', 'FR'),
-          city: text('Geo City', 'Paris'),
-          position: lngLatKnob('Geo Position', 2.3333, 48.8667)
-        }
-      })
+      feedback: RemoteData.Succeed(feedbackKnob())
     }}
     dispatch={action('dispatch')}
   />

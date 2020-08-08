@@ -2,6 +2,7 @@ import React, { FC } from 'react'
 import styled from '@emotion/styled/macro'
 
 import * as api from 'api'
+import * as Skelet from 'Skeleton'
 
 export enum Selection {
   None,
@@ -14,11 +15,11 @@ const DEFAULT_MAXIMUM_WIDTH = 300
 type StyledViewportProps = {
   screen?: boolean
   dim: boolean
-  dominate: boolean
+  dominating: boolean
 }
 
 const StyledViewport = styled.div<StyledViewportProps>`
-  position: ${props => (props.dominate ? 'relative' : 'absolute')};
+  position: ${props => (props.dominating ? 'relative' : 'absolute')};
   z-index: ${props => (props.dim ? 1 : 2)};
   top: 0;
   left: 0;
@@ -38,7 +39,7 @@ const StyledRoot = styled.div<StyledRootProps>`
   width: ${props => props.width}px;
 `
 
-const Viewport: FC<{
+export const View: FC<{
   selected: Selection
   viewport: api.Viewport
   screen: api.Screen
@@ -66,7 +67,7 @@ const Viewport: FC<{
     return (
       <StyledRoot width={width}>
         <StyledViewport
-          dominate={viewportIsDominating}
+          dominating={viewportIsDominating}
           dim={selected === Selection.Screen}
           style={{
             width: Math.round(relativePx * viewport.width),
@@ -78,7 +79,7 @@ const Viewport: FC<{
 
         <StyledViewport
           screen
-          dominate={!viewportIsDominating}
+          dominating={!viewportIsDominating}
           dim={selected === Selection.Viewport}
           style={{
             marginTop: Math.round(relativePx * screen.availableTop),
@@ -94,4 +95,10 @@ const Viewport: FC<{
   }
 )
 
-export default Viewport
+export const Skeleton: FC<{ width?: number }> = React.memo(
+  ({ width = DEFAULT_MAXIMUM_WIDTH }) => (
+    <StyledRoot width={width}>
+      <Skelet.Rect width="100%" height={Math.round((2 / 3) * width)} />
+    </StyledRoot>
+  )
+)

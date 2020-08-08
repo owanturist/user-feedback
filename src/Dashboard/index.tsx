@@ -23,11 +23,13 @@ export type Model = {
   filters: Filters.Model
 }
 
+export const initial: Model = {
+  feedback: RemoteData.Loading,
+  filters: Filters.initial
+}
+
 export const init: [Model, Cmd<Msg>] = [
-  {
-    feedback: RemoteData.Loading,
-    filters: Filters.initial
-  },
+  initial,
   api.getFeedbackList.send(result => LoadFeedbackDone(result))
 ]
 
@@ -84,24 +86,15 @@ const FiltersMsg = cons(
 // V I E W
 
 const cssFilters = css`
-  margin: 16px 0;
+  margin-bottom: 16px;
 
   @media ${breakpoints.big.minWidth} {
-    margin: 28px 0;
+    margin-bottom: 28px;
   }
 `
 
-const cssFeedbackTable = css`
-  margin-bottom: 16px;
-`
-
-const StyledErrorReportContainer = styled.div`
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 16px;
-  min-height: 100%;
+const StyledHttpFailureReport = styled(HttpFailureReport)`
+  margin: 0 auto;
 `
 
 const ViewSucceed: FC<{
@@ -131,7 +124,7 @@ const ViewSucceed: FC<{
         dispatch={msg => dispatch(FiltersMsg(msg))}
       />
 
-      <FeedbackTable.View className={cssFeedbackTable} items={items} />
+      <FeedbackTable.View items={items} />
     </>
   )
 })
@@ -144,12 +137,10 @@ export const View: FC<{
     Loading: () => <Skeleton />,
 
     Failure: error => (
-      <StyledErrorReportContainer>
-        <HttpFailureReport
-          error={error}
-          onTryAgain={() => dispatch(LoadFeedback)}
-        />
-      </StyledErrorReportContainer>
+      <StyledHttpFailureReport
+        error={error}
+        onTryAgain={() => dispatch(LoadFeedback)}
+      />
     ),
 
     Succeed: feedback => (
@@ -170,10 +161,16 @@ const StyledHeaderIcon = styled(TachometerIcon)`
   height: 27px;
 `
 
+const StyledHeader = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
 export const Header: FC = React.memo(() => (
-  <>
+  <StyledHeader>
     <StyledHeaderIcon /> Dashboard
-  </>
+  </StyledHeader>
 ))
 
 // S K E L E T O N
@@ -182,6 +179,6 @@ const Skeleton: FC = React.memo(() => (
   <>
     <Filters.Skeleton className={cssFilters} />
 
-    <FeedbackTable.Skeleton className={cssFeedbackTable} count={20} />
+    <FeedbackTable.Skeleton count={20} />
   </>
 ))

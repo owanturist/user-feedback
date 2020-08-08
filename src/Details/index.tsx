@@ -1,5 +1,6 @@
 import React, { FC, ReactNode } from 'react'
 import styled from '@emotion/styled/macro'
+import { css } from 'emotion/macro'
 import { Map as ReactMapboxGl, Marker } from 'react-mapbox-gl'
 import { Cmd } from 'frctl'
 import { cons } from 'frctl/Basics'
@@ -15,9 +16,7 @@ import * as Router from 'Router'
 import * as Skeleton from 'Skeleton'
 import * as Rating from 'Rating'
 import HttpFailureReport from 'HttpFailureReport'
-import ViewportScreen, {
-  Selection as ViewportSelection
-} from './ViewportScreen'
+import * as ViewportScreen from './ViewportScreen'
 import { ReactComponent as MarkerIcon } from './marker.svg'
 
 // M O D E L
@@ -77,6 +76,10 @@ const LoadFeedbackDone = cons(
 
 // V I E W
 
+const cssMap = css`
+  margin-top: 15px;
+`
+
 const StyledSectionTitle = styled.h3`
   margin: 0;
   color: #333;
@@ -109,13 +112,9 @@ const ViewSection: FC<{ title?: ReactNode }> = ({
   </StyledSection>
 )
 
-const StyledMap = styled(
-  ReactMapboxGl({
-    accessToken: process.env.REACT_APP_MAPBOX_TOKEN || ''
-  })
-)`
-  margin-top: 15px;
-`
+const ViewMap = ReactMapboxGl({
+  accessToken: process.env.REACT_APP_MAPBOX_TOKEN || ''
+})
 
 const StyledMarkerIcon = styled(MarkerIcon)`
   height: 50px;
@@ -131,7 +130,8 @@ const ViewMapSection: FC<{
       <ViewPair label="City">{geo.city}</ViewPair>
     </ViewPairs>
 
-    <StyledMap
+    <ViewMap
+      className={cssMap}
       style="mapbox://styles/mapbox/streets-v11"
       containerStyle={{
         width: '100%',
@@ -143,7 +143,7 @@ const ViewMapSection: FC<{
       <Marker coordinates={geo.position}>
         <StyledMarkerIcon />
       </Marker>
-    </StyledMap>
+    </ViewMap>
   </ViewSection>
 ))
 
@@ -162,27 +162,22 @@ const StyledScreenMarker = styled(StyledViewportMarker)`
   border-color: #1ea0be;
 `
 
-type StyledViewportProps = {
-  screen?: boolean
-  dim: boolean
-  dominate: boolean
-}
-
 const ViewScreenViewportSection: FC<{
   viewport: api.Viewport
   screen: api.Screen
 }> = React.memo(({ viewport, screen }) => {
-  const [selection, setSelection] = React.useState<ViewportSelection>(
-    ViewportSelection.None
+  const [selection, setSelection] = React.useState<ViewportScreen.Selection>(
+    ViewportScreen.Selection.None
   )
-  const selectViewport = (): void => setSelection(ViewportSelection.Viewport)
-  const selectScreen = (): void => setSelection(ViewportSelection.Screen)
-  const unselect = (): void => setSelection(ViewportSelection.None)
+  const selectViewport = (): void =>
+    setSelection(ViewportScreen.Selection.Viewport)
+  const selectScreen = (): void => setSelection(ViewportScreen.Selection.Screen)
+  const unselect = (): void => setSelection(ViewportScreen.Selection.None)
 
   const titleView = (
     <>
       <StyledScreenMarker
-        dim={selection === ViewportSelection.Viewport}
+        dim={selection === ViewportScreen.Selection.Viewport}
         onMouseEnter={selectScreen}
         onMouseLeave={unselect}
       >
@@ -190,7 +185,7 @@ const ViewScreenViewportSection: FC<{
       </StyledScreenMarker>{' '}
       &{' '}
       <StyledViewportMarker
-        dim={selection === ViewportSelection.Screen}
+        dim={selection === ViewportScreen.Selection.Screen}
         onMouseEnter={selectViewport}
         onMouseLeave={unselect}
       >
@@ -201,7 +196,7 @@ const ViewScreenViewportSection: FC<{
 
   return (
     <ViewSection title={titleView}>
-      <ViewportScreen
+      <ViewportScreen.View
         selected={selection}
         viewport={viewport}
         screen={screen}
@@ -216,10 +211,6 @@ const ViewBasicSection: FC<{ feedback: api.FeedbackDetailed }> = ({
 }) => (
   <ViewSection>
     <ViewPairs>
-      <ViewPair label="Rating">
-        <Rating.Static rating={feedback.rating} />
-      </ViewPair>
-
       <ViewPair label="Creation Date">
         {feedback.creationDate.format('HH:mm, dd.MM.YYYY')}
       </ViewPair>
@@ -255,6 +246,7 @@ const ViewBrowserSection: FC<{ browser: api.Browser }> = ({ browser }) => (
 )
 
 const StyledTable = styled.table`
+  min-width: 200px;
   font-size: 14px;
 
   td {
@@ -279,7 +271,7 @@ const ViewPairs: FC = ({ children }) => (
   </StyledTable>
 )
 
-const StyledSections = styled.div`
+const StyledRoot = styled.div`
   display: flex;
   flex-direction: column;
   margin: -10px 0 0 -10px;
@@ -289,7 +281,7 @@ const StyledSections = styled.div`
   }
 `
 
-const StyledCol = styled.div`
+const StyledInfo = styled.div`
   display: flex;
   flex-flow: row wrap;
 
@@ -300,8 +292,8 @@ const StyledCol = styled.div`
 
 const ViewSucceed: FC<{ feedback: api.FeedbackDetailed }> = React.memo(
   ({ feedback }) => (
-    <StyledSections>
-      <StyledCol>
+    <StyledRoot>
+      <StyledInfo>
         <ViewBasicSection feedback={feedback} />
 
         <ViewBrowserSection browser={feedback.browser} />
@@ -310,12 +302,16 @@ const ViewSucceed: FC<{ feedback: api.FeedbackDetailed }> = React.memo(
           viewport={feedback.viewport}
           screen={feedback.screen}
         />
-      </StyledCol>
+      </StyledInfo>
 
       <ViewMapSection geo={feedback.geo} />
-    </StyledSections>
+    </StyledRoot>
   )
 )
+
+const StyledHttpFailureReport = styled(HttpFailureReport)`
+  margin: 0 auto;
+`
 
 export const View: FC<{
   feedbackId: string
@@ -323,10 +319,10 @@ export const View: FC<{
   dispatch: Dispatch<Msg>
 }> = ({ feedbackId, model, dispatch, ...props }) =>
   model.feedback.cata({
-    Loading: () => <Skeleton.Text />,
+    Loading: () => <SkeletonRoot />,
 
     Failure: error => (
-      <HttpFailureReport
+      <StyledHttpFailureReport
         error={error}
         onTryAgain={() => dispatch(LoadFeedback(feedbackId))}
       />
@@ -335,4 +331,65 @@ export const View: FC<{
     Succeed: feedback => <ViewSucceed feedback={feedback} />
   })
 
+// H E A D E R
+
+const cssRating = css`
+  margin-right: 10px;
+`
+
+const StyledHeader = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
+export const Header: FC<{ model: Model }> = React.memo(({ model }) => (
+  <StyledHeader>
+    {model.feedback.cata({
+      Loading: () => <Rating.Skeleton className={cssRating} />,
+      Failure: () => null,
+      Succeed: ({ rating }) => (
+        <Rating.Static className={cssRating} rating={rating} />
+      )
+    })}
+    Feedback Details
+  </StyledHeader>
+))
+
 // S K E L E T O N
+
+const SkeletonPairs: FC<{ count: number }> = React.memo(({ count }) => (
+  <ViewPairs>
+    {new Array(count).fill(null).map((_, i) => (
+      <tr key={i}>
+        <td>
+          <Skeleton.Text />
+        </td>
+      </tr>
+    ))}
+  </ViewPairs>
+))
+
+const SkeletonRoot: FC = React.memo(() => (
+  <StyledRoot>
+    <StyledInfo>
+      <ViewSection>
+        <SkeletonPairs count={3} />
+      </ViewSection>
+
+      <ViewSection title={<Skeleton.Text />}>
+        <SkeletonPairs count={4} />
+      </ViewSection>
+
+      <ViewSection title={<Skeleton.Text />}>
+        <ViewportScreen.Skeleton />
+      </ViewSection>
+    </StyledInfo>
+
+    <ViewSection title={<Skeleton.Text />}>
+      <SkeletonPairs count={2} />
+
+      <Skeleton.Rect className={cssMap} width="100%" height="450px" />
+    </ViewSection>
+  </StyledRoot>
+))

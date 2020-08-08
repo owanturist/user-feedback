@@ -5,6 +5,7 @@ import { Cata, cons } from 'frctl/Basics'
 import { Url } from 'frctl/Url'
 
 import { Dispatch, UrlRequest } from 'Provider'
+import * as breakpoints from 'breakpoints'
 import * as Router from 'Router'
 import * as Dashboard from 'Dashboard'
 import * as Details from 'Details'
@@ -22,7 +23,7 @@ type Screen = {
   cata<R>(pattern: ScreenPattern<R>): R
 }
 
-const DashboardScreen = cons<[Dashboard.Model], Screen>(
+export const DashboardScreen = cons<[Dashboard.Model], Screen>(
   class DashboardScreen implements Screen {
     public constructor(private readonly dashboard: Dashboard.Model) {}
 
@@ -36,7 +37,7 @@ const DashboardScreen = cons<[Dashboard.Model], Screen>(
   }
 )
 
-const DetailsScreen = cons<[string, Details.Model], Screen>(
+export const DetailsScreen = cons<[string, Details.Model], Screen>(
   class DetailsScreen implements Screen {
     public constructor(
       private readonly feedbackId: string,
@@ -54,7 +55,7 @@ const DetailsScreen = cons<[string, Details.Model], Screen>(
   }
 )
 
-const NotFoundScreen: Screen = {
+export const NotFoundScreen: Screen = {
   cata<R>(pattern: ScreenPattern<R>): R {
     return utils.callOrElse(pattern._, pattern.NotFoundScreen)
   }
@@ -191,13 +192,15 @@ const DetailsMsg = cons(
 // V I E W
 
 const StyledHeader = styled.header`
+  box-sizing: border-box;
   position: relative; /* shadow overflow of content */
   z-index: 2;
-  flex: 0 0 auto;
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  align-items: center;
-  padding: 19px 16px;
+  flex: 0 0 auto;
+  min-height: 67px;
+  padding: 5px 16px;
   margin: 0;
   color: #5e6264;
   background: #fff;
@@ -211,9 +214,13 @@ const StyledHeader = styled.header`
 const StyledContainer = styled.div`
   box-sizing: border-box;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 16px;
   width: 100%;
   max-width: 1454px;
+
+  @media ${breakpoints.big.minWidth} {
+    padding-top: 28px;
+  }
 `
 
 const StyledScroller = styled.div`
@@ -262,7 +269,7 @@ const ViewDetailsScreen: FC<{
   details: Details.Model
   dispatch: Dispatch<Msg>
 }> = ({ feedbackId, details, dispatch }) => (
-  <ViewScreen header="Counter">
+  <ViewScreen header={<Details.Header model={details} />}>
     <Details.View
       feedbackId={feedbackId}
       model={details}

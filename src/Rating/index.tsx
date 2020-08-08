@@ -47,9 +47,10 @@ const StyledInteractiveRoot = styled(StyledRoot.withComponent('button'))<
 `
 
 export const Static: FC<{
+  className?: string
   rating: api.Rating
-}> = React.memo(({ rating }) => (
-  <StyledRoot data-cy={`rating__static_${rating}`}>
+}> = React.memo(({ className, rating }) => (
+  <StyledRoot className={className} data-cy={`rating__static_${rating}`}>
     {limitRating(rating)}
   </StyledRoot>
 ))
