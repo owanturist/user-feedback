@@ -15,6 +15,9 @@ import * as Router from 'Router'
 import * as Skeleton from 'Skeleton'
 import * as Rating from 'Rating'
 import HttpFailureReport from 'HttpFailureReport'
+import ViewportScreen, {
+  Selection as ViewportSelection
+} from './ViewportScreen'
 import { ReactComponent as MarkerIcon } from './marker.svg'
 
 // M O D E L
@@ -73,8 +76,6 @@ const LoadFeedbackDone = cons(
 )
 
 // V I E W
-
-const VIEWPORT_WIDTH = 300
 
 const StyledSectionTitle = styled.h3`
   margin: 0;
@@ -167,28 +168,6 @@ type StyledViewportProps = {
   dominate: boolean
 }
 
-const StyledViewport = styled.div<StyledViewportProps>`
-  position: ${props => (props.dominate ? 'relative' : 'absolute')};
-  z-index: ${props => (props.dim ? 1 : 2)};
-  top: 0;
-  left: 0;
-  background: ${props => (props.screen ? '#1ea0be' : '#be1ea0')};
-  border-radius: 2px;
-  opacity: ${props => (props.dim ? 0.4 : 0.7)};
-`
-
-const StyledViewportContainer = styled.div`
-  position: relative;
-  padding-top: 1px;
-  width: ${VIEWPORT_WIDTH}px;
-`
-
-enum ViewportSelection {
-  None,
-  Viewport,
-  Screen
-}
-
 const ViewScreenViewportSection: FC<{
   viewport: api.Viewport
   screen: api.Screen
@@ -220,41 +199,14 @@ const ViewScreenViewportSection: FC<{
     </>
   )
 
-  const viewportIsDominating =
-    viewport.height > screen.availableTop + screen.availableHeight
-  const relativePx =
-    viewport.width > screen.availableLeft + screen.availableWidth
-      ? VIEWPORT_WIDTH / viewport.width
-      : VIEWPORT_WIDTH / screen.availableWidth
-
   return (
     <ViewSection title={titleView}>
-      <StyledViewportContainer>
-        <StyledViewport
-          dominate={viewportIsDominating}
-          dim={selection === ViewportSelection.Screen}
-          style={{
-            width: Math.round(relativePx * viewport.width),
-            height: Math.round(relativePx * viewport.height)
-          }}
-          onMouseEnter={selectViewport}
-          onMouseLeave={unselect}
-        />
-
-        <StyledViewport
-          screen
-          dominate={!viewportIsDominating}
-          dim={selection === ViewportSelection.Viewport}
-          style={{
-            marginTop: Math.round(relativePx * screen.availableTop),
-            marginLeft: Math.round(relativePx * screen.availableLeft),
-            width: Math.round(relativePx * screen.availableWidth),
-            height: Math.round(relativePx * screen.availableHeight)
-          }}
-          onMouseEnter={selectScreen}
-          onMouseLeave={unselect}
-        />
-      </StyledViewportContainer>
+      <ViewportScreen
+        selected={selection}
+        viewport={viewport}
+        screen={screen}
+        onSelect={setSelection}
+      />
     </ViewSection>
   )
 })
