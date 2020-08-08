@@ -290,6 +290,12 @@ const ViewPairs: FC = ({ children }) => (
   </StyledTable>
 )
 
+const StyledBackLink = styled.div`
+  margin: 10px 0 0 10px;
+  padding: 5px 0;
+  flex: 1 0 100%;
+`
+
 const StyledRoot = styled.div`
   display: flex;
   flex-direction: column;
@@ -314,6 +320,12 @@ const ViewSucceed: FC<{ feedback: api.FeedbackDetailed }> = React.memo(
   ({ feedback }) => (
     <StyledRoot>
       <StyledInfo>
+        <StyledBackLink>
+          <Router.Link route={Router.ToDashboard()}>
+            ← Back to Dashboard
+          </Router.Link>
+        </StyledBackLink>
+
         <ViewBasicSection feedback={feedback} />
 
         <ViewBrowserSection browser={feedback.browser} />
@@ -395,6 +407,10 @@ const SkeletonPairs: FC<{ count: number }> = React.memo(({ count }) => (
 const SkeletonRoot: FC = React.memo(() => (
   <StyledRoot>
     <StyledInfo>
+      <StyledBackLink>
+        <Skeleton.Text />
+      </StyledBackLink>
+
       <ViewSection>
         <SkeletonPairs count={3} />
       </ViewSection>

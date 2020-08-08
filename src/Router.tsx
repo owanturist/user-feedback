@@ -8,7 +8,7 @@ import { Parser as UrlParser } from 'frctl/Url/Parser'
 import Maybe from 'frctl/Maybe'
 import { NavigationConsumer } from 'Provider'
 import * as api from 'api'
-import * as utils from 'utils'
+import { callOrElse, nonEmptyString } from 'utils'
 
 export type Navigation = {
   replace(url: string): Cmd<never>
@@ -39,7 +39,17 @@ export type Route = {
 
 export const ToDashboard = cons(
   class implements Route {
-    public constructor(private readonly filters: DashboardFilters) {}
+    private readonly filters: DashboardFilters
+
+    public constructor(filters?: {
+      search?: string
+      rating?: Array<api.Rating>
+    }) {
+      this.filters = {
+        search: Maybe.fromNullable(filters?.search).chain(nonEmptyString),
+        rating: Set.fromList(filters?.rating || [])
+      }
+    }
 
     public stringify(): string {
       const queries = [
@@ -51,7 +61,7 @@ export const ToDashboard = cons(
     }
 
     public cata<R>(pattern: RoutePattern<R>): R {
-      return utils.callOrElse(pattern._, pattern.ToDashboard, this.filters)
+      return callOrElse(pattern._, pattern.ToDashboard, this.filters)
     }
   }
 )
@@ -65,7 +75,7 @@ export const ToDetails = cons(
     }
 
     public cata<R>(pattern: RoutePattern<R>): R {
-      return utils.callOrElse(pattern._, pattern.ToDetails, this.feedbackId)
+      return callOrElse(pattern._, pattern.ToDetails, this.feedbackId)
     }
   }
 )
@@ -83,8 +93,8 @@ const parser = UrlParser.oneOf([
     .query('search')
     .string.map(rating => search =>
       ToDashboard({
-        search,
-        rating: Set.fromList(rating)
+        search: search.getOrElse(''),
+        rating
       })
     ),
 
