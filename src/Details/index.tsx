@@ -1,7 +1,6 @@
 import React, { FC, ReactNode } from 'react'
 import styled from '@emotion/styled/macro'
 import { Map as ReactMapboxGl, Marker } from 'react-mapbox-gl'
-import { css } from 'emotion/macro'
 import { Cmd } from 'frctl'
 import * as Http from 'frctl/Http'
 import RemoteData from 'frctl/RemoteData'
@@ -35,10 +34,6 @@ export type Msg = utils.Msg<[Model], [Model, Cmd<Msg>]>
 // V I E W
 
 const VIEWPORT_WIDTH = 300
-
-const cssLink = css`
-  color: #1ea0be;
-`
 
 const StyledSectionTitle = styled.h3`
   margin: 0;
@@ -219,18 +214,13 @@ const ViewBasicSection: FC<{ feedback: api.FeedbackDetailed }> = ({
       </ViewPair>
 
       <ViewPair label="Contact email">
-        <a
-          className={cssLink}
-          href={`mailto:${feedback.email}`}
-          title="Write an email"
-        >
+        <Router.Link href={`mailto:${feedback.email}`} title="Write an email">
           {feedback.email}
-        </a>
+        </Router.Link>
       </ViewPair>
 
       <ViewPair label="Source url">
         <Router.Link
-          className={cssLink}
           href={feedback.url}
           title="Visit source url"
           target="_blank"

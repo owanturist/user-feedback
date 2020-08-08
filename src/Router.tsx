@@ -1,4 +1,5 @@
 import React, { FC } from 'react'
+import styled from '@emotion/styled/macro'
 import { Cmd } from 'frctl'
 import { Cata, cons } from 'frctl/Basics'
 import { Url } from 'frctl/Url'
@@ -92,14 +93,29 @@ const parser = UrlParser.oneOf([
 
 export const parse = (url: Url): Maybe<Route> => parser.parse(url)
 
+const StyledLink = styled.a`
+  color: #1ea0be;
+`
+
+const assignNoReferrer = (
+  props: React.AnchorHTMLAttributes<HTMLAnchorElement>
+): React.AnchorHTMLAttributes<HTMLAnchorElement> => {
+  if (props.target === '_blank' && typeof props.rel === 'undefined') {
+    return {
+      ...props,
+      rel: 'noreferrer'
+    }
+  }
+
+  return props
+}
+
 const ViewLink: FC<
   React.AnchorHTMLAttributes<HTMLAnchorElement> & {
     onChangeUrl(href: string): void
   }
-> = React.memo(({ onChangeUrl, children, ...props }) => (
-  <a
-    // eslint-disable-next-line no-undefined
-    rel={props.target === '_blank' ? 'noreferrer' : undefined}
+> = React.memo(({ onChangeUrl, ...props }) => (
+  <StyledLink
     {...props}
     onClick={React.useCallback(
       event => {
@@ -108,9 +124,7 @@ const ViewLink: FC<
       },
       [onChangeUrl]
     )}
-  >
-    {children}
-  </a>
+  />
 ))
 
 export const Link: FC<
@@ -120,12 +134,16 @@ export const Link: FC<
   | (React.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string })
 > = props => (
   <NavigationConsumer>
-    {onChangeUrl => (
-      <ViewLink
-        {...props}
-        href={'route' in props ? props.route.stringify() : props.href}
-        onChangeUrl={onChangeUrl}
-      />
-    )}
+    {onChangeUrl =>
+      'route' in props ? (
+        <ViewLink
+          {...assignNoReferrer(props)}
+          href={props.route.stringify()}
+          onChangeUrl={onChangeUrl}
+        />
+      ) : (
+        <StyledLink {...assignNoReferrer(props)} />
+      )
+    }
   </NavigationConsumer>
 )
