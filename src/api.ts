@@ -153,27 +153,38 @@ const feedbackDetailedDecoder: Decode.Decoder<FeedbackDetailed> = Decode.shape({
 // it matches to target id and then decodes
 const findDetailedFeedbackByIdDecoder = (
   index: number,
+  length: number,
   feedbackId: string
-): Decode.Decoder<FeedbackDetailed> => {
+): Decode.Decoder<Maybe<FeedbackDetailed>> => {
+  if (index >= length) {
+    return Decode.succeed(Maybe.Nothing)
+  }
+
   return Decode.lazy(
     // it uses lazy to keep array context after [index].id probe
     () => Decode.index(index).field('id').string
   ).chain(testFeedbackId => {
     if (feedbackId === testFeedbackId) {
-      return Decode.index(index).of(feedbackDetailedDecoder)
+      return Decode.index(index).of(feedbackDetailedDecoder).map(Maybe.Just)
     }
 
-    return findDetailedFeedbackByIdDecoder(index + 1, feedbackId)
+    return findDetailedFeedbackByIdDecoder(index + 1, length, feedbackId)
   })
 }
 
 export const getFeedbackById = (
   feedbackId: string
-): Http.Request<FeedbackDetailed> => {
+): Http.Request<Maybe<FeedbackDetailed>> => {
   // keep id for e2e mocking
   return Http.get(`${API_URL}/example/apidemo.json?id=${feedbackId}`)
     .withTimeout(5000)
     .withExpectJson(
-      Decode.field('items').of(findDetailedFeedbackByIdDecoder(0, feedbackId))
+      Decode.field('items')
+        .list(Decode.value)
+        .chain(list =>
+          Decode.field('items').of(
+            findDetailedFeedbackByIdDecoder(0, list.length, feedbackId)
+          )
+        )
     )
 }

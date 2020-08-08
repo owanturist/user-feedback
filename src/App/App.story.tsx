@@ -3,6 +3,7 @@ import { action } from '@storybook/addon-actions'
 
 import { Url } from 'frctl/Url'
 import RemoteData from 'frctl/RemoteData'
+import OptionalRemoteData from 'frctl/RemoteData/Optional'
 import * as Http from 'frctl/Http'
 
 import * as Router from 'Router'
@@ -52,13 +53,26 @@ export const ScreenDetails: FC = () => (
   />
 )
 
+export const ScreenDetailsNotFound: FC = () => (
+  <App.View
+    model={{
+      ...initial,
+      screen: App.DetailsScreen('feedback-id', {
+        ...Details.initial,
+        feedback: OptionalRemoteData.NotAsked
+      })
+    }}
+    dispatch={action('dispatch')}
+  />
+)
+
 export const ScreenDetailsFailed: FC = () => (
   <App.View
     model={{
       ...initial,
       screen: App.DetailsScreen('feedback-id', {
         ...Details.initial,
-        feedback: RemoteData.Failure(Http.Error.Timeout)
+        feedback: OptionalRemoteData.Failure(Http.Error.Timeout)
       })
     }}
     dispatch={action('dispatch')}

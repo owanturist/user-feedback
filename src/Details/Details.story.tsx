@@ -4,7 +4,7 @@ import { text, date, number } from '@storybook/addon-knobs'
 import { action } from '@storybook/addon-actions'
 
 import * as Http from 'frctl/Http'
-import RemoteData from 'frctl/RemoteData'
+import RemoteData from 'frctl/RemoteData/Optional'
 import { nonEmptyString } from 'utils'
 import * as api from 'api'
 import * as Details from './index'
@@ -105,6 +105,17 @@ export const Loading: FC = () => (
   <Details.View
     feedbackId={text('Feedback ID', 'some_id')}
     model={Details.initial}
+    dispatch={action('dispatch')}
+  />
+)
+
+export const NotFound: FC = () => (
+  <Details.View
+    feedbackId={text('Feedback ID', 'some_id')}
+    model={{
+      ...Details.initial,
+      feedback: RemoteData.NotAsked
+    }}
     dispatch={action('dispatch')}
   />
 )

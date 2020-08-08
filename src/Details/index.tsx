@@ -5,8 +5,9 @@ import { Map as ReactMapboxGl, Marker } from 'react-mapbox-gl'
 import { Cmd } from 'frctl'
 import { cons } from 'frctl/Basics'
 import * as Http from 'frctl/Http'
+import Maybe from 'frctl/Maybe'
 import Either from 'frctl/Either'
-import RemoteData from 'frctl/RemoteData'
+import RemoteData from 'frctl/RemoteData/Optional'
 
 import { Dispatch } from 'Provider'
 import * as breakpoints from 'breakpoints'
@@ -15,6 +16,7 @@ import * as utils from 'utils'
 import * as Router from 'Router'
 import * as Skeleton from 'Skeleton'
 import * as Rating from 'Rating'
+import * as Page404 from 'Page404'
 import HttpFailureReport from 'HttpFailureReport'
 import * as ViewportScreen from './ViewportScreen'
 import { ReactComponent as MarkerIcon } from './marker.svg'
@@ -63,14 +65,23 @@ const LoadFeedback = cons(
 const LoadFeedbackDone = cons(
   class LoadFeedbackDone implements Msg {
     public constructor(
-      private readonly result: Either<Http.Error, api.FeedbackDetailed>
+      private readonly result: Either<Http.Error, Maybe<api.FeedbackDetailed>>
     ) {}
 
     public update(model: Model): [Model, Cmd<Msg>] {
       return [
         {
           ...model,
-          feedback: RemoteData.fromEither(this.result)
+          feedback: this.result.cata<
+            RemoteData<Http.Error, api.FeedbackDetailed>
+          >({
+            Left: RemoteData.Failure,
+            Right: feedback =>
+              feedback.cata({
+                Nothing: () => RemoteData.NotAsked,
+                Just: RemoteData.Succeed
+              })
+          })
         },
         Cmd.none
       ]
@@ -356,6 +367,8 @@ export const View: FC<{
   dispatch: Dispatch<Msg>
 }> = ({ feedbackId, model, dispatch, ...props }) =>
   model.feedback.cata({
+    NotAsked: () => <Page404.View />,
+
     Loading: () => <SkeletonRoot />,
 
     Failure: error => (
@@ -380,18 +393,25 @@ const StyledHeader = styled.div`
   align-items: center;
 `
 
-export const Header: FC<{ model: Model }> = React.memo(({ model }) => (
-  <StyledHeader>
-    {model.feedback.cata({
-      Loading: () => <Rating.Skeleton className={cssRating} />,
-      Failure: () => null,
-      Succeed: ({ rating }) => (
-        <Rating.Static className={cssRating} rating={rating} />
-      )
-    })}
-    Feedback Details
-  </StyledHeader>
-))
+export const Header: FC<{ model: Model }> = React.memo(({ model }) =>
+  model.feedback.cata({
+    NotAsked: () => <Page404.Header />,
+
+    Loading: () => (
+      <StyledHeader>
+        <Rating.Skeleton className={cssRating} /> Feedback Details
+      </StyledHeader>
+    ),
+
+    Failure: () => <StyledHeader>Feedback Details</StyledHeader>,
+
+    Succeed: ({ rating }) => (
+      <StyledHeader>
+        <Rating.Static className={cssRating} rating={rating} /> Feedback Details
+      </StyledHeader>
+    )
+  })
+)
 
 // S K E L E T O N
 
