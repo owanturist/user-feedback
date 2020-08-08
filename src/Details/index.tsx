@@ -318,10 +318,13 @@ const StyledInfo = styled.div`
 
 const ViewSucceed: FC<{ feedback: api.FeedbackDetailed }> = React.memo(
   ({ feedback }) => (
-    <StyledRoot>
+    <StyledRoot data-cy="details__root">
       <StyledInfo>
         <StyledBackLink>
-          <Router.Link route={Router.ToDashboard()}>
+          <Router.Link
+            data-cy="details__link-to-dashboard"
+            route={Router.ToDashboard()}
+          >
             ← Back to Dashboard
           </Router.Link>
         </StyledBackLink>
@@ -405,7 +408,7 @@ const SkeletonPairs: FC<{ count: number }> = React.memo(({ count }) => (
 ))
 
 const SkeletonRoot: FC = React.memo(() => (
-  <StyledRoot>
+  <StyledRoot data-cy="details__skeleton">
     <StyledInfo>
       <StyledBackLink>
         <Skeleton.Text />

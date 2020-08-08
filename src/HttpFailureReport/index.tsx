@@ -28,7 +28,7 @@ const StyledTryAgain = styled.button`
 
 const ViewTryAgain: FC<{ onTryAgain(): void }> = ({ onTryAgain }) => (
   <StyledTryAgain
-    data-cy="app__retry"
+    data-cy="http__retry"
     autoFocus
     type="button"
     tabIndex={0}
@@ -70,10 +70,12 @@ const StyledRoot = styled.div`
   overflow-y: auto;
 `
 
-const FailureReport: FC<{
-  error: Http.Error
-  onTryAgain(): void
-}> = React.memo(({ error, onTryAgain, ...props }) =>
+const FailureReport: FC<
+  {
+    error: Http.Error
+    onTryAgain(): void
+  } & React.HTMLAttributes<HTMLDivElement>
+> = React.memo(({ error, onTryAgain, ...props }) =>
   error.cata({
     NetworkError: () => (
       <StyledRoot {...props}>

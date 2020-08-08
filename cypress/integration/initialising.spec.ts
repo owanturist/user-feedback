@@ -1,11 +1,12 @@
 describe('Initialising', () => {
   beforeEach(() => {
     cy.viewport('macbook-15')
+    cy.server({
+      force404: true
+    })
   })
 
   it('should show loading skeleton', () => {
-    cy.server()
-
     cy.route({
       url: '**/example/apidemo.json',
       response: 'fixture:success',
@@ -18,8 +19,6 @@ describe('Initialising', () => {
   })
 
   it('renders feedback correctly', () => {
-    cy.server()
-
     cy.route({
       url: '**/example/apidemo.json',
       response: 'fixture:success',
@@ -50,8 +49,6 @@ describe('Initialising', () => {
 
   context('failure', () => {
     it('shows bad status 500 error screen', () => {
-      cy.server()
-
       cy.route({
         url: '**/example/apidemo.json',
         response: 'fixture:success',
@@ -68,8 +65,6 @@ describe('Initialising', () => {
     })
 
     it('shows bad status 400 error screen', () => {
-      cy.server()
-
       cy.route({
         url: '**/example/apidemo.json',
         response: 'fixture:success',
@@ -86,8 +81,6 @@ describe('Initialising', () => {
     })
 
     it('shows timeout error screen', () => {
-      cy.server()
-
       cy.route({
         url: '**/example/apidemo.json',
         response: 'fixture:success',
@@ -108,7 +101,7 @@ describe('Initialising', () => {
         delay: 200
       }).as('getApiDemoFast')
 
-      cy.getcy('app__retry').click()
+      cy.getcy('http__retry').click()
 
       cy.getcy('dashboard__skeleton').should('be.visible')
 

@@ -1,8 +1,9 @@
 describe('Filtering', () => {
   beforeEach(() => {
     cy.viewport('macbook-15')
-
-    cy.server()
+    cy.server({
+      force404: true
+    })
 
     cy.route({
       url: '**/example/apidemo.json',
