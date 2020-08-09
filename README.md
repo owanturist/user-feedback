@@ -76,7 +76,7 @@ Runs Cypress tests to completion.
 
 - [x] responsible layout
 - [x] greedy search to filter feedback by comment
-- uses [`Json/Decode`](https://github.com/owanturist/Fractal/tree/master/src/Json/Decode) to validate and transform an api response. See handling of a decode error in [ [x]action](https://bit.ly/user-feedback-app-error)
+- [x] uses [`Json/Decode`](https://github.com/owanturist/Fractal/tree/master/src/Json/Decode) to validate and transform an api response. See handling of a decode error in [ action](https://bit.ly/user-feedback-app-error)
 - [x] client side routing
 - [x] nice [detailed feedback](https://bit.ly/user-feedback-app-details) page
 - [x] 404 page
@@ -199,8 +199,8 @@ class Decrement implements Action {
   }
 }
 
-class Reset implements Action {
-  public update(state: State): State {
+const Reset: Action = {
+  update(state: State): State {
     return { ...state, count: 0 }
   }
 }
@@ -219,7 +219,6 @@ class Reset implements Action {
 1. You should implement `update` method in every `Action`, so it looks like kind of boilerplate.
    Otherwise you have single place (`reducer`) which describes the signature.
 1. Creating of `Action` with `new` looks unusual and not natural.
-1. Everyone does like Redux, nobody likes classes.
 
 ### Get rid of the `new`
 
