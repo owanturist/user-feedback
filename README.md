@@ -89,7 +89,7 @@ Runs Cypress tests to completion.
 ## Known issues
 
 - [ ] Desktop Safary (V 13.1.2) slows down when dashboard scrolls to very top or bottom
-- [ ] Device decodes a hardcoded string
+- [ ] Device decodes a [hardcoded string](./src/api.ts#L20). User Agent parsing ([user-agent-parse](https://www.npmjs.com/package/user-agent-parse) or [ua-parser-js](https://github.com/faisalman/ua-parser-js)) does not provide any information for the majority of data.
 - [ ] No scroll position restoration
 
 ## Why classes?
