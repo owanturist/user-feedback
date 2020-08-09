@@ -102,7 +102,7 @@ export const Rect: FC<{
 )
 
 /**
- * Reactangle shape skeleton
+ * Circle shape skeleton
  *
  * @param [className] optional class attribute
  * @param [inline] use display 'inline' instead of 'block'

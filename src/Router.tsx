@@ -29,7 +29,7 @@ export type UrlRequestPattern<R> = Cata<{
 }>
 
 /**
- * Internal message triggered when app url is changed via Link or Navigation
+ * Internal message triggered when app url is changed via Link
  */
 export type UrlRequest = {
   cata<R>(pattern: UrlRequestPattern<R>): R
