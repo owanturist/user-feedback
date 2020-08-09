@@ -72,6 +72,15 @@ Runs Cypress tests to completion.
 - State management with [Fractal][fractal]
 - CSS-in-JS via [Emotion][emotion]
 
+## Features
+
+- responsible layout
+- greedy search to filter feedback by comment
+- uses [`Json/Decode`](https://github.com/owanturist/Fractal/tree/master/src/Json/Decode) to validate and transform an api response. See handling of a decode error in [action](https://bit.ly/user-feedback-app-error)
+- client side routing
+- nice [detailed feedback](https://bit.ly/user-feedback-app-details) page
+- 404 page
+
 [cra]: https://github.com/facebook/create-react-app
 [ts]: https://www.typescriptlang.org
 [eslint]: https://eslint.org
