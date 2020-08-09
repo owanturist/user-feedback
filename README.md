@@ -86,6 +86,12 @@ Runs Cypress tests to completion.
 - [x] 404 page
 - [ ] save and restore filters to url query
 
+## Known issues
+
+- [ ] Desktop Safary (V 13.1.2) slows down when dashboard scrolls to very top or bottom
+- [ ] Device decodes a hardcoded string
+- [ ] No scroll position restoration
+
 ## Why classes?
 
 Here is a piece of code which describes simple counter's `Action` and way of handling them like `update`/`reducer`. Below the code you might find a lists of pros and cons by my opinion. I didn't use `readonly` for keep the example more clean.
