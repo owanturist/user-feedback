@@ -23,12 +23,14 @@ export type Model = {
   filters: Filters.Model
 }
 
+export const initial: Model = {
+  feedback: RemoteData.Loading,
+  filters: Filters.initial
+}
+
 export const init: [Model, Cmd<Msg>] = [
-  {
-    feedback: RemoteData.Loading,
-    filters: Filters.initial
-  },
-  api.getFeedback.send(result => LoadFeedbackDone(result))
+  initial,
+  api.getFeedbackList.send(result => LoadFeedbackDone(result))
 ]
 
 // U P D A T E
@@ -42,7 +44,7 @@ const LoadFeedback: Msg = {
         ...model,
         feedback: RemoteData.Loading
       },
-      api.getFeedback.send(result => LoadFeedbackDone(result))
+      api.getFeedbackList.send(result => LoadFeedbackDone(result))
     ]
   }
 }
@@ -91,77 +93,9 @@ const cssFilters = css`
   }
 `
 
-const StyledContainer = styled.div`
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
+const StyledHttpFailureReport = styled(HttpFailureReport)`
   margin: 0 auto;
-  padding: 16px;
-  width: 100%;
-  max-width: 1454px;
-
-  @media ${breakpoints.big.minWidth} {
-    padding-top: 28px;
-  }
 `
-
-const StyledScroller = styled.div`
-  flex: 1 1 auto;
-  overflow-y: auto;
-  scroll-behavior: smooth;
-`
-
-const StyledIcon = styled(TachometerIcon)`
-  width: 27px;
-  height: 27px;
-`
-
-const StyledPageTitle = styled.h1`
-  margin: 0 0 0 16px;
-  font-weight: 600;
-  font-size: 26px;
-  letter-spacing: 0.02em;
-`
-
-const StyledHeader = styled.header`
-  box-sizing: border-box;
-  position: relative; /* shadow overflow of content */
-  z-index: 2;
-  flex: 0 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 19px 16px;
-  color: rgb(94, 98, 100);
-  background: #fff;
-  box-shadow: 0 0 2px 2px #dadee0;
-  transition: box-shadow 0.4s ease;
-  user-select: none;
-`
-
-const ViewHeader: FC = React.memo(() => (
-  <StyledHeader>
-    <StyledIcon />
-    <StyledPageTitle>Dashboard</StyledPageTitle>
-  </StyledHeader>
-))
-
-const StyledRoot = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-`
-
-const ViewRoot: FC = ({ children, ...props }) => (
-  <StyledRoot {...props}>
-    <ViewHeader />
-
-    <StyledScroller>
-      <StyledContainer>{children}</StyledContainer>
-    </StyledScroller>
-  </StyledRoot>
-)
 
 const ViewSucceed: FC<{
   feedback: Array<api.Feedback>
@@ -183,7 +117,7 @@ const ViewSucceed: FC<{
   )
 
   return (
-    <ViewRoot data-cy="dashboard__root">
+    <div data-cy="dashboard__root">
       <Filters.View
         className={cssFilters}
         model={filters}
@@ -191,7 +125,7 @@ const ViewSucceed: FC<{
       />
 
       <FeedbackTable.View items={items} />
-    </ViewRoot>
+    </div>
   )
 })
 
@@ -203,7 +137,7 @@ export const View: FC<{
     Loading: () => <Skeleton />,
 
     Failure: error => (
-      <HttpFailureReport
+      <StyledHttpFailureReport
         error={error}
         onTryAgain={() => dispatch(LoadFeedback)}
       />
@@ -219,12 +153,32 @@ export const View: FC<{
   })
 )
 
+// H E A D E R
+
+const StyledHeaderIcon = styled(TachometerIcon)`
+  margin-right: 16px;
+  width: 27px;
+  height: 27px;
+`
+
+const StyledHeader = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
+export const Header: FC = React.memo(() => (
+  <StyledHeader>
+    <StyledHeaderIcon /> Dashboard
+  </StyledHeader>
+))
+
 // S K E L E T O N
 
 const Skeleton: FC = React.memo(() => (
-  <ViewRoot data-cy="dashboard__skeleton">
+  <div data-cy="dashboard__skeleton">
     <Filters.Skeleton className={cssFilters} />
 
     <FeedbackTable.Skeleton count={20} />
-  </ViewRoot>
+  </div>
 ))

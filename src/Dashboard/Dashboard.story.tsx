@@ -27,6 +27,8 @@ export default {
   component: Dashboard.View
 }
 
+export const Header: FC = () => <Dashboard.Header />
+
 export const Loading: FC = () => (
   <Dashboard.View model={initial} dispatch={action('dispatch')} />
 )

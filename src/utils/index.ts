@@ -4,6 +4,12 @@ export type Msg<A extends Array<unknown>, R> = {
   update(...args: A): R
 }
 
+export const nonEmptyString = (str: string): Maybe<string> => {
+  const trimmed = str.trim()
+
+  return trimmed.length === 0 ? Maybe.Nothing : Maybe.Just(trimmed)
+}
+
 export const callOrElse = <A extends Array<unknown>, R>(
   defaultFn: (() => R) | undefined,
   fn: ((...args: A) => R) | undefined,

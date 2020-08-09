@@ -5,12 +5,13 @@ import { cons } from 'frctl/Basics'
 import Set from 'frctl/Set'
 import Maybe from 'frctl/Maybe'
 
-import { Dispatch } from 'Provider'
+import theme from 'theme'
 import * as utils from 'utils'
 import * as breakpoints from 'breakpoints'
 import * as api from 'api'
 import * as Skelet from 'Skeleton'
 import * as Rating from 'Rating'
+import { Dispatch } from 'Provider'
 
 // M O D E L
 
@@ -139,7 +140,7 @@ const StyledInput = styled.input`
   padding: 0 13px 2px;
   border-radius: 3px;
   border: 2px solid #ddd;
-  color: #59636b;
+  color: ${theme.dark};
   background: #fff;
   font-size: 15px;
   letter-spacing: 0.02em;

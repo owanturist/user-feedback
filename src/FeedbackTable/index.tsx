@@ -1,6 +1,7 @@
 import React, { FC, ReactNode } from 'react'
 import styled from '@emotion/styled/macro'
 
+import theme from 'theme'
 import * as api from 'api'
 import * as breakpoints from 'breakpoints'
 import * as utils from 'utils'
@@ -81,7 +82,7 @@ const ViewFragments: FC<{
 const StyledItem = styled.div`
   display: flex;
   flex-direction: column;
-  color: #59636b;
+  color: ${theme.dark};
   background: #fff;
   border-radius: 5px;
   box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);
@@ -126,7 +127,7 @@ const ViewItem: FC<{
 }> = React.memo(({ fragments, feedback }) => (
   <StyledItemLink
     data-cy="feedback-table__item"
-    route={Router.ToFeedback(feedback.id)}
+    route={Router.ToDetails(feedback.id)}
   >
     <ViewItemProperty label="Rating">
       <Rating.Static rating={feedback.rating} />
@@ -159,8 +160,8 @@ const StyledHeaderCell = styled.div`
 
 const StyledHeader = styled.div`
   display: none;
-  color: #e5ecf2;
-  background: #59636b;
+  color: ${theme.cloud};
+  background: ${theme.dark};
   text-align: center;
   font-weight: bold;
   font-size: 18px;
@@ -199,7 +200,7 @@ const StyledEmpty = styled.div`
   padding: 50px;
   background: #fff;
   border-radius: 5px;
-  color: #59636b;
+  color: ${theme.dark};
   box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);
   text-align: center;
 `

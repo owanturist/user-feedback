@@ -1,13 +1,16 @@
-import React, { FC, ReactNode } from 'react'
+import React, { FC } from 'react'
+import styled from '@emotion/styled/macro'
 import { Cmd } from 'frctl'
 import { Cata, cons } from 'frctl/Basics'
 import { Url } from 'frctl/Url'
 import { Set } from 'frctl/Set'
 import { Parser as UrlParser } from 'frctl/Url/Parser'
 import Maybe from 'frctl/Maybe'
-import { NavigationConsumer } from 'Provider'
+
+import theme from 'theme'
 import * as api from 'api'
-import * as utils from 'utils'
+import { NavigationConsumer } from 'Provider'
+import { callOrElse, nonEmptyString } from 'utils'
 
 export type Navigation = {
   replace(url: string): Cmd<never>
@@ -28,7 +31,7 @@ export type DashboardFilters = {
 
 export type RoutePattern<R> = Cata<{
   ToDashboard(filters: DashboardFilters): R
-  ToFeedback(feedbackId: string): R
+  ToDetails(feedbackId: string): R
 }>
 
 export type Route = {
@@ -37,8 +40,18 @@ export type Route = {
 }
 
 export const ToDashboard = cons(
-  class ToDashboard implements Route {
-    public constructor(private readonly filters: DashboardFilters) {}
+  class implements Route {
+    private readonly filters: DashboardFilters
+
+    public constructor(filters?: {
+      search?: string
+      rating?: Array<api.Rating>
+    }) {
+      this.filters = {
+        search: Maybe.fromNullable(filters?.search).chain(nonEmptyString),
+        rating: Set.fromList(filters?.rating || [])
+      }
+    }
 
     public stringify(): string {
       const queries = [
@@ -50,21 +63,21 @@ export const ToDashboard = cons(
     }
 
     public cata<R>(pattern: RoutePattern<R>): R {
-      return utils.callOrElse(pattern._, pattern.ToDashboard, this.filters)
+      return callOrElse(pattern._, pattern.ToDashboard, this.filters)
     }
   }
 )
 
-export const ToFeedback = cons(
-  class ToFeedback implements Route {
+export const ToDetails = cons(
+  class implements Route {
     public constructor(private readonly feedbackId: string) {}
 
     public stringify(): string {
-      return `/feedback/${this.feedbackId}`
+      return `/details/${this.feedbackId}`
     }
 
     public cata<R>(pattern: RoutePattern<R>): R {
-      return utils.callOrElse(pattern._, pattern.ToFeedback, this.feedbackId)
+      return callOrElse(pattern._, pattern.ToDetails, this.feedbackId)
     }
   }
 )
@@ -82,45 +95,63 @@ const parser = UrlParser.oneOf([
     .query('search')
     .string.map(rating => search =>
       ToDashboard({
-        search,
-        rating: Set.fromList(rating)
+        search: search.getOrElse(''),
+        rating
       })
     ),
 
-  UrlParser.s('feedback').slash.string.map(ToFeedback)
+  UrlParser.s('details').slash.string.map(ToDetails)
 ])
 
 export const parse = (url: Url): Maybe<Route> => parser.parse(url)
+
+const StyledLink = styled.a`
+  color: ${theme.primary};
+`
 
 const ViewLink: FC<
   React.AnchorHTMLAttributes<HTMLAnchorElement> & {
     onChangeUrl(href: string): void
   }
-> = React.memo(({ onChangeUrl, ...props }) => (
-  // eslint-disable-next-line jsx-a11y/anchor-has-content
-  <a
-    {...props}
-    onClick={React.useCallback(
-      event => {
+> = React.memo(({ onChangeUrl, ...props }) => {
+  const hasTarget = typeof props.target !== 'undefined'
+  const hasDownload = typeof props.download !== 'undefined'
+
+  const onClick = React.useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>): void => {
+      if (
+        event.button < 1 &&
+        !event.ctrlKey &&
+        !event.metaKey &&
+        !event.shiftKey &&
+        !hasTarget &&
+        !hasDownload
+      ) {
         onChangeUrl(event.currentTarget.href)
         event.preventDefault()
-      },
-      [onChangeUrl]
-    )}
-  />
-))
+      }
+    },
+    [hasDownload, hasTarget, onChangeUrl]
+  )
+
+  if (props.target === '_blank' && typeof props.rel === 'undefined') {
+    return <StyledLink {...props} rel="noreferrer" onClick={onClick} />
+  }
+
+  return <StyledLink {...props} onClick={onClick} />
+})
 
 export const Link: FC<
-  React.AnchorHTMLAttributes<HTMLAnchorElement> & {
-    route: Route
-    children: ReactNode
-  }
+  | (Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
+      route: Route
+    })
+  | (React.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string })
 > = props => (
   <NavigationConsumer>
     {onChangeUrl => (
       <ViewLink
         {...props}
-        href={props.route.stringify()}
+        href={'route' in props ? props.route.stringify() : props.href}
         onChangeUrl={onChangeUrl}
       />
     )}

@@ -1,5 +1,8 @@
+import dayjs, { Dayjs } from 'dayjs'
+import Maybe from 'frctl/Maybe'
 import Decode from 'frctl/Json/Decode'
 import * as Http from 'frctl/Http'
+import { nonEmptyString } from 'utils'
 
 const API_URL = process.env.REACT_APP_API_URL || ''
 
@@ -48,6 +51,140 @@ const feedbackDecoder: Decode.Decoder<Feedback> = Decode.shape({
   browser: Decode.field('computed_browser').of(browserDecoder)
 })
 
-export const getFeedback = Http.get(`${API_URL}/example/apidemo.json`)
+export const getFeedbackList = Http.get(`${API_URL}/example/apidemo.json`)
   .withTimeout(5000)
   .withExpectJson(Decode.field('items').list(feedbackDecoder))
+
+const dayjsDecoder: Decode.Decoder<Dayjs> = Decode.oneOf([
+  Decode.string.map(dayjs),
+
+  Decode.int.map(ts => {
+    if (ts.toString().length < 11) {
+      // assume we cought timestamp in seconds
+      // https://stackoverflow.com/a/23982005/4582383
+      return dayjs(ts * 1000)
+    }
+
+    return dayjs(ts)
+  })
+]).chain(date =>
+  date.isValid() ? Decode.succeed(date) : Decode.fail('Date is invalid.')
+)
+
+export type LngLat = [number, number]
+
+const lngLatDecoder: Decode.Decoder<LngLat> = Decode.oneOf([
+  // lon/lat object notation
+  Decode.shape({
+    lng: Decode.field('lon').float,
+    lat: Decode.field('lat').float
+  }),
+
+  // lng/lat object notation
+  Decode.shape({
+    lng: Decode.field('lng').float,
+    lat: Decode.field('lat').float
+  }),
+
+  // [lng, lat] notation
+  Decode.shape({
+    lng: Decode.index(0).float,
+    lat: Decode.index(1).float
+  })
+]).map(({ lng, lat }) => [lng, lat])
+
+export type Geo = {
+  country: string
+  city: string
+  position: LngLat
+}
+
+const geoDecoder: Decode.Decoder<Geo> = Decode.shape({
+  country: Decode.field('country').string,
+  city: Decode.field('city').string,
+  position: lngLatDecoder
+})
+
+export type Viewport = {
+  width: number
+  height: number
+}
+
+const viewportDecoder: Decode.Decoder<Viewport> = Decode.shape({
+  width: Decode.field('width').int,
+  height: Decode.field('height').int
+})
+
+export type Screen = {
+  availableTop: number
+  availableLeft: number
+  availableWidth: number
+  availableHeight: number
+}
+
+const screenDecoder: Decode.Decoder<Screen> = Decode.shape({
+  availableTop: Decode.field('availTop').int,
+  availableLeft: Decode.field('availLeft').int,
+  availableWidth: Decode.field('availWidth').int,
+  availableHeight: Decode.field('availHeight').int
+})
+
+export type FeedbackDetailed = Feedback & {
+  url: string
+  email: Maybe<string>
+  creationDate: Dayjs
+  viewport: Viewport
+  screen: Screen
+  geo: Geo
+}
+
+const feedbackDetailedDecoder: Decode.Decoder<FeedbackDetailed> = Decode.shape({
+  basic: feedbackDecoder,
+  url: Decode.field('url').string,
+  email: Decode.field('email').optional.string.map(email =>
+    email.chain(nonEmptyString)
+  ),
+  creationDate: Decode.field('creation_date').of(dayjsDecoder),
+  viewport: Decode.field('viewport').of(viewportDecoder),
+  screen: Decode.field('screen').of(screenDecoder),
+  geo: Decode.field('geo').of(geoDecoder)
+}).map(({ basic, ...detailed }) => ({ ...basic, ...detailed }))
+
+// it matches to target id and then decodes
+const findDetailedFeedbackByIdDecoder = (
+  index: number,
+  length: number,
+  feedbackId: string
+): Decode.Decoder<Maybe<FeedbackDetailed>> => {
+  if (index >= length) {
+    return Decode.succeed(Maybe.Nothing)
+  }
+
+  return Decode.lazy(
+    // it uses lazy to keep array context after [index].id probe
+    () => Decode.index(index).field('id').string
+  ).chain(testFeedbackId => {
+    if (feedbackId === testFeedbackId) {
+      return Decode.index(index).of(feedbackDetailedDecoder).map(Maybe.Just)
+    }
+
+    return findDetailedFeedbackByIdDecoder(index + 1, length, feedbackId)
+  })
+}
+
+export const getFeedbackById = (
+  feedbackId: string
+): Http.Request<Maybe<FeedbackDetailed>> => {
+  // keep id for e2e mocking
+  return Http.get(`${API_URL}/example/apidemo.json?id=${feedbackId}`)
+    .withTimeout(5000)
+    .withExpectJson(
+      Decode.field('items')
+        .list(Decode.value)
+        .chain(list =>
+          Decode.field('items').of(
+            findDetailedFeedbackByIdDecoder(0, list.length, feedbackId)
+          )
+        )
+    )
+}

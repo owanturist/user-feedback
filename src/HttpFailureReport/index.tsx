@@ -1,5 +1,7 @@
 import React, { FC } from 'react'
 import styled from '@emotion/styled/macro'
+
+import theme from 'theme'
 import * as Http from 'frctl/Http'
 
 const StyledTryAgain = styled.button`
@@ -10,8 +12,8 @@ const StyledTryAgain = styled.button`
   padding: 9px 18px;
   border: none;
   border-radius: 3px;
-  color: #e5ecf2;
-  background: #1ea0be;
+  color: ${theme.cloud};
+  background: ${theme.primary};
   font-weight: 600;
   font-size: 22px;
   font-family: inherit;
@@ -28,7 +30,7 @@ const StyledTryAgain = styled.button`
 
 const ViewTryAgain: FC<{ onTryAgain(): void }> = ({ onTryAgain }) => (
   <StyledTryAgain
-    data-cy="app__retry"
+    data-cy="http__retry"
     autoFocus
     type="button"
     tabIndex={0}
@@ -57,12 +59,12 @@ const StyledPre = styled.pre`
   text-align: left;
 `
 
-const StyledPanel = styled.div`
+const StyledRoot = styled.div`
   box-sizing: border-box;
   max-width: 560px;
   padding: 50px;
   border-radius: 3px;
-  color: #59636b;
+  color: ${theme.dark};
   background: #fff;
   box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);
   text-align: center;
@@ -70,95 +72,84 @@ const StyledPanel = styled.div`
   overflow-y: auto;
 `
 
-const StyledRoot = styled.div`
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 16px;
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
-`
+const FailureReport: FC<
+  {
+    error: Http.Error
+    onTryAgain(): void
+  } & React.HTMLAttributes<HTMLDivElement>
+> = React.memo(({ error, onTryAgain, ...props }) =>
+  error.cata({
+    NetworkError: () => (
+      <StyledRoot {...props}>
+        <StyledTitle>You are facing a Network Error</StyledTitle>
+        <StyledDescription>
+          Pleace check your Internet connection and try again.
+        </StyledDescription>
 
-const FailureReport: FC<{
-  error: Http.Error
-  onTryAgain(): void
-}> = React.memo(({ error, onTryAgain }) => (
-  <StyledRoot>
-    {error.cata({
-      NetworkError: () => (
-        <StyledPanel>
-          <StyledTitle>You are facing a Network Error</StyledTitle>
-          <StyledDescription>
-            Pleace check your Internet connection and try again.
-          </StyledDescription>
+        <ViewTryAgain onTryAgain={onTryAgain} />
+      </StyledRoot>
+    ),
 
-          <ViewTryAgain onTryAgain={onTryAgain} />
-        </StyledPanel>
-      ),
+    Timeout: () => (
+      <StyledRoot {...props}>
+        <StyledTitle>You are facing a Timeout issue</StyledTitle>
+        <StyledDescription>
+          It takes too long to get a response so please check your Internect
+          connection and try again.
+        </StyledDescription>
 
-      Timeout: () => (
-        <StyledPanel>
-          <StyledTitle>You are facing a Timeout issue</StyledTitle>
-          <StyledDescription>
-            It takes too long to get a response so please check your Internect
-            connection and try again.
-          </StyledDescription>
+        <ViewTryAgain onTryAgain={onTryAgain} />
+      </StyledRoot>
+    ),
 
-          <ViewTryAgain onTryAgain={onTryAgain} />
-        </StyledPanel>
-      ),
+    BadUrl: url => (
+      <StyledRoot {...props}>
+        <StyledTitle>Oops... we broke something...</StyledTitle>
+        <StyledDescription>
+          It looks like the app hits a wrong endpoint <code>{url}</code>.
+        </StyledDescription>
+        <StyledDescription>We are fixing the issue.</StyledDescription>
+      </StyledRoot>
+    ),
 
-      BadUrl: url => (
-        <StyledPanel>
-          <StyledTitle>Oops... we broke something...</StyledTitle>
-          <StyledDescription>
-            It looks like the app hits a wrong endpoint <code>{url}</code>.
-          </StyledDescription>
-          <StyledDescription>We are fixing the issue.</StyledDescription>
-        </StyledPanel>
-      ),
+    BadStatus: ({ statusCode }) => {
+      const [side, role] =
+        statusCode < 500 ? ['Client', 'frontend'] : ['Server', 'backend']
 
-      BadStatus: ({ statusCode }) => {
-        const [side, role] =
-          statusCode < 500 ? ['Client', 'frontend'] : ['Server', 'backend']
-
-        return (
-          <StyledPanel>
-            <StyledTitle>
-              You are facing an unexpected {side}&nbsp;side&nbsp;Error&nbsp;
-              {statusCode}!
-            </StyledTitle>
-
-            <StyledDescription>
-              Our {role} developers are fixing the issue.
-            </StyledDescription>
-          </StyledPanel>
-        )
-      },
-
-      BadBody: decoderError => (
-        <StyledPanel>
+      return (
+        <StyledRoot {...props}>
           <StyledTitle>
-            You are facing an unexpected Response Body Error!
+            You are facing an unexpected {side}&nbsp;side&nbsp;Error&nbsp;
+            {statusCode}!
           </StyledTitle>
 
           <StyledDescription>
-            Something went wrong and our apps seems don't communicate well...
+            Our {role} developers are fixing the issue.
           </StyledDescription>
-
-          <StyledPre>
-            {decoderError
-              .stringify(4)
-              .replace(/\\"/g, '"')
-              .replace(/\s{2}\s+"/, '\n\n"')
-              .replace(/\\n/g, '\n')}
-          </StyledPre>
-        </StyledPanel>
+        </StyledRoot>
       )
-    })}
-  </StyledRoot>
-))
+    },
+
+    BadBody: decoderError => (
+      <StyledRoot {...props}>
+        <StyledTitle>
+          You are facing an unexpected Response Body Error!
+        </StyledTitle>
+
+        <StyledDescription>
+          Something went wrong and our apps seems don't communicate well...
+        </StyledDescription>
+
+        <StyledPre>
+          {decoderError
+            .stringify(4)
+            .replace(/\\"/g, '"')
+            .replace(/\s{2}\s+"/, '\n\n"')
+            .replace(/\\n/g, '\n')}
+        </StyledPre>
+      </StyledRoot>
+    )
+  })
+)
 
 export default FailureReport
