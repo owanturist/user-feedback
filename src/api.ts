@@ -4,8 +4,12 @@ import Decode from 'frctl/Json/Decode'
 import * as Http from 'frctl/Http'
 import { nonEmptyString } from 'utils'
 
+// @TODO find a way to declare variables in TS level
 const API_URL = process.env.REACT_APP_API_URL || ''
 
+/**
+ * Users' browser who left a feedback
+ */
 export type Browser = {
   name: string
   version: string
@@ -20,7 +24,10 @@ const browserDecoder: Decode.Decoder<Browser> = Decode.shape({
   device: Decode.succeed('Desktop') // @TODO decode device somehow
 })
 
-// It has to be sure that we don't have rating out of bounds in UI
+/**
+ * Rating of a feedback
+ * It has to be sure that we don't have rating out of bounds in UI
+ */
 export enum Rating {
   One = 1,
   Two = 2,
@@ -37,6 +44,9 @@ const ratingDecoder: Decode.Decoder<Rating> = Decode.enums([
   [5, Rating.Five]
 ])
 
+/**
+ * Preview of feedback to display in lists
+ */
 export type Feedback = {
   id: string
   rating: Rating
@@ -51,10 +61,9 @@ const feedbackDecoder: Decode.Decoder<Feedback> = Decode.shape({
   browser: Decode.field('computed_browser').of(browserDecoder)
 })
 
-export const getFeedbackList = Http.get(`${API_URL}/example/apidemo.json`)
-  .withTimeout(5000)
-  .withExpectJson(Decode.field('items').list(feedbackDecoder))
-
+/**
+ * Decodes various date formats to Dayjs instance
+ */
 const dayjsDecoder: Decode.Decoder<Dayjs> = Decode.oneOf([
   Decode.string.map(dayjs),
 
@@ -71,8 +80,14 @@ const dayjsDecoder: Decode.Decoder<Dayjs> = Decode.oneOf([
   date.isValid() ? Decode.succeed(date) : Decode.fail('Date is invalid.')
 )
 
+/**
+ * Longitude and Latitude tuple (array) representation to be used in Mapbox
+ */
 export type LngLat = [number, number]
 
+/**
+ * Decodes various lng-lat formats to tuple one
+ */
 const lngLatDecoder: Decode.Decoder<LngLat> = Decode.oneOf([
   // lon/lat object notation
   Decode.shape({
@@ -93,6 +108,9 @@ const lngLatDecoder: Decode.Decoder<LngLat> = Decode.oneOf([
   })
 ]).map(({ lng, lat }) => [lng, lat])
 
+/**
+ * Geo position of a user who left feedback
+ */
 export type Geo = {
   country: string
   city: string
@@ -105,6 +123,9 @@ const geoDecoder: Decode.Decoder<Geo> = Decode.shape({
   position: lngLatDecoder
 })
 
+/**
+ * Viewport of a users' device
+ */
 export type Viewport = {
   width: number
   height: number
@@ -115,6 +136,9 @@ const viewportDecoder: Decode.Decoder<Viewport> = Decode.shape({
   height: Decode.field('height').int
 })
 
+/**
+ * Screen of a users' device
+ */
 export type Screen = {
   availableTop: number
   availableLeft: number
@@ -129,6 +153,9 @@ const screenDecoder: Decode.Decoder<Screen> = Decode.shape({
   availableHeight: Decode.field('availHeight').int
 })
 
+/**
+ * Detailed feedback
+ */
 export type FeedbackDetailed = Feedback & {
   url: string
   email: Maybe<string>
@@ -150,11 +177,19 @@ const feedbackDetailedDecoder: Decode.Decoder<FeedbackDetailed> = Decode.shape({
   geo: Decode.field('geo').of(geoDecoder)
 }).map(({ basic, ...detailed }) => ({ ...basic, ...detailed }))
 
-// it matches to target id and then decodes
+/**
+ * First it matches only id with target one
+ * and then it case it found a match decodes detailed feedback
+ * or return Nothing otherwise to handle later as 404
+ *
+ * @param index current index to be checked
+ * @param length total size of list with feedback items
+ * @param targetId id of feedback to lookup
+ */
 const findDetailedFeedbackByIdDecoder = (
   index: number,
   length: number,
-  feedbackId: string
+  targetId: string
 ): Decode.Decoder<Maybe<FeedbackDetailed>> => {
   if (index >= length) {
     return Decode.succeed(Maybe.Nothing)
@@ -163,15 +198,30 @@ const findDetailedFeedbackByIdDecoder = (
   return Decode.lazy(
     // it uses lazy to keep array context after [index].id probe
     () => Decode.index(index).field('id').string
-  ).chain(testFeedbackId => {
-    if (feedbackId === testFeedbackId) {
+  ).chain(currentId => {
+    if (targetId === currentId) {
       return Decode.index(index).of(feedbackDetailedDecoder).map(Maybe.Just)
     }
 
-    return findDetailedFeedbackByIdDecoder(index + 1, length, feedbackId)
+    return findDetailedFeedbackByIdDecoder(index + 1, length, targetId)
   })
 }
 
+/**
+ * Http request builder to retrieve Array<Feedback>
+ */
+export const getFeedbackList = Http.get(`${API_URL}/example/apidemo.json`)
+  .withTimeout(5000)
+  .withExpectJson(Decode.field('items').list(feedbackDecoder))
+
+/**
+ * Simulation of using api endpoint to retrieve detailed feedback
+ *
+ * @param feedbackId id of detailed feedback to be returned
+ *
+ * @returns Http request builder to retrieve Just<FeedbackDetailed>
+ * when it's found or Nothing otherwise
+ */
 export const getFeedbackById = (
   feedbackId: string
 ): Http.Request<Maybe<FeedbackDetailed>> => {

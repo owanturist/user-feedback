@@ -12,16 +12,27 @@ import * as api from 'api'
 import { NavigationConsumer } from 'Provider'
 import { callOrElse, nonEmptyString } from 'utils'
 
+/**
+ * Set of navigation command creators
+ */
 export type Navigation = {
   replace(url: string): Cmd<never>
-
   push(url: string): Cmd<never>
-
   back(steps: number): Cmd<never>
-
   forward(steps: number): Cmd<never>
-
   load(url: string): Cmd<never>
+}
+
+export type UrlRequestPattern<R> = Cata<{
+  Internal(url: Url): R
+  External(url: string): R
+}>
+
+/**
+ * Internal message triggered when app url is changed via Link or Navigation
+ */
+export type UrlRequest = {
+  cata<R>(pattern: UrlRequestPattern<R>): R
 }
 
 export type DashboardFilters = {
@@ -34,19 +45,29 @@ export type RoutePattern<R> = Cata<{
   ToDetails(feedbackId: string): R
 }>
 
+/**
+ * Represents an applications' route interface.
+ */
 export type Route = {
   stringify(): string
   cata<R>(pattern: RoutePattern<R>): R
 }
 
-export const ToDashboard = cons(
+export type ToDashboardFilters = {
+  search?: string
+  rating?: Array<api.Rating>
+}
+
+/**
+ * Represents a Route to dashboard.
+ *
+ * @param args_0 an optional filters object
+ */
+export const ToDashboard = cons<[] | [ToDashboardFilters], Route>(
   class implements Route {
     private readonly filters: DashboardFilters
 
-    public constructor(filters?: {
-      search?: string
-      rating?: Array<api.Rating>
-    }) {
+    public constructor(filters?: ToDashboardFilters) {
       this.filters = {
         search: Maybe.fromNullable(filters?.search).chain(nonEmptyString),
         rating: Set.fromList(filters?.rating || [])
@@ -54,6 +75,8 @@ export const ToDashboard = cons(
     }
 
     public stringify(): string {
+      // @TODO use/implement some tool to construct query object
+      // in an easy and natural way
       const queries = [
         this.filters.search.map(s => `search=${s}`).getOrElse(''),
         ...this.filters.rating.keys().map(r => `rating=${r}`)
@@ -68,7 +91,12 @@ export const ToDashboard = cons(
   }
 )
 
-export const ToDetails = cons(
+/**
+ * Represents a Route to details page.
+ *
+ * @param args_0 an id of feedback item for detail view
+ */
+export const ToDetails = cons<[string], Route>(
   class implements Route {
     public constructor(private readonly feedbackId: string) {}
 
@@ -103,6 +131,9 @@ const parser = UrlParser.oneOf([
   UrlParser.s('details').slash.string.map(ToDetails)
 ])
 
+/**
+ * Converts an Url into a Just<Route> when matches and Nothing otherwise.
+ */
 export const parse = (url: Url): Maybe<Route> => parser.parse(url)
 
 const StyledLink = styled.a`
@@ -119,6 +150,9 @@ const ViewLink: FC<
 
   const onClick = React.useCallback(
     (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>): void => {
+      // handle only simple left click mouse button event
+      // opens link in the same browsers' page
+      // otherwise perform as a regular link
       if (
         event.button < 1 &&
         !event.ctrlKey &&
@@ -141,6 +175,15 @@ const ViewLink: FC<
   return <StyledLink {...props} onClick={onClick} />
 })
 
+/**
+ * App link produces `UrlRequest` on click.
+ *
+ * @example
+ *
+ * <Link route={toDashboard()}>Go Dashboard</Link>
+ *
+ * <Link href="/dashboard">Go Dashboard</Link>
+ */
 export const Link: FC<
   | (Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
       route: Route

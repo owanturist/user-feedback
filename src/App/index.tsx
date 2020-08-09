@@ -4,7 +4,7 @@ import { Cmd } from 'frctl'
 import { Cata, cons } from 'frctl/Basics'
 import { Url } from 'frctl/Url'
 
-import { Dispatch, UrlRequest } from 'Provider'
+import { Dispatch } from 'Provider'
 import * as breakpoints from 'breakpoints'
 import * as Router from 'Router'
 import * as Dashboard from 'Dashboard'
@@ -115,7 +115,7 @@ export type Msg = utils.Msg<[Model], [Model, Cmd<Msg>]>
 
 export const onUrlRequest = cons(
   class RequestUrl implements Msg {
-    public constructor(private readonly urlRequest: UrlRequest) {}
+    public constructor(private readonly urlRequest: Router.UrlRequest) {}
 
     public update(model: Model): [Model, Cmd<Msg>] {
       return [
