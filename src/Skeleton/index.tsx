@@ -43,6 +43,12 @@ const StyledText = styled.span`
   user-select: none;
 `
 
+/**
+ * Text skeleton fills all possible width
+ * simulating text height of content.
+ *
+ * @param [count=1] optional count of text rows
+ */
 export const Text: FC<{
   count?: number
 }> = ({ count = 1 }) =>
@@ -71,6 +77,14 @@ const StyledBlock = styled.span<StyledBlockProp>`
   user-select: none;
 `
 
+/**
+ * Reactangle shape skeleton
+ *
+ * @param [className] optional class attribute
+ * @param [inline] use display 'inline' instead of 'block'
+ * @param width px in number or any other value via string
+ * @param height px in number or any other value via string
+ */
 export const Rect: FC<{
   className?: string
   inline?: boolean
@@ -87,6 +101,13 @@ export const Rect: FC<{
   />
 )
 
+/**
+ * Circle shape skeleton
+ *
+ * @param [className] optional class attribute
+ * @param [inline] use display 'inline' instead of 'block'
+ * @param size px in number or any other value via string
+ */
 export const Circle: FC<{
   className?: string
   inline?: boolean

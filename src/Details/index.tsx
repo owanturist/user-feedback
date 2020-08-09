@@ -98,14 +98,13 @@ const cssMap = css`
 `
 
 const StyledSectionTitle = styled.h3`
-  margin: 0;
+  margin: 0 0 16px;
   color: #333;
   font-weight: 600;
   font-size: 18px;
 `
 
 const StyledSectionContent = styled.div`
-  margin: 16px 0 0;
   color: ${theme.dark};
 `
 
@@ -144,6 +143,7 @@ const StyledMapSectionContent = styled(StyledSectionContent)`
   display: flex;
   flex-direction: column;
   flex: 1 0 auto;
+  align-items: flex-start;
 `
 
 const ViewMapSection: FC<{
@@ -303,9 +303,21 @@ const ViewPairs: FC = ({ children }) => (
 )
 
 const StyledBackLink = styled.div`
+  box-sizing: border-box;
   margin: 10px 0 0 10px;
   padding: 5px 0;
-  flex: 1 0 100%;
+  flex: 1 0 auto;
+`
+
+const StyledInfo = styled.div`
+  display: flex;
+  flex-flow: row wrap;
+  flex: 1 1 auto;
+
+  @media ${breakpoints.big.minWidth} {
+    flex: 0;
+    flex-direction: column;
+  }
 `
 
 const StyledRoot = styled.div`
@@ -315,16 +327,6 @@ const StyledRoot = styled.div`
 
   @media ${breakpoints.big.minWidth} {
     flex-flow: row nowrap;
-  }
-`
-
-const StyledInfo = styled.div`
-  display: flex;
-  flex-flow: row wrap;
-  flex: 1 1 0;
-
-  @media ${breakpoints.big.minWidth} {
-    flex-direction: column;
   }
 `
 

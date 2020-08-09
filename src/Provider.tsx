@@ -1,32 +1,76 @@
 import React from 'react'
 import { Program, Cmd, Sub, Task } from 'frctl'
-import { Cata, cons } from 'frctl/Basics'
+import { cons } from 'frctl/Basics'
 import { Url } from 'frctl/Url'
 import Maybe from 'frctl/Maybe'
 import { createBrowserHistory } from 'history'
 
-import type { Navigation } from 'Router'
+import type { Navigation, UrlRequest, UrlRequestPattern } from 'Router'
+
+const noop = (): void => {
+  /* noop */
+}
 
 export type Dispatch<Msg> = (msg: Msg) => void
 
-export type UrlRequestPattern<R> = Cata<{
-  Internal(url: Url): R
-  External(url: string): R
-}>
-
-export type UrlRequest = {
-  cata<R>(pattern: UrlRequestPattern<R>): R
-}
-
 export type Props<Model, Msg> = {
+  /**
+   * The root React application component
+   */
   view: React.ComponentType<{
     model: Model
     dispatch: Dispatch<Msg>
   }>
+
+  /**
+   * Initialisation pure function called once in very beggining.
+   *
+   * @param initialUrl apps' initial url
+   * @param navigation singleton of Navigation
+   *
+   * @returns initial apps' model and command
+   */
   init(initialUrl: Url, navigation: Navigation): [Model, Cmd<Msg>]
+
+  /**
+   * Update pure function called on each dispatch call.
+   * Transforms a model according the message
+   *
+   * @param msg updating message
+   * @param model current model
+   *
+   * @returns next model and command
+   */
   update(msg: Msg, model: Model): [Model, Cmd<Msg>]
+
+  /**
+   * Subscription pure function called on each models' update.
+   * Represents current subscriptions according a model.
+   *
+   * @param model current model
+   *
+   * @returns subscription to watch
+   */
   subscriptions(model: Model): Sub<Msg>
+
+  /**
+   * Pure function called each time when user clicks to a link.
+   * This is a place where an application decides how to handle it.
+   *
+   * @param request either Internal or External url request
+   *
+   * @returns message to be handled via the update function
+   */
   onUrlRequest(request: UrlRequest): Msg
+
+  /**
+   * Pure function called each time when url is changed to internal one.
+   * This is a place where an application handles screen initialisations.
+   *
+   * @param url new url
+   *
+   * @returns message to be handled via the update function
+   */
   onUrlChange(url: Url): Msg
 }
 
@@ -44,13 +88,11 @@ export const Provider = React.memo(
       dispatch: Dispatch<Msg>
     }>({
       model: null,
-      dispatch: () => {
-        /* noop */
-      }
+      dispatch: noop
     })
 
     React.useEffect(() => {
-      const dispatch: Dispatch<Msg> = msg => worker.dispatch(msg)
+      let dispatch: Dispatch<Msg> = noop
       const onUrlChangeHandler = (): void => dispatch(onUrlChange(getURL()))
       const navigation = new NavigationImpl(onUrlChangeHandler)
 
@@ -59,6 +101,8 @@ export const Provider = React.memo(
         update,
         subscriptions
       }).init(null)
+
+      dispatch = msg => worker.dispatch(msg)
 
       const unsubscribe = worker.subscribe(() =>
         setState({
