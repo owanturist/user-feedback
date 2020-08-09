@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "react-scripts start",
+    "start": "yarn build && npx serve -s ./build -p 3000",
+    "dev": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
     "lint": "eslint ./ --config=.eslintrc.prod.json --ext=js,ts,tsx",
-    "prettify": "prettier \"{src,cypress}/**/*.{js,ts,tsx,json,md}\" --write",
+    "prettify": "prettier . --write",
     "analyze": "source-map-explorer 'build/static/js/**/*.js' --gzip",
     "storybook": "start-storybook -p 9009 -s public",
     "storybook:build": "build-storybook -s public",
@@ -22,10 +22,10 @@
     }
   },
   "lint-staged": {
-    "{src,cypress}/**/*.{js,ts,tsx,json,md}": [
+    "**/*.{js,ts,tsx,json,md}": [
       "prettier --write"
     ],
-    "{src,cypress}/**/*.{js,ts,tsx}": [
+    "**/*.{js,ts,tsx}": [
       "eslint ./ --config=.eslintrc.prod.json --fix"
     ]
   },
@@ -66,6 +66,7 @@
     "lint-staged": "^10.2.11",
     "prettier": "^2.0.5",
     "react-scripts": "^3.4.1",
+    "serve": "^11.3.2",
     "source-map-explorer": "^2.4.2",
     "typescript": "^3.9.7"
   }

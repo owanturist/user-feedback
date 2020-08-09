@@ -1,7 +1,5 @@
 {
-  "extends": [
-    ".eslintrc.json"
-  ],
+  "extends": [".eslintrc.json"],
 
   "rules": {
     "no-console": "error",
@@ -12,10 +10,7 @@
 
   "overrides": [
     {
-      "files": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
+      "files": ["**/*.ts", "**/*.tsx"],
 
       "rules": {
         "no-unused-vars": "off",

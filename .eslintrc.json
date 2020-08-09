@@ -9,10 +9,7 @@
     "ecmaFeatures": { "jsx": true },
     "ecmaVersion": 2018,
     "sourceType": "module",
-    "project": [
-      "./cypress/tsconfig.json",
-      "./tsconfig.json"
-    ]
+    "project": ["./cypress/tsconfig.json", "./tsconfig.json"]
   },
 
   "extends": ["eslint:recommended", "react-app"],
@@ -118,11 +115,17 @@
         "no-unused-vars": "off",
         "array-callback-return": "off",
         "consistent-return": "off",
-        "padding-line-between-statements": ["error", { "blankLine": "always", "prev": "*", "next": "return" }],
+        "padding-line-between-statements": [
+          "error",
+          { "blankLine": "always", "prev": "*", "next": "return" }
+        ],
 
         // Typescript Eslint
         "@typescript-eslint/no-unused-vars": "warn",
-        "@typescript-eslint/array-type": ["error", { "default": "generic", "readonly": "generic" }],
+        "@typescript-eslint/array-type": [
+          "error",
+          { "default": "generic", "readonly": "generic" }
+        ],
         "@typescript-eslint/consistent-type-definitions": ["error", "type"],
         "@typescript-eslint/explicit-function-return-type": [
           "error",
@@ -162,9 +165,12 @@
         "react/no-unescaped-entities": "off",
         "react/jsx-curly-brace-presence": "error",
         "react/display-name": "off",
-        "react/style-prop-object": ["warn", {
-          "allow": ["ViewMap", "StyledMap", "Map"]
-        }]
+        "react/style-prop-object": [
+          "warn",
+          {
+            "allow": ["ViewMap", "StyledMap", "Map"]
+          }
+        ]
       }
     }
   ]
