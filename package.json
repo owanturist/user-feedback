@@ -6,9 +6,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
     "lint": "eslint ./ --config=.eslintrc.prod.json --ext=js,ts,tsx",
-    "prettify": "prettier \"{src,cypress}/**/*.{js,ts,tsx,json,md}\" --write",
+    "prettify": "prettier . --write",
     "analyze": "source-map-explorer 'build/static/js/**/*.js' --gzip",
     "storybook": "start-storybook -p 9009 -s public",
     "storybook:build": "build-storybook -s public",
@@ -22,10 +21,10 @@
     }
   },
   "lint-staged": {
-    "{src,cypress}/**/*.{js,ts,tsx,json,md}": [
+    "**/*.{js,ts,tsx,json,md}": [
       "prettier --write"
     ],
-    "{src,cypress}/**/*.{js,ts,tsx}": [
+    "**/*.{js,ts,tsx}": [
       "eslint ./ --config=.eslintrc.prod.json --fix"
     ]
   },
