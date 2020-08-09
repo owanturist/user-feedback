@@ -1,6 +1,6 @@
 # User Feedback | [Demo](https://bit.ly/user-feedback-app) | [Storybook](https://bit.ly/user-feedback-ui)
 
-_This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app)._
+_This project was bootstrapped with [Create React App][cra]._
 
 ## Available Scripts
 
@@ -27,21 +27,21 @@ The build is minified and the filenames include the hashes.
 
 ### `yarn lint`
 
-Runs [eslint](https://eslint.org/) for every TypeScript and JavaScript file including TSX/JSX.<br />
+Runs [ESLint][eslint] for every TypeScript and JavaScript file including TSX/JSX.<br />
 Prompts lint warnings and errors to console.
 
 ### `yarn prettify`
 
-Runs [prettier](https://prettier.io/) for everything.
+Runs [Prettier][prettier] for everything.
 
 ### `yarn analyze`
 
-Runs [source-map-explorer](https://www.npmjs.com/package/source-map-explorer) on `build` folder.<br />
+Runs [source-map-explorer][sme] on `build` folder.<br />
 It shows you a treemap visualization to help you debug where all the code is coming from.
 
 ### `yarn storybook`
 
-Runs [storybook](https://storybook.js.org/) sandbox.<br />
+Runs [Storybook][storybook] sandbox.<br />
 Open [http://localhost:9009](http://localhost:9009) to view it in the browser.
 
 The page will reload if you make edits
@@ -52,8 +52,35 @@ Builds the storybook sandbox for deploy to the `storybook-static` folder.
 
 ### [`yarn cy:open`](https://docs.cypress.io/guides/guides/command-line.html#cypress-open)
 
-Opens the [cypress](https://www.cypress.io/) Test Runner.
+Opens the [Cypress][cypress] Test Runner.
 
 ### [`yarn cy:run`](https://docs.cypress.io/guides/guides/command-line.html#cypress-run)
 
 Runs Cypress tests to completion.
+
+## Tech Stack
+
+- [TypeScript][ts]
+- [Webpack](https://webpack.js.org/) configured via [Create React App][cra]
+- Code linting with [ESLint][eslint] and [Prettier][prettier]
+- Isolated React component development environment with [Storybook][storybook]
+- Functional tests with [Cypress][cypress]
+- Unit tests with [Jest][jest]
+- Bundle analyser [source-map-explorer][sme] to keep the size
+- Prepush/commit hooks with [husky][husky]
+- Layout with [React][react]
+- State management with [Fractal][fractal]
+- CSS-in-JS via [Emotion][emotion]
+
+[cra]: https://github.com/facebook/create-react-app
+[ts]: https://www.typescriptlang.org
+[eslint]: https://eslint.org
+[prettier]: https://prettier.io
+[storybook]: https://storybook.js.org
+[cypress]: https://www.cypress.io
+[jest]: https://jestjs.io/
+[sme]: https://www.npmjs.com/package/source-map-explorer
+[husky]: https://github.com/typicode/husky
+[react]: https://reactjs.org/
+[fractal]: https://github.com/owanturist/Fractal
+[emotion]: https://emotion.sh
