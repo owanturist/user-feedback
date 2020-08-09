@@ -1,5 +1,7 @@
 import React, { FC } from 'react'
 import styled from '@emotion/styled/macro'
+
+import theme from 'theme'
 import * as Http from 'frctl/Http'
 
 const StyledTryAgain = styled.button`
@@ -10,8 +12,8 @@ const StyledTryAgain = styled.button`
   padding: 9px 18px;
   border: none;
   border-radius: 3px;
-  color: #e5ecf2;
-  background: #1ea0be;
+  color: ${theme.cloud};
+  background: ${theme.primary};
   font-weight: 600;
   font-size: 22px;
   font-family: inherit;
@@ -62,7 +64,7 @@ const StyledRoot = styled.div`
   max-width: 560px;
   padding: 50px;
   border-radius: 3px;
-  color: #59636b;
+  color: ${theme.dark};
   background: #fff;
   box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);
   text-align: center;

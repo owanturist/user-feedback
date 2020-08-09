@@ -1,6 +1,7 @@
 import React, { FC } from 'react'
 import styled from '@emotion/styled/macro'
 
+import theme from 'theme'
 import * as Router from 'Router'
 
 const StyledBackLink = styled.div`
@@ -23,7 +24,7 @@ const StyledRoot = styled.div`
   margin: 0 auto;
   padding: 50px 16px;
   max-width: 400px;
-  color: #59636b;
+  color: ${theme.dark};
   background: #fff;
   box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);
   text-align: center;

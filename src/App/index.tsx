@@ -280,8 +280,8 @@ const ViewDetailsScreen: FC<{
 )
 
 export const View: FC<{ model: Model; dispatch: Dispatch<Msg> }> = React.memo(
-  ({ model, dispatch }) => {
-    return model.screen.cata({
+  ({ model, dispatch }) =>
+    model.screen.cata({
       DashboardScreen: dashboard => (
         <ViewDashboardScreen dashboard={dashboard} dispatch={dispatch} />
       ),
@@ -300,5 +300,4 @@ export const View: FC<{ model: Model; dispatch: Dispatch<Msg> }> = React.memo(
         </ViewScreen>
       )
     })
-  }
 )

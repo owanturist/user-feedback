@@ -1,6 +1,6 @@
 import React, { FC } from 'react'
-import { css, cx, keyframes } from 'emotion/macro'
 import styled from '@emotion/styled/macro'
+import { css, cx, keyframes } from 'emotion/macro'
 
 const COLOR_BASE = 'hsl(0 0% 86%)'
 const COLOR_GLOW = 'hsl(0 0% 96%)'

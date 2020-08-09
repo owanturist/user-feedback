@@ -6,8 +6,10 @@ import { Url } from 'frctl/Url'
 import { Set } from 'frctl/Set'
 import { Parser as UrlParser } from 'frctl/Url/Parser'
 import Maybe from 'frctl/Maybe'
-import { NavigationConsumer } from 'Provider'
+
+import theme from 'theme'
 import * as api from 'api'
+import { NavigationConsumer } from 'Provider'
 import { callOrElse, nonEmptyString } from 'utils'
 
 export type Navigation = {
@@ -104,7 +106,7 @@ const parser = UrlParser.oneOf([
 export const parse = (url: Url): Maybe<Route> => parser.parse(url)
 
 const StyledLink = styled.a`
-  color: #1ea0be;
+  color: ${theme.primary};
 `
 
 const ViewLink: FC<

@@ -1,6 +1,7 @@
 import React, { FC } from 'react'
 import styled from '@emotion/styled/macro'
 
+import theme from 'theme'
 import * as api from 'api'
 import * as Skelet from 'Skeleton'
 
@@ -23,7 +24,7 @@ const StyledViewport = styled.div<StyledViewportProps>`
   z-index: ${props => (props.dim ? 1 : 2)};
   top: 0;
   left: 0;
-  background: ${props => (props.screen ? '#1ea0be' : '#be1ea0')};
+  background: ${props => (props.screen ? theme.primary : theme.secondary)};
   border-radius: 2px;
   opacity: ${props => (props.dim ? 0.4 : 0.7)};
 `

@@ -9,7 +9,7 @@ import Maybe from 'frctl/Maybe'
 import Either from 'frctl/Either'
 import RemoteData from 'frctl/RemoteData/Optional'
 
-import { Dispatch } from 'Provider'
+import theme from 'theme'
 import * as breakpoints from 'breakpoints'
 import * as api from 'api'
 import * as utils from 'utils'
@@ -17,6 +17,7 @@ import * as Router from 'Router'
 import * as Skeleton from 'Skeleton'
 import * as Rating from 'Rating'
 import * as Page404 from 'Page404'
+import { Dispatch } from 'Provider'
 import HttpFailureReport from 'HttpFailureReport'
 import * as ViewportScreen from './ViewportScreen'
 import { ReactComponent as MarkerIcon } from './marker.svg'
@@ -105,7 +106,7 @@ const StyledSectionTitle = styled.h3`
 
 const StyledSectionContent = styled.div`
   margin: 16px 0 0;
-  color: #59636b;
+  color: ${theme.dark};
 `
 
 const StyledSection = styled.section`
@@ -131,7 +132,7 @@ const ViewMap = ReactMapboxGl({
 
 const StyledMarkerIcon = styled(MarkerIcon)`
   height: 50px;
-  color: #be1ea0;
+  color: ${theme.secondary};
 `
 
 const StyledMapSection = styled(StyledSection)`
@@ -181,13 +182,13 @@ type StyledViewportMarkerProps = {
 
 const StyledViewportMarker = styled.span<StyledViewportMarkerProps>`
   padding-bottom: 2px;
-  border-bottom: 2px solid #be1ea0;
+  border-bottom: 2px solid ${theme.secondary};
   cursor: default;
   opacity: ${props => props.dim && 0.4};
 `
 
 const StyledScreenMarker = styled(StyledViewportMarker)`
-  border-color: #1ea0be;
+  border-color: ${theme.primary};
 `
 
 const ViewScreenViewportSection: FC<{

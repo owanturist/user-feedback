@@ -1,6 +1,7 @@
 import React, { FC } from 'react'
 import styled from '@emotion/styled/macro'
 
+import theme from 'theme'
 import * as Skelet from 'Skeleton'
 import * as api from 'api'
 
@@ -14,9 +15,9 @@ const StyledRoot = styled.span`
   height: 40px;
   padding: 0;
   border-radius: 50%;
-  border: 2px solid #1ea0be;
-  color: #e5ecf2;
-  background: #1ea0be;
+  border: 2px solid ${theme.primary};
+  color: ${theme.cloud};
+  background: ${theme.primary};
   font-weight: 600;
   font-size: 22px;
   font-family: inherit;
