@@ -6,7 +6,7 @@ _This project was bootstrapped with [Create React App][cra]._
 
 In the project directory, you can run:
 
-### `yaen start`
+### `yarn start`
 
 Builds and runs optimised app locally at [http://localhost:3000](http://localhost:3000).
 
