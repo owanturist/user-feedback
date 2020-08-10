@@ -6,8 +6,13 @@ import theme from 'theme'
 import * as breakpoints from 'breakpoints'
 import * as api from 'api'
 import * as Router from 'Router'
-import { View as ViewViewportScreen, Selection } from '../ViewportScreen'
-import { cssMap, StyledSection, StyledSectionTitle, ViewSection } from './index'
+import { View as ViewViewportScreen, Selection } from './ViewportScreen'
+import {
+  cssMap,
+  StyledSection,
+  StyledSectionTitle,
+  ViewSection
+} from './Layout'
 import { ReactComponent as MarkerIcon } from './marker.svg'
 
 const ellipsisString = (maxLengh: number, input: string): string => {

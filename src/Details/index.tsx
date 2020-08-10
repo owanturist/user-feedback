@@ -86,7 +86,7 @@ const StyledHttpFailureReport = styled(HttpFailureReport)`
   margin: 0 auto;
 `
 
-const ViewSucceed = React.lazy(() => import('./Layout/View'))
+const ViewSucceed = React.lazy(() => import('./View'))
 
 export const View: FC<{
   feedbackId: string

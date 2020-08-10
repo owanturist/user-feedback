@@ -5,7 +5,7 @@ import { css } from 'emotion/macro'
 import * as Skelet from 'Skeleton'
 import theme from 'theme'
 import * as breakpoints from 'breakpoints'
-import { Skeleton as SkeletonViewportScreen } from '../ViewportScreen'
+import { Skeleton as SkeletonViewportScreen } from './ViewportScreen'
 
 // V I E W
 
