@@ -10,10 +10,10 @@ import RemoteData from 'frctl/RemoteData/Optional'
 
 import * as api from 'api'
 import * as utils from 'utils'
-import * as Rating from 'Rating'
-import * as Page404 from 'Page404'
+import * as Rating from 'components/Rating'
+import * as Page404 from 'components/Page404'
+import HttpFailureReport from 'components/HttpFailureReport'
 import { Dispatch } from 'Provider'
-import HttpFailureReport from 'HttpFailureReport'
 import { Skeleton } from './Layout'
 
 // M O D E L

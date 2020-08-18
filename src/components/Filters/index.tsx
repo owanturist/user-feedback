@@ -9,9 +9,9 @@ import theme from 'theme'
 import * as utils from 'utils'
 import * as breakpoints from 'breakpoints'
 import * as api from 'api'
-import * as Skelet from 'Skeleton'
-import * as Rating from 'Rating'
 import { Dispatch } from 'Provider'
+import * as Skelet from 'components/Skeleton'
+import * as Rating from 'components/Rating'
 
 // M O D E L
 

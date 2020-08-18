@@ -5,9 +5,9 @@ import theme from 'theme'
 import * as api from 'api'
 import * as breakpoints from 'breakpoints'
 import * as utils from 'utils'
-import * as Skelet from 'Skeleton'
-import * as Rating from 'Rating'
 import * as Router from 'Router'
+import * as Skelet from 'components/Skeleton'
+import * as Rating from 'components/Rating'
 import { ReactComponent as EmptyTableIcon } from './empty-table.svg'
 
 const StyledLabel = styled.div`

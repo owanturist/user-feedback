@@ -3,7 +3,7 @@ import styled from '@emotion/styled/macro'
 
 import theme from 'theme'
 import * as api from 'api'
-import * as Skelet from 'Skeleton'
+import * as Skelet from 'components/Skeleton'
 
 export enum Selection {
   None,

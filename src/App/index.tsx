@@ -7,9 +7,9 @@ import { Url } from 'frctl/Url'
 import { Dispatch } from 'Provider'
 import * as breakpoints from 'breakpoints'
 import * as Router from 'Router'
-import * as Dashboard from 'Dashboard'
-import * as Details from 'Details'
-import * as Page404 from 'Page404'
+import * as Dashboard from 'components/Dashboard'
+import * as Details from 'components/Details'
+import * as Page404 from 'components/Page404'
 import * as utils from 'utils'
 
 // S C R E E N

@@ -2,7 +2,7 @@ import React, { FC, ReactNode } from 'react'
 import styled from '@emotion/styled/macro'
 import { css } from 'emotion/macro'
 
-import * as Skelet from 'Skeleton'
+import * as Skelet from 'components/Skeleton'
 import theme from 'theme'
 import * as breakpoints from 'breakpoints'
 import { Skeleton as SkeletonViewportScreen } from './ViewportScreen'

@@ -11,9 +11,9 @@ import { Dispatch } from 'Provider'
 import * as breakpoints from 'breakpoints'
 import * as api from 'api'
 import * as utils from 'utils'
-import * as Filters from 'Filters'
-import * as FeedbackTable from 'FeedbackTable'
-import HttpFailureReport from 'HttpFailureReport'
+import * as Filters from 'components/Filters'
+import * as FeedbackTable from 'components/FeedbackTable'
+import HttpFailureReport from 'components/HttpFailureReport'
 import { ReactComponent as TachometerIcon } from './tachometer.svg'
 
 // M O D E L

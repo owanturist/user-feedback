@@ -8,8 +8,8 @@ import * as Http from 'frctl/Http'
 
 import * as Router from 'Router'
 import * as App from './index'
-import * as Dashboard from 'Dashboard'
-import * as Details from 'Details'
+import * as Dashboard from 'components/Dashboard'
+import * as Details from 'components/Details'
 
 export default {
   title: 'App',
