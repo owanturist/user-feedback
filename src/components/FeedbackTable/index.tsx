@@ -2,13 +2,15 @@ import React, { FC, ReactNode } from 'react'
 import styled from '@emotion/styled/macro'
 
 import theme from 'theme'
-import * as api from 'api'
 import * as breakpoints from 'breakpoints'
-import * as utils from 'utils'
-import * as Router from 'Router'
-import * as Skelet from 'components/Skeleton'
+import { Feedback } from 'api'
+import { Fragment } from 'utils'
+import { toDetails, Link } from 'Router'
+import * as Skeleton from 'components/Skeleton'
 import * as Rating from 'components/Rating'
 import { ReactComponent as EmptyTableIcon } from './empty-table.svg'
+
+export type FeedbackTableItem = Feedback<Array<Fragment>>
 
 const StyledLabel = styled.div`
   margin-bottom: 8px;
@@ -61,7 +63,7 @@ const StyledMatchedFragment = styled.span`
 `
 
 const ViewFragments: FC<{
-  fragments: Array<utils.Fragment>
+  fragments: Array<Fragment>
 }> = ({ fragments }) =>
   fragments.length === 0 ? (
     <StyledEmptyComment>Empty comment</StyledEmptyComment>
@@ -119,37 +121,31 @@ const StyledItemLink = styled(StyledItem)`
   &:hover {
     background: #fafafa;
   }
-`.withComponent(Router.Link)
+`.withComponent(Link)
 
 const ViewItem: FC<{
-  fragments: Array<utils.Fragment>
-  feedback: api.Feedback
-}> = React.memo(({ fragments, feedback }) => (
-  <StyledItemLink
-    data-cy="feedback-table__item"
-    route={Router.ToDetails(feedback.id)}
-  >
+  item: FeedbackTableItem
+}> = React.memo(({ item }) => (
+  <StyledItemLink data-cy="feedback-table__item" to={toDetails(item.id)}>
     <ViewItemProperty label="Rating">
-      <Rating.Static rating={feedback.rating} />
+      <Rating.Static rating={item.rating} />
     </ViewItemProperty>
 
     <StyledItemComment>
       <StyledLabel>Comment</StyledLabel>
-      <ViewFragments fragments={fragments} />
+      <ViewFragments fragments={item.comment} />
     </StyledItemComment>
 
     <ViewItemProperty label="Browser">
-      {feedback.browser.name}
+      {item.browser.name}
       <br />
-      {feedback.browser.version}
+      {item.browser.version}
     </ViewItemProperty>
 
-    <ViewItemProperty label="Device">
-      {feedback.browser.device}
-    </ViewItemProperty>
+    <ViewItemProperty label="Device">{item.browser.device}</ViewItemProperty>
 
     <ViewItemProperty label="Platform">
-      {feedback.browser.platform}
+      {item.browser.platform}
     </ViewItemProperty>
   </StyledItemLink>
 ))
@@ -224,16 +220,16 @@ const StyledRoot = styled.div`
   }
 `
 
-export const View: FC<{
+export const FeedbackTable: FC<{
   className?: string
-  items: Array<[Array<utils.Fragment>, api.Feedback]>
+  items: Array<FeedbackTableItem>
 }> = React.memo(({ className, items }) =>
   items.length > 0 ? (
     <StyledRoot className={className}>
       <ViewHeader />
 
-      {items.map(([fragments, feedback]) => (
-        <ViewItem key={feedback.id} fragments={fragments} feedback={feedback} />
+      {items.map(item => (
+        <ViewItem key={item.id} item={item} />
       ))}
     </StyledRoot>
   ) : (
@@ -244,22 +240,22 @@ export const View: FC<{
 // S K E L E T O N
 
 const SkeletonItemProperty: FC = () => (
-  <ViewItemProperty label={<Skelet.Text />}>
-    <Skelet.Text />
+  <ViewItemProperty label={<Skeleton.Text />}>
+    <Skeleton.Text />
   </ViewItemProperty>
 )
 
 const SkeletonItem: FC = React.memo(() => (
   <StyledItem>
-    <ViewItemProperty label={<Skelet.Text />}>
+    <ViewItemProperty label={<Skeleton.Text />}>
       <Rating.Skeleton inline />
     </ViewItemProperty>
 
     <StyledItemComment>
       <StyledLabel>
-        <Skelet.Text />
+        <Skeleton.Text />
       </StyledLabel>
-      <Skelet.Text count={2} />
+      <Skeleton.Text count={2} />
     </StyledItemComment>
 
     <SkeletonItemProperty />
@@ -270,26 +266,26 @@ const SkeletonItem: FC = React.memo(() => (
   </StyledItem>
 ))
 
-export const Skeleton: FC<{
+export const FeedbackTableSkeleton: FC<{
   className?: string
   count?: number
 }> = React.memo(({ className, count = 1 }) => (
   <StyledRoot className={className}>
     <StyledHeader>
       <StyledHeaderCell>
-        <Skelet.Text />
+        <Skeleton.Text />
       </StyledHeaderCell>
       <StyledHeaderCell className="text-left">
-        <Skelet.Text />
+        <Skeleton.Text />
       </StyledHeaderCell>
       <StyledHeaderCell>
-        <Skelet.Text />
+        <Skeleton.Text />
       </StyledHeaderCell>
       <StyledHeaderCell>
-        <Skelet.Text />
+        <Skeleton.Text />
       </StyledHeaderCell>
       <StyledHeaderCell>
-        <Skelet.Text />
+        <Skeleton.Text />
       </StyledHeaderCell>
     </StyledHeader>
 

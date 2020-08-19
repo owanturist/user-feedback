@@ -1,78 +1,12 @@
 import React, { FC } from 'react'
 import styled from '@emotion/styled/macro'
 import { css } from 'emotion/macro'
-import { cons } from 'frctl/Basics'
-import Set from 'frctl/Set'
-import Maybe from 'frctl/Maybe'
 
 import theme from 'theme'
-import * as utils from 'utils'
 import * as breakpoints from 'breakpoints'
 import * as api from 'api'
-import { Dispatch } from 'Provider'
 import * as Skelet from 'components/Skeleton'
 import * as Rating from 'components/Rating'
-
-// M O D E L
-
-export type Model = {
-  search: string
-  ratings: Set<api.Rating>
-}
-
-export const initial: Model = {
-  search: '',
-  ratings: Set.fromList([
-    api.Rating.One,
-    api.Rating.Two,
-    api.Rating.Three,
-    api.Rating.Four,
-    api.Rating.Five
-  ])
-}
-
-export const toFragments = (
-  model: Model,
-  feedback: api.Feedback
-): Maybe<Array<utils.Fragment>> => {
-  if (!model.ratings.member(feedback.rating)) {
-    return Maybe.Nothing
-  }
-
-  return utils.fragmentize(model.search, feedback.comment)
-}
-
-// U P D A T E
-
-export type Msg = utils.Msg<[Model], Model>
-
-const ChangeSearch = cons(
-  class ChangeSearch implements Msg {
-    public constructor(private readonly input: string) {}
-
-    public update(model: Model): Model {
-      return {
-        ...model,
-        search: this.input
-      }
-    }
-  }
-)
-
-const ToggleRating = cons(
-  class ToggleRating implements Msg {
-    public constructor(private readonly rating: api.Rating) {}
-
-    public update(model: Model): Model {
-      return {
-        ...model,
-        ratings: model.ratings.toggle(this.rating)
-      }
-    }
-  }
-)
-
-// V I E W
 
 const RATINGS_RANGE = [
   api.Rating.One,
@@ -106,23 +40,17 @@ const StyledRatings = styled.span`
   }
 `
 
-const ViewRatings: FC<{
-  selected: Set<api.Rating>
-  dispatch: Dispatch<Msg>
-}> = React.memo(({ selected, dispatch }) => (
-  <StyledRatings>
-    {RATINGS_RANGE.map(rating => (
-      <Rating.Interactive
-        key={rating}
-        className={cssRating}
-        active={selected.member(rating)}
-        rating={rating}
-        onChange={React.useCallback(() => dispatch(ToggleRating(rating)), [
-          rating
-        ])}
-      />
-    ))}
-  </StyledRatings>
+const ViewRating: FC<{
+  rating: api.Rating
+  excludeRatings: Record<number, boolean>
+  onToggleRating(rating: api.Rating): void
+}> = React.memo(({ rating, excludeRatings, onToggleRating }) => (
+  <Rating.Interactive
+    className={cssRating}
+    active={!excludeRatings[rating]}
+    rating={rating}
+    onChange={() => onToggleRating(rating)}
+  />
 ))
 
 const StyledInputContainer = styled.div`
@@ -159,34 +87,44 @@ const StyledRoot = styled.div`
   flex-flow: row wrap;
 `
 
-export const View: FC<{
+export const Filters: FC<{
   className?: string
-  model: Model
-  dispatch: Dispatch<Msg>
-}> = React.memo(({ className, model, dispatch }) => (
-  <StyledRoot className={className}>
-    <StyledInputContainer>
-      <StyledInput
-        data-cy="filters__search-input"
-        autoFocus
-        tabIndex={0}
-        type="search"
-        placeholder="Search here!"
-        value={model.search}
-        onChange={React.useCallback(
-          event => dispatch(ChangeSearch(event.target.value)),
-          [dispatch]
-        )}
-      />
-    </StyledInputContainer>
+  search: string
+  excludeRatings: Record<number, boolean>
+  onSearchChange(search: string): void
+  onToggleRating(rating: api.Rating): void
+}> = React.memo(
+  ({ className, search, excludeRatings, onSearchChange, onToggleRating }) => (
+    <StyledRoot className={className}>
+      <StyledInputContainer>
+        <StyledInput
+          data-cy="filters__search-input"
+          autoFocus
+          tabIndex={0}
+          type="search"
+          placeholder="Search here!"
+          value={search}
+          onChange={event => onSearchChange(event.target.value)}
+        />
+      </StyledInputContainer>
 
-    <ViewRatings selected={model.ratings} dispatch={dispatch} />
-  </StyledRoot>
-))
+      <StyledRatings>
+        {RATINGS_RANGE.map(rating => (
+          <ViewRating
+            key={rating}
+            excludeRatings={excludeRatings}
+            rating={rating}
+            onToggleRating={onToggleRating}
+          />
+        ))}
+      </StyledRatings>
+    </StyledRoot>
+  )
+)
 
 // S K E L E T O N
 
-export const Skeleton: FC<{
+export const FiltersSkeleton: FC<{
   className?: string
 }> = React.memo(({ className }) => (
   <StyledRoot className={className}>

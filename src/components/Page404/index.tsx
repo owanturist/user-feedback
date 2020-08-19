@@ -1,8 +1,8 @@
-import React, { FC } from 'react'
+import React from 'react'
 import styled from '@emotion/styled/macro'
 
 import theme from 'theme'
-import * as Router from 'Router'
+import { Link, toDashboard } from 'Router'
 
 const StyledBackLink = styled.div`
   margin-top: 20px;
@@ -30,17 +30,14 @@ const StyledRoot = styled.div`
   text-align: center;
 `
 
-export const View: FC = React.memo(() => (
+export const Page404: React.FC = React.memo(() => (
   <StyledRoot data-cy="page404__root">
     <StyledCode>404</StyledCode>
     <StyledExplanation>This page is missing</StyledExplanation>
     <StyledBackLink>
-      <Router.Link
-        data-cy="page404__dashboard-link"
-        route={Router.ToDashboard()}
-      >
+      <Link data-cy="page404__dashboard-link" to={toDashboard}>
         Go Dashboard
-      </Router.Link>
+      </Link>
     </StyledBackLink>
   </StyledRoot>
 ))
@@ -49,6 +46,6 @@ const StyledHeader = styled.div`
   text-align: center;
 `
 
-export const Header: FC = React.memo(() => (
+export const Header: React.FC = React.memo(() => (
   <StyledHeader>Page Not Found</StyledHeader>
 ))

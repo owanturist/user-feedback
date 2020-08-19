@@ -1,27 +1,32 @@
+import 'es6-promise/auto'
 import './index.css'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Provider from 'Provider'
-import { Cmd, Sub } from 'frctl'
+import { BrowserRouter, Switch, Route } from 'react-router-dom'
+import { createStore, applyMiddleware } from 'redux'
+import thunkMiddleware from 'redux-thunk'
+import { Provider } from 'react-redux'
 
-import * as App from 'App'
+import { toDashboard } from 'Router'
+import { State, reducer } from 'store'
+import Dashboard from 'containers/DashboardContainer'
 
-const update = (msg: App.Msg, model: App.Model): [App.Model, Cmd<App.Msg>] =>
-  msg.update(model)
-
-const subscriptions = (): Sub<App.Msg> => Sub.none
+const App: React.FC = () => (
+  <BrowserRouter>
+    <Switch>
+      <Route path={toDashboard}>
+        <Dashboard selector={(state: State) => state.dashboard} />
+      </Route>
+    </Switch>
+  </BrowserRouter>
+)
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider
-      init={App.init}
-      update={update}
-      subscriptions={subscriptions}
-      onUrlRequest={App.onUrlRequest}
-      onUrlChange={App.onUrlChange}
-      view={App.View}
-    />
+    <Provider store={createStore(reducer, applyMiddleware(thunkMiddleware))}>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 )

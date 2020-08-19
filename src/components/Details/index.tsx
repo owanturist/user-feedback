@@ -1,145 +1,151 @@
-import React, { FC, Suspense } from 'react'
-import styled from '@emotion/styled/macro'
-import { css } from 'emotion/macro'
-import { Cmd } from 'frctl'
-import { cons } from 'frctl/Basics'
-import * as Http from 'frctl/Http'
-import Maybe from 'frctl/Maybe'
-import Either from 'frctl/Either'
-import RemoteData from 'frctl/RemoteData/Optional'
+import React from 'react'
 
-import * as api from 'api'
-import * as utils from 'utils'
-import * as Rating from 'components/Rating'
-import * as Page404 from 'components/Page404'
-import HttpFailureReport from 'components/HttpFailureReport'
-import { Dispatch } from 'Provider'
-import { Skeleton } from './Layout'
+// import React, { FC, Suspense } from 'react'
+// import styled from '@emotion/styled/macro'
+// import { css } from 'emotion/macro'
+// import { Cmd } from 'frctl'
+// import { cons } from 'frctl/Basics'
+// import * as Http from 'frctl/Http'
+// import Maybe from 'frctl/Maybe'
+// import Either from 'frctl/Either'
+// import RemoteData from 'frctl/RemoteData/Optional'
 
-// M O D E L
+// import * as api from 'api'
+// import * as utils from 'utils'
+// import * as Rating from 'components/Rating'
+// import * as Page404 from 'components/Page404'
+// import HttpFailureReport from 'components/HttpFailureReport'
+// import { Dispatch } from 'Provider'
+// import { Skeleton } from './Layout'
 
-export type Model = {
-  feedback: RemoteData<Http.Error, api.FeedbackDetailed>
-}
+// // M O D E L
 
-export const initial: Model = {
-  feedback: RemoteData.Loading
-}
+// export type Model = {
+//   feedback: RemoteData<Http.Error, api.FeedbackDetailed>
+// }
 
-export const init = (feedbackId: string): [Model, Cmd<Msg>] => [
-  initial,
-  api.getFeedbackById(feedbackId).send(result => LoadFeedbackDone(result))
-]
+// export const initial: Model = {
+//   feedback: RemoteData.Loading
+// }
 
-// U P D A T E
+// export const init = (feedbackId: string): [Model, Cmd<Msg>] => [
+//   initial,
+//   api.getFeedbackById(feedbackId).send(result => LoadFeedbackDone(result))
+// ]
 
-export type Msg = utils.Msg<[Model], [Model, Cmd<Msg>]>
+// // U P D A T E
 
-const LoadFeedback = cons(
-  class LoadFeedback implements Msg {
-    public constructor(private readonly feedbackId: string) {}
+// export type Msg = utils.Msg<[Model], [Model, Cmd<Msg>]>
 
-    public update(model: Model): [Model, Cmd<Msg>] {
-      return [
-        {
-          ...model,
-          feedback: RemoteData.Loading
-        },
-        api
-          .getFeedbackById(this.feedbackId)
-          .send(result => LoadFeedbackDone(result))
-      ]
-    }
-  }
-)
+// const LoadFeedback = cons(
+//   class LoadFeedback implements Msg {
+//     public constructor(private readonly feedbackId: string) {}
 
-const LoadFeedbackDone = cons(
-  class LoadFeedbackDone implements Msg {
-    public constructor(
-      private readonly result: Either<Http.Error, Maybe<api.FeedbackDetailed>>
-    ) {}
+//     public update(model: Model): [Model, Cmd<Msg>] {
+//       return [
+//         {
+//           ...model,
+//           feedback: RemoteData.Loading
+//         },
+//         api
+//           .getFeedbackById(this.feedbackId)
+//           .send(result => LoadFeedbackDone(result))
+//       ]
+//     }
+//   }
+// )
 
-    public update(model: Model): [Model, Cmd<Msg>] {
-      return [
-        {
-          ...model,
-          feedback: this.result.cata<
-            RemoteData<Http.Error, api.FeedbackDetailed>
-          >({
-            Left: RemoteData.Failure,
-            Right: feedback =>
-              feedback.cata({
-                Nothing: () => RemoteData.NotAsked,
-                Just: RemoteData.Succeed
-              })
-          })
-        },
-        Cmd.none
-      ]
-    }
-  }
-)
+// const LoadFeedbackDone = cons(
+//   class LoadFeedbackDone implements Msg {
+//     public constructor(
+//       private readonly result: Either<Http.Error, Maybe<api.FeedbackDetailed>>
+//     ) {}
 
-// V I E W
+//     public update(model: Model): [Model, Cmd<Msg>] {
+//       return [
+//         {
+//           ...model,
+//           feedback: this.result.cata<
+//             RemoteData<Http.Error, api.FeedbackDetailed>
+//           >({
+//             Left: RemoteData.Failure,
+//             Right: feedback =>
+//               feedback.cata({
+//                 Nothing: () => RemoteData.NotAsked,
+//                 Just: RemoteData.Succeed
+//               })
+//           })
+//         },
+//         Cmd.none
+//       ]
+//     }
+//   }
+// )
 
-const StyledHttpFailureReport = styled(HttpFailureReport)`
-  margin: 0 auto;
-`
+// // V I E W
 
-const ViewSucceed = React.lazy(() => import('./View'))
+// const StyledHttpFailureReport = styled(HttpFailureReport)`
+//   margin: 0 auto;
+// `
 
-export const View: FC<{
-  feedbackId: string
-  model: Model
-  dispatch: Dispatch<Msg>
-}> = ({ feedbackId, model, dispatch }) =>
-  model.feedback.cata({
-    NotAsked: () => <Page404.View />,
+// const ViewSucceed = React.lazy(() => import('./View'))
 
-    Loading: () => <Skeleton />,
+// export const View: FC<{
+//   feedbackId: string
+//   model: Model
+//   dispatch: Dispatch<Msg>
+// }> = ({ feedbackId, model, dispatch }) =>
+//   model.feedback.cata({
+//     NotAsked: () => <Page404.View />,
 
-    Failure: error => (
-      <StyledHttpFailureReport
-        error={error}
-        onTryAgain={() => dispatch(LoadFeedback(feedbackId))}
-      />
-    ),
+//     Loading: () => <Skeleton />,
 
-    Succeed: feedback => (
-      <Suspense fallback={<Skeleton />}>
-        <ViewSucceed feedback={feedback} />
-      </Suspense>
-    )
-  })
+//     Failure: error => (
+//       <StyledHttpFailureReport
+//         error={error}
+//         onTryAgain={() => dispatch(LoadFeedback(feedbackId))}
+//       />
+//     ),
 
-// H E A D E R
+//     Succeed: feedback => (
+//       <Suspense fallback={<Skeleton />}>
+//         <ViewSucceed feedback={feedback} />
+//       </Suspense>
+//     )
+//   })
 
-const cssRating = css`
-  margin-right: 10px;
-`
+// // H E A D E R
 
-const StyledHeader = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`
+// const cssRating = css`
+//   margin-right: 10px;
+// `
 
-export const Header: FC<{ model: Model }> = React.memo(({ model }) =>
-  model.feedback.cata({
-    NotAsked: () => <Page404.Header />,
+// const StyledHeader = styled.div`
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+// `
 
-    Loading: () => (
-      <StyledHeader>
-        <Rating.Skeleton className={cssRating} /> Feedback Details
-      </StyledHeader>
-    ),
+// export const Header: FC<{ model: Model }> = React.memo(({ model }) =>
+//   model.feedback.cata({
+//     NotAsked: () => <Page404.Header />,
 
-    Failure: () => <StyledHeader>Feedback Details</StyledHeader>,
+//     Loading: () => (
+//       <StyledHeader>
+//         <Rating.Skeleton className={cssRating} /> Feedback Details
+//       </StyledHeader>
+//     ),
 
-    Succeed: ({ rating }) => (
-      <StyledHeader>
-        <Rating.Static className={cssRating} rating={rating} /> Feedback Details
-      </StyledHeader>
-    )
-  })
-)
+//     Failure: () => <StyledHeader>Feedback Details</StyledHeader>,
+
+//     Succeed: ({ rating }) => (
+//       <StyledHeader>
+//         <Rating.Static className={cssRating} rating={rating} /> Feedback Details
+//       </StyledHeader>
+//     )
+//   })
+// )
+
+const Details: React.FC = () => null
+
+export default Details

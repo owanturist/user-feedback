@@ -1,11 +1,16 @@
+import axios, { AxiosResponse } from 'axios'
 import dayjs, { Dayjs } from 'dayjs'
-import Maybe from 'frctl/Maybe'
 import Decode from 'frctl/Json/Decode'
-import * as Http from 'frctl/Http'
 import { nonEmptyString } from 'utils'
 
 // @TODO find a way to declare variables in TS level
 const API_URL = process.env.REACT_APP_API_URL || ''
+const HTTP_TIMEOUT = Number(process.env.REACT_APP_HTTP_TIMEOUT)
+
+const request = axios.create({
+  baseURL: API_URL,
+  timeout: HTTP_TIMEOUT
+})
 
 /**
  * Users' browser who left a feedback
@@ -47,10 +52,10 @@ const ratingDecoder: Decode.Decoder<Rating> = Decode.enums([
 /**
  * Preview of feedback to display in lists
  */
-export type Feedback = {
+export type Feedback<C = string> = {
   id: string
   rating: Rating
-  comment: string
+  comment: C
   browser: Browser
 }
 
@@ -158,7 +163,7 @@ const screenDecoder: Decode.Decoder<Screen> = Decode.shape({
  */
 export type FeedbackDetailed = Feedback & {
   url: string
-  email: Maybe<string>
+  email: null | string
   creationDate: Dayjs
   viewport: Viewport
   screen: Screen
@@ -169,7 +174,7 @@ const feedbackDetailedDecoder: Decode.Decoder<FeedbackDetailed> = Decode.shape({
   basic: feedbackDecoder,
   url: Decode.field('url').string,
   email: Decode.field('email').optional.string.map(email =>
-    email.chain(nonEmptyString)
+    email.map(nonEmptyString).getOrElse(null)
   ),
   creationDate: Decode.field('creation_date').of(dayjsDecoder),
   viewport: Decode.field('viewport').of(viewportDecoder),
@@ -190,9 +195,9 @@ const findDetailedFeedbackByIdDecoder = (
   index: number,
   length: number,
   targetId: string
-): Decode.Decoder<Maybe<FeedbackDetailed>> => {
+): Decode.Decoder<null | FeedbackDetailed> => {
   if (index >= length) {
-    return Decode.succeed(Maybe.Nothing)
+    return Decode.succeed(null)
   }
 
   return Decode.lazy(
@@ -200,7 +205,7 @@ const findDetailedFeedbackByIdDecoder = (
     () => Decode.index(index).field('id').string
   ).chain(currentId => {
     if (targetId === currentId) {
-      return Decode.index(index).of(feedbackDetailedDecoder).map(Maybe.Just)
+      return Decode.index(index).of(feedbackDetailedDecoder)
     }
 
     return findDetailedFeedbackByIdDecoder(index + 1, length, targetId)
@@ -210,9 +215,27 @@ const findDetailedFeedbackByIdDecoder = (
 /**
  * Http request builder to retrieve Array<Feedback>
  */
-export const getFeedbackList = Http.get(`${API_URL}/example/apidemo.json`)
-  .withTimeout(5000)
-  .withExpectJson(Decode.field('items').list(feedbackDecoder))
+export const getFeedbackList = (): Promise<Array<Feedback>> => {
+  return request
+    .get(`/example/apidemo.json`, {
+      transformResponse: body => {
+        return Decode.field('items')
+          .list(feedbackDecoder)
+          .decodeJSON(body)
+          .fold<string | Array<Feedback>>(
+            decodeError => decodeError.stringify(4),
+            feedback => feedback
+          )
+      }
+    })
+    .then(({ data }: AxiosResponse<string | Array<Feedback>>) => {
+      if (typeof data === 'string') {
+        return Promise.reject(data)
+      }
+
+      return data
+    })
+}
 
 /**
  * Simulation of using api endpoint to retrieve detailed feedback
@@ -224,17 +247,17 @@ export const getFeedbackList = Http.get(`${API_URL}/example/apidemo.json`)
  */
 export const getFeedbackById = (
   feedbackId: string
-): Http.Request<Maybe<FeedbackDetailed>> => {
+): Promise<FeedbackDetailed> => {
   // keep id for e2e mocking
-  return Http.get(`${API_URL}/example/apidemo.json?id=${feedbackId}`)
-    .withTimeout(5000)
-    .withExpectJson(
-      Decode.field('items')
+  return request.get(`$/example/apidemo.json?id=${feedbackId}`, {
+    transformResponse: data => {
+      return Decode.field('items')
         .list(Decode.value)
-        .chain(list =>
-          Decode.field('items').of(
+        .chain(list => {
+          return Decode.field('items').of(
             findDetailedFeedbackByIdDecoder(0, list.length, feedbackId)
           )
-        )
-    )
+        })
+    }
+  })
 }

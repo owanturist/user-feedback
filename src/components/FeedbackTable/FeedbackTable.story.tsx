@@ -1,19 +1,23 @@
 import React, { FC } from 'react'
 import { number, text } from '@storybook/addon-knobs'
 
-import * as api from 'api'
-import * as utils from 'utils'
-import * as FeedbackTable from './index'
+import { Feedback } from 'api'
+import { fragmentize } from 'utils'
+import {
+  FeedbackTableItem,
+  FeedbackTable,
+  FeedbackTableSkeleton
+} from './index'
 
 const addFragment = (
   pattern: string,
-  item: api.Feedback
-): [Array<utils.Fragment>, api.Feedback] => [
-  utils.fragmentize(pattern, item.comment).getOrElse([]),
-  item
-]
+  feedback: Feedback
+): FeedbackTableItem => ({
+  ...feedback,
+  comment: fragmentize(pattern, feedback.comment) || []
+})
 
-const feedbackItems: Array<api.Feedback> = [
+const feedbackItems: Array<Feedback> = [
   {
     id: '0',
     rating: 2,
@@ -54,13 +58,13 @@ export default {
 }
 
 export const Skeleton: FC = () => (
-  <FeedbackTable.Skeleton count={number('Count', 10)} />
+  <FeedbackTableSkeleton count={number('Count', 10)} />
 )
 
-export const Empty: FC = () => <FeedbackTable.View items={[]} />
+export const Empty: FC = () => <FeedbackTable items={[]} />
 
 export const CSRF: FC = () => (
-  <FeedbackTable.View
+  <FeedbackTable
     items={[
       {
         id: '0',
@@ -78,16 +82,14 @@ export const CSRF: FC = () => (
 )
 
 export const Normal: FC = () => (
-  <FeedbackTable.View
-    items={feedbackItems.map(item => addFragment('', item))}
-  />
+  <FeedbackTable items={feedbackItems.map(item => addFragment('', item))} />
 )
 
 export const Overflowed: FC = () => {
   const search = text('Search', '')
 
   return (
-    <FeedbackTable.View
+    <FeedbackTable
       items={[
         ...feedbackItems,
         {

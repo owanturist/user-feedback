@@ -1,48 +1,47 @@
 import React, { FC } from 'react'
 import { action } from '@storybook/addon-actions'
 import { boolean, text } from '@storybook/addon-knobs'
-import Set from 'frctl/Set'
 
-import * as api from 'api'
-import * as Filters from './index'
+import { Rating } from 'api'
+import { Filters, FiltersSkeleton } from './index'
 
 export default {
   title: 'Filters',
   component: Filters
 }
 
-const ratingsKnob = (active: Array<api.Rating>): Set<api.Rating> => {
-  const arr: Array<api.Rating> = []
+const ratingsKnob = (
+  active: Array<Rating>
+): {
+  [rating: number]: boolean
+} => {
+  const acc: {
+    [rating: number]: boolean
+  } = {}
 
   for (let i = 1; i <= 5; i++) {
-    if (boolean(`Rating ${i}`, active.indexOf(i) >= 0)) {
-      arr.push(i)
-    }
+    acc[i] = boolean(`Exclude rating ${i}`, active.indexOf(i) >= 0)
   }
 
-  return Set.fromList(arr)
+  return acc
 }
 
-export const Skeleton: FC = () => <Filters.Skeleton />
+export const Skeleton: FC = () => <FiltersSkeleton />
 
 export const Initial: FC = () => (
-  <Filters.View
-    model={{
-      ...Filters.initial,
-      ratings: ratingsKnob([]),
-      search: text('Search', '')
-    }}
-    dispatch={action('dispatch')}
+  <Filters
+    search={text('Search', '')}
+    excludeRatings={ratingsKnob([])}
+    onSearchChange={action('onSearchChange')}
+    onToggleRating={action('onToggleRating')}
   />
 )
 
 export const Filled: FC = () => (
-  <Filters.View
-    model={{
-      ...Filters.initial,
-      ratings: ratingsKnob([1, 3, 4]),
-      search: text('Search', 'Some comment')
-    }}
-    dispatch={action('dispatch')}
+  <Filters
+    search={text('Search', '')}
+    excludeRatings={ratingsKnob([1, 3, 4])}
+    onSearchChange={action('onSearchChange')}
+    onToggleRating={action('onToggleRating')}
   />
 )

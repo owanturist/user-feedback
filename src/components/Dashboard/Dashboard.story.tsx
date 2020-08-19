@@ -1,19 +1,36 @@
 import React, { FC } from 'react'
+import { text, boolean } from '@storybook/addon-knobs'
 import { action } from '@storybook/addon-actions'
 
-import * as Http from 'frctl/Http'
-import RemoteData from 'frctl/RemoteData'
-import * as api from 'api'
-import * as Dashboard from './index'
+import { Feedback, Rating } from 'api'
+import { Fragment, fragmentize } from 'utils'
+import { Dashboard, DashboardHeader, DashboardSkeleton } from './index'
 
-const [initial] = Dashboard.init
+const ratingsKnob = (
+  active: Array<Rating>
+): {
+  [rating: number]: boolean
+} => {
+  const acc: {
+    [rating: number]: boolean
+  } = {}
 
-const feedbackItems: Array<api.Feedback> = new Array(20)
-  .fill(0)
-  .map((_, i) => ({
+  for (let i = 1; i <= 5; i++) {
+    acc[i] = boolean(`Exclude rating ${i}`, active.indexOf(i) >= 0)
+  }
+
+  return acc
+}
+
+const itemsKnob = (search: string): Array<Feedback<Array<Fragment>>> => {
+  return new Array(20).fill(0).map((_, i) => ({
     id: `#${i}`,
     rating: Math.floor(Math.random() * 5) + 1,
-    comment: `Lorem ipsum dolor sit amet, consectetur adipiscing elit ${i}`,
+    comment:
+      fragmentize(
+        search,
+        `Lorem ipsum dolor sit amet, consectetur adipiscing elit ${i}`
+      ) || [],
     browser: {
       name: 'Chrome',
       version: '32.0',
@@ -21,34 +38,27 @@ const feedbackItems: Array<api.Feedback> = new Array(20)
       platform: 'MacOSX'
     }
   }))
+}
 
 export default {
   title: 'Dashboard',
-  component: Dashboard.View
+  component: Dashboard
 }
 
-export const Header: FC = () => <Dashboard.Header />
+export const Header: FC = () => <DashboardHeader />
 
-export const Loading: FC = () => (
-  <Dashboard.View model={initial} dispatch={action('dispatch')} />
-)
+export const Loading: FC = () => <DashboardSkeleton />
 
-export const Failure: FC = () => (
-  <Dashboard.View
-    model={{
-      ...initial,
-      feedback: RemoteData.Failure(Http.Error.Timeout)
-    }}
-    dispatch={action('dispatch')}
-  />
-)
+export const Success: FC = () => {
+  const search = text('search', '')
 
-export const Success: FC = () => (
-  <Dashboard.View
-    model={{
-      ...initial,
-      feedback: RemoteData.Succeed(feedbackItems)
-    }}
-    dispatch={action('dispatch')}
-  />
-)
+  return (
+    <Dashboard
+      items={itemsKnob(search)}
+      search={search}
+      excludeRatings={ratingsKnob([Rating.One, Rating.Three])}
+      onSearchChange={action('onSearchChange')}
+      onToggleRating={action('onToggleRating')}
+    />
+  )
+}
