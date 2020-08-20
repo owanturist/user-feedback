@@ -48,11 +48,11 @@ const StyledRoot = styled.div`
   height: 100%;
 `
 
-const Screen: React.FC<{ header: ReactNode }> = ({
-  header,
-  children,
-  ...props
-}) => (
+export type ScreenProps = React.HTMLAttributes<HTMLDivElement> & {
+  header: ReactNode
+}
+
+const Screen: React.FC<ScreenProps> = ({ header, children, ...props }) => (
   <StyledRoot {...props}>
     <StyledHeader>{header}</StyledHeader>
 

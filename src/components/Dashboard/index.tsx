@@ -4,7 +4,7 @@ import { css } from 'emotion/macro'
 
 import * as breakpoints from 'breakpoints'
 import { Rating } from 'api'
-import Screen from 'components/Screen'
+import Screen, { ScreenProps } from 'components/Screen'
 import { Filters, FiltersSkeleton } from 'components/Filters'
 import {
   FeedbackTable,
@@ -28,16 +28,15 @@ const StyledHeader = styled.div`
   align-items: center;
 `
 
-const ViewScreen: FC = ({ children }) => (
+const ViewScreen: FC<Omit<ScreenProps, 'header'>> = props => (
   <Screen
     header={
       <StyledHeader>
         <StyledHeaderIcon /> Dashboard
       </StyledHeader>
     }
-  >
-    {children}
-  </Screen>
+    {...props}
+  />
 )
 
 const cssFilters = css`

@@ -59,9 +59,7 @@ describe('Initialising', () => {
 
       cy.wait('@getApiDemo')
 
-      cy.contains('You are facing an unexpected Server side Error 500!').should(
-        'be.visible'
-      )
+      cy.contains('Request failed with status code 500').should('be.visible')
     })
 
     it('shows bad status 400 error screen', () => {
@@ -75,9 +73,7 @@ describe('Initialising', () => {
 
       cy.wait('@getApiDemo')
 
-      cy.contains('You are facing an unexpected Client side Error 400!').should(
-        'be.visible'
-      )
+      cy.contains('Request failed with status code 400').should('be.visible')
     })
 
     it('shows timeout error screen', () => {
@@ -85,14 +81,14 @@ describe('Initialising', () => {
         url: '**/example/apidemo.json',
         response: 'fixture:success',
         status: 200,
-        delay: 6000
+        delay: 2000
       }).as('getApiDemoSlow')
 
       cy.visit('/')
 
       cy.wait('@getApiDemoSlow')
 
-      cy.contains('You are facing a Timeout issue').should('be.visible')
+      cy.contains('timeout of 1000ms exceeded').should('be.visible')
 
       cy.route({
         url: '**/example/apidemo.json',
