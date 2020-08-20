@@ -2,7 +2,7 @@ import React from 'react'
 import styled from '@emotion/styled/macro'
 import { css } from 'emotion/macro'
 
-import * as breakpoints from 'breakpoints'
+import breakpoints from 'breakpoints'
 import { Rating } from 'api'
 import Screen, { ScreenProps } from 'components/Screen'
 import { Filters, FiltersSkeleton } from 'components/Filters'
