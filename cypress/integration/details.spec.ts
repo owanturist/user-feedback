@@ -77,13 +77,13 @@ describe('Details', () => {
       url: '**/example/apidemo.json?id=52efc552b6679cfe6ede406c',
       response: 'fixture:success',
       status: 200,
-      delay: 6000
+      delay: 2000
     }).as('getApiDemoByIdSlow')
 
     cy.visit('/details/52efc552b6679cfe6ede406c')
 
     cy.wait('@getApiDemoByIdSlow')
-    cy.contains('You are facing a Timeout issue').should('be.visible')
+    cy.contains('timeout of 1000ms exceeded').should('be.visible')
 
     cy.route({
       url: '**/example/apidemo.json?id=52efc552b6679cfe6ede406c',

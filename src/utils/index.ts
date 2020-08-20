@@ -1,12 +1,3 @@
-import Maybe from 'frctl/Maybe'
-
-/**
- * Template to define message signature
- */
-export type Msg<A extends Array<unknown>, R> = {
-  update(...args: A): R
-}
-
 /**
  * Trimm a string and return Just<string> if not empty or Nothing otherwise
  *
@@ -17,27 +8,10 @@ export type Msg<A extends Array<unknown>, R> = {
  * nonEmptyString('  ') === Nothing
  * nonEmptyString('  hi  ') === Just('hi')
  */
-export const nonEmptyString = (str: string): Maybe<string> => {
+export const nonEmptyString = (str: string): null | string => {
   const trimmed = str.trim()
 
-  return trimmed.length === 0 ? Maybe.Nothing : Maybe.Just(trimmed)
-}
-
-/**
- * Tricky helper to handle tricky Cata default '_' case.
- * In Cata we assume that default case is always present
- * in case of current is not provided.
- *
- * @param defaultFn usually '_' pattern case
- * @param fn target optional case
- * @param args arguments for optional case
- */
-export const callOrElse = <A extends Array<unknown>, R>(
-  defaultFn: (() => R) | undefined,
-  fn: ((...args: A) => R) | undefined,
-  ...args: A
-): R => {
-  return typeof fn === 'function' ? fn(...args) : (defaultFn as () => R)()
+  return trimmed.length === 0 ? null : trimmed
 }
 
 /**
@@ -63,28 +37,28 @@ const getLowChar = (index: number, input: string): string => {
 export const fragmentize = (
   pattern: string,
   input: string
-): Maybe<Array<Fragment>> => {
+): null | Array<Fragment> => {
   const P = pattern.length
   const I = input.length
 
   // pattern is bigger - no match possible
   if (P > I) {
-    return Maybe.Nothing
+    return null
   }
 
   // input is empty - no fragments
   if (I === 0) {
-    return Maybe.Just([])
+    return []
   }
 
   // pattern is empty - everything is not matched
   if (P === 0) {
-    return Maybe.Just([
+    return [
       {
         slice: input,
         matched: false
       }
-    ])
+    ]
   }
 
   const fragments: Array<Fragment> = []
@@ -95,7 +69,7 @@ export const fragmentize = (
   for (let p = 0; p < P; i++) {
     // eof but pattern not entirely matched
     if (i === I) {
-      return Maybe.Nothing
+      return null
     }
 
     const charMatched = getLowChar(p, pattern) === getLowChar(i, input)
@@ -128,5 +102,5 @@ export const fragmentize = (
     })
   }
 
-  return Maybe.Just(fragments)
+  return fragments
 }

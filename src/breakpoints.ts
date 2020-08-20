@@ -11,3 +11,5 @@ const makeBreakpoint = (width: number): Breakpoint => ({
 
 export const small = makeBreakpoint(SMALL)
 export const big = makeBreakpoint(BIG)
+
+export default { small, big }

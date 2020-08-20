@@ -1,27 +1,57 @@
+import 'es6-promise/auto'
 import './index.css'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Provider from 'Provider'
-import { Cmd, Sub } from 'frctl'
+import {
+  BrowserRouter,
+  Switch,
+  Route,
+  RouteComponentProps
+} from 'react-router-dom'
+import { createStore, applyMiddleware } from 'redux'
+import thunkMiddleware from 'redux-thunk'
+import { composeWithDevTools } from 'redux-devtools-extension/logOnlyInProduction'
+import { Provider } from 'react-redux'
 
-import * as App from 'App'
+import { reducer, selectDashboard, selectDetails } from 'store'
+import Dashboard from 'containers/DashboardContainer'
+import Details from 'containers/DetailsContainer'
+import Page404 from 'components/Page404'
 
-const update = (msg: App.Msg, model: App.Model): [App.Model, Cmd<App.Msg>] =>
-  msg.update(model)
+const ViewDetails: React.FC<RouteComponentProps<{
+  feedbackId: string
+}>> = props => (
+  <Details
+    feedbackId={props.match.params.feedbackId}
+    selector={selectDetails}
+  />
+)
 
-const subscriptions = (): Sub<App.Msg> => Sub.none
+const App: React.FC = () => (
+  <BrowserRouter>
+    <Switch>
+      <Route exact strict path="/">
+        <Dashboard selector={selectDashboard} />
+      </Route>
+
+      <Route exact strict path="/details/:feedbackId" component={ViewDetails} />
+
+      <Route component={Page404} />
+    </Switch>
+  </BrowserRouter>
+)
+
+const store = createStore(
+  reducer,
+  composeWithDevTools(applyMiddleware(thunkMiddleware))
+)
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider
-      init={App.init}
-      update={update}
-      subscriptions={subscriptions}
-      onUrlRequest={App.onUrlRequest}
-      onUrlChange={App.onUrlChange}
-      view={App.View}
-    />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 )
