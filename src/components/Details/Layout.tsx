@@ -107,7 +107,7 @@ const SkeletonPairs: React.FC<{ count: number }> = React.memo(({ count }) => (
   </ViewPairs>
 ))
 
-export const LayoutSkeleton: React.FC = React.memo(() => (
+export const LayoutSkeleton: React.FC = () => (
   <StyledRoot data-cy="details__skeleton">
     <StyledInfo>
       <StyledBackLink>
@@ -133,4 +133,4 @@ export const LayoutSkeleton: React.FC = React.memo(() => (
       <SkeletonRect className={cssMap} width="100%" height="450px" />
     </ViewSection>
   </StyledRoot>
-))
+)

@@ -222,29 +222,31 @@ const StyledRoot = styled.div`
   }
 `
 
-const ViewRoot: React.FC<{ feedback: FeedbackDetailed }> = ({ feedback }) => (
-  <StyledRoot data-cy="details__root">
-    <StyledInfo>
-      <StyledBackLink>
-        <Link data-cy="details__link-dashboard" to={toDashboard}>
-          ← Back to Dashboard
-        </Link>
-      </StyledBackLink>
+const ViewRoot: React.FC<{ feedback: FeedbackDetailed }> = React.memo(
+  ({ feedback }) => (
+    <StyledRoot data-cy="details__root">
+      <StyledInfo>
+        <StyledBackLink>
+          <Link data-cy="details__link-dashboard" to={toDashboard}>
+            ← Back to Dashboard
+          </Link>
+        </StyledBackLink>
 
-      <ViewBasicSection feedback={feedback} />
+        <ViewBasicSection feedback={feedback} />
 
-      <ViewBrowserSection browser={feedback.browser} />
+        <ViewBrowserSection browser={feedback.browser} />
 
-      <ViewSection title="Comment">{feedback.comment}</ViewSection>
+        <ViewSection title="Comment">{feedback.comment}</ViewSection>
 
-      <ViewScreenViewportSection
-        viewport={feedback.viewport}
-        screen={feedback.screen}
-      />
-    </StyledInfo>
+        <ViewScreenViewportSection
+          viewport={feedback.viewport}
+          screen={feedback.screen}
+        />
+      </StyledInfo>
 
-    <ViewMapSection geo={feedback.geo} />
-  </StyledRoot>
+      <ViewMapSection geo={feedback.geo} />
+    </StyledRoot>
+  )
 )
 
-export default React.memo(ViewRoot)
+export default ViewRoot

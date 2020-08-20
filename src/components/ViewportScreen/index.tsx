@@ -98,10 +98,10 @@ const ViewportScreen: React.FC<{
 
 export default ViewportScreen
 
-export const ViewportScreenSkeleton: React.FC<{ width?: number }> = React.memo(
-  ({ width = DEFAULT_MAXIMUM_WIDTH }) => (
-    <StyledRoot width={width}>
-      <SkeletonRect width="100%" height={Math.round((2 / 3) * width)} />
-    </StyledRoot>
-  )
+export const ViewportScreenSkeleton: React.FC<{ width?: number }> = ({
+  width = DEFAULT_MAXIMUM_WIDTH
+}) => (
+  <StyledRoot width={width}>
+    <SkeletonRect width="100%" height={Math.round((2 / 3) * width)} />
+  </StyledRoot>
 )

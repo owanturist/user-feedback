@@ -56,7 +56,7 @@ export const DetailsFailureReport: React.FC<HttpFailureReportProps> = props => (
 
 // S K E L T O N
 
-export const DetailsSkeleton: React.FC = React.memo(() => (
+export const DetailsSkeleton: React.FC = () => (
   <Screen
     header={
       <Viewheader>
@@ -66,4 +66,4 @@ export const DetailsSkeleton: React.FC = React.memo(() => (
   >
     <LayoutSkeleton />
   </Screen>
-))
+)

@@ -126,7 +126,7 @@ export const Filters: React.FC<{
 
 export const FiltersSkeleton: React.FC<{
   className?: string
-}> = React.memo(({ className }) => (
+}> = ({ className }) => (
   <StyledRoot className={className}>
     <StyledInputContainer>
       <SkeletonRect width="100%" height="40px" />
@@ -138,4 +138,4 @@ export const FiltersSkeleton: React.FC<{
       ))}
     </StyledRatings>
   </StyledRoot>
-))
+)

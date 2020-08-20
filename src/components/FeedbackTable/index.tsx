@@ -176,7 +176,7 @@ const StyledHeader = styled.div`
   }
 `
 
-const ViewHeader: React.FC = React.memo(() => (
+const ViewHeader: React.FC = () => (
   <StyledHeader>
     <StyledHeaderCell>Rating</StyledHeaderCell>
     <StyledHeaderCell className="text-left">Comment</StyledHeaderCell>
@@ -184,7 +184,7 @@ const ViewHeader: React.FC = React.memo(() => (
     <StyledHeaderCell>Device</StyledHeaderCell>
     <StyledHeaderCell>Platform</StyledHeaderCell>
   </StyledHeader>
-))
+)
 
 const StyledEmptyTableIcon = styled(EmptyTableIcon)`
   display: block;
@@ -201,13 +201,11 @@ const StyledEmpty = styled.div`
   text-align: center;
 `
 
-const ViewEmpty: React.FC<{ className?: string }> = React.memo(
-  ({ className }) => (
-    <StyledEmpty className={className}>
-      <StyledEmptyTableIcon />
-      No Data
-    </StyledEmpty>
-  )
+const ViewEmpty: React.FC<{ className?: string }> = ({ className }) => (
+  <StyledEmpty className={className}>
+    <StyledEmptyTableIcon />
+    No Data
+  </StyledEmpty>
 )
 
 const StyledRoot = styled.div`
@@ -247,7 +245,7 @@ const SkeletonItemProperty: React.FC = () => (
   </ViewItemProperty>
 )
 
-const SkeletonItem: React.FC = React.memo(() => (
+const SkeletonItem: React.FC = () => (
   <StyledItem>
     <ViewItemProperty label={<SkeletonText />}>
       <RatingMarkSkeleton inline />
@@ -266,7 +264,7 @@ const SkeletonItem: React.FC = React.memo(() => (
 
     <SkeletonItemProperty />
   </StyledItem>
-))
+)
 
 export const FeedbackTableSkeleton: React.FC<{
   className?: string

@@ -83,10 +83,10 @@ export const DashboardFailureReport: React.FC<HttpFailureReportProps> = props =>
 
 // S K E L E T O N
 
-export const DashboardSkeleton: React.FC = React.memo(() => (
+export const DashboardSkeleton: React.FC = () => (
   <ViewScreen data-cy="dashboard__skeleton">
     <FiltersSkeleton className={cssFilters} />
 
     <FeedbackTableSkeleton count={20} />
   </ViewScreen>
-))
+)
