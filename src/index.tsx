@@ -19,7 +19,7 @@ import Dashboard from 'containers/DashboardContainer'
 import Details from 'containers/DetailsContainer'
 import Page404 from 'components/Page404'
 
-const RouteDetails: React.FC<RouteComponentProps<{
+const ViewDetails: React.FC<RouteComponentProps<{
   feedbackId: string
 }>> = props => (
   <Details
@@ -35,12 +35,7 @@ const App: React.FC = () => (
         <Dashboard selector={selectDashboard} />
       </Route>
 
-      <Route
-        exact
-        strict
-        path="/details/:feedbackId"
-        component={RouteDetails}
-      />
+      <Route exact strict path="/details/:feedbackId" component={ViewDetails} />
 
       <Route component={Page404} />
     </Switch>
