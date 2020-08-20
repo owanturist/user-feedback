@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React from 'react'
 import styled from '@emotion/styled/macro'
 
 import theme from 'theme'
@@ -40,7 +40,7 @@ const StyledRoot = styled.div<StyledRootProps>`
   width: ${props => props.width}px;
 `
 
-const ViewportScreen: FC<{
+const ViewportScreen: React.FC<{
   selected: Selection
   viewport: api.Viewport
   screen: api.Screen
@@ -98,7 +98,7 @@ const ViewportScreen: FC<{
 
 export default ViewportScreen
 
-export const ViewportScreenSkeleton: FC<{ width?: number }> = React.memo(
+export const ViewportScreenSkeleton: React.FC<{ width?: number }> = React.memo(
   ({ width = DEFAULT_MAXIMUM_WIDTH }) => (
     <StyledRoot width={width}>
       <Skelet.Rect width="100%" height={Math.round((2 / 3) * width)} />

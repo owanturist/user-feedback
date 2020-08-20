@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React from 'react'
 import styled from '@emotion/styled/macro'
 import { number } from '@storybook/addon-knobs'
 import { action } from '@storybook/addon-actions'
@@ -32,9 +32,9 @@ const StyledContainer = styled.div`
   border: 10px solid #ccc;
 `
 
-export const Skeleton: FC = () => <ViewportScreenSkeleton />
+export const Skeleton: React.FC = () => <ViewportScreenSkeleton />
 
-export const ViewportIsWiderAndHigher: FC = () => (
+export const ViewportIsWiderAndHigher: React.FC = () => (
   <StyledContainer>
     <ViewportScreen
       selected={Selection.None}
@@ -53,7 +53,7 @@ export const ViewportIsWiderAndHigher: FC = () => (
   </StyledContainer>
 )
 
-export const ViewportIsWiderButNotHigher: FC = () => (
+export const ViewportIsWiderButNotHigher: React.FC = () => (
   <StyledContainer>
     <ViewportScreen
       selected={Selection.None}
@@ -72,7 +72,7 @@ export const ViewportIsWiderButNotHigher: FC = () => (
   </StyledContainer>
 )
 
-export const ViewportIsNotWiderButHigher: FC = () => (
+export const ViewportIsNotWiderButHigher: React.FC = () => (
   <StyledContainer>
     <ViewportScreen
       selected={Selection.None}
@@ -91,7 +91,7 @@ export const ViewportIsNotWiderButHigher: FC = () => (
   </StyledContainer>
 )
 
-export const ViewportIsNotWiderAndNotHigher: FC = () => (
+export const ViewportIsNotWiderAndNotHigher: React.FC = () => (
   <StyledContainer>
     <ViewportScreen
       selected={Selection.None}

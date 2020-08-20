@@ -1,8 +1,8 @@
-import React, { FC } from 'react'
+import React from 'react'
 import styled from '@emotion/styled/macro'
 
 import theme from 'theme'
-import * as Skelet from 'components/Skeleton'
+import * as Skeleton from 'components/Skeleton'
 import * as api from 'api'
 
 const limitRating = (rating: number): string =>
@@ -47,7 +47,7 @@ const StyledInteractiveRoot = styled(StyledRoot.withComponent('button'))<
   }
 `
 
-export const Static: FC<{
+export const RatingMarkStatic: React.FC<{
   className?: string
   rating: api.Rating
 }> = React.memo(({ className, rating }) => (
@@ -56,7 +56,7 @@ export const Static: FC<{
   </StyledRoot>
 ))
 
-export const Interactive: FC<{
+const RatingMark: React.FC<{
   className?: string
   rating: api.Rating
   active: boolean
@@ -73,9 +73,11 @@ export const Interactive: FC<{
   </StyledInteractiveRoot>
 ))
 
-export const Skeleton: FC<{
+export default RatingMark
+
+export const RatingMarkSkeleton: React.FC<{
   className?: string
   inline?: boolean
 }> = React.memo(({ className, inline }) => (
-  <Skelet.Circle className={className} inline={inline} size="40px" />
+  <Skeleton.Circle className={className} inline={inline} size="40px" />
 ))

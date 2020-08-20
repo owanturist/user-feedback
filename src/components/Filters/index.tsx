@@ -4,16 +4,16 @@ import { css } from 'emotion/macro'
 
 import theme from 'theme'
 import * as breakpoints from 'breakpoints'
-import * as api from 'api'
-import * as Skelet from 'components/Skeleton'
-import * as Rating from 'components/Rating'
+import { Rating } from 'api'
+import * as Skeleton from 'components/Skeleton'
+import RatingMark, { RatingMarkSkeleton } from 'components/RatingMark'
 
 const RATINGS_RANGE = [
-  api.Rating.One,
-  api.Rating.Two,
-  api.Rating.Three,
-  api.Rating.Four,
-  api.Rating.Five
+  Rating.One,
+  Rating.Two,
+  Rating.Three,
+  Rating.Four,
+  Rating.Five
 ]
 
 const cssRating = css`
@@ -41,11 +41,11 @@ const StyledRatings = styled.span`
 `
 
 const ViewRating: FC<{
-  rating: api.Rating
+  rating: Rating
   excludeRatings: Record<number, boolean>
-  onToggleRating(rating: api.Rating): void
+  onToggleRating(rating: Rating): void
 }> = React.memo(({ rating, excludeRatings, onToggleRating }) => (
-  <Rating.Interactive
+  <RatingMark
     className={cssRating}
     active={!excludeRatings[rating]}
     rating={rating}
@@ -92,7 +92,7 @@ export const Filters: FC<{
   search: string
   excludeRatings: Record<number, boolean>
   onSearchChange(search: string): void
-  onToggleRating(rating: api.Rating): void
+  onToggleRating(rating: Rating): void
 }> = React.memo(
   ({ className, search, excludeRatings, onSearchChange, onToggleRating }) => (
     <StyledRoot className={className}>
@@ -129,12 +129,12 @@ export const FiltersSkeleton: FC<{
 }> = React.memo(({ className }) => (
   <StyledRoot className={className}>
     <StyledInputContainer>
-      <Skelet.Rect width="100%" height="40px" />
+      <Skeleton.Rect width="100%" height="40px" />
     </StyledInputContainer>
 
     <StyledRatings>
       {RATINGS_RANGE.map(rating => (
-        <Rating.Skeleton key={rating} className={cssRating} />
+        <RatingMarkSkeleton key={rating} className={cssRating} />
       ))}
     </StyledRatings>
   </StyledRoot>

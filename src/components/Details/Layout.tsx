@@ -2,10 +2,10 @@ import React, { FC, ReactNode } from 'react'
 import styled from '@emotion/styled/macro'
 import { css } from 'emotion/macro'
 
-import * as Skelet from 'components/Skeleton'
 import theme from 'theme'
 import * as breakpoints from 'breakpoints'
-import { Skeleton as SkeletonViewportScreen } from './ViewportScreen'
+import * as Skeleton from 'components/Skeleton'
+import { ViewportScreenSkeleton } from 'components/ViewportScreen'
 
 // V I E W
 
@@ -97,37 +97,37 @@ const SkeletonPairs: FC<{ count: number }> = React.memo(({ count }) => (
     {new Array(count).fill(null).map((_, i) => (
       <tr key={i}>
         <td>
-          <Skelet.Text />
+          <Skeleton.Text />
         </td>
       </tr>
     ))}
   </ViewPairs>
 ))
 
-export const Skeleton: FC = React.memo(() => (
+export const LayoutSkeleton: FC = React.memo(() => (
   <StyledRoot data-cy="details__skeleton">
     <StyledInfo>
       <StyledBackLink>
-        <Skelet.Text />
+        <Skeleton.Text />
       </StyledBackLink>
 
       <ViewSection>
         <SkeletonPairs count={3} />
       </ViewSection>
 
-      <ViewSection title={<Skelet.Text />}>
+      <ViewSection title={<Skeleton.Text />}>
         <SkeletonPairs count={4} />
       </ViewSection>
 
-      <ViewSection title={<Skelet.Text />}>
-        <SkeletonViewportScreen />
+      <ViewSection title={<Skeleton.Text />}>
+        <ViewportScreenSkeleton />
       </ViewSection>
     </StyledInfo>
 
-    <ViewSection title={<Skelet.Text />}>
+    <ViewSection title={<Skeleton.Text />}>
       <SkeletonPairs count={2} />
 
-      <Skelet.Rect className={cssMap} width="100%" height="450px" />
+      <Skeleton.Rect className={cssMap} width="100%" height="450px" />
     </ViewSection>
   </StyledRoot>
 ))

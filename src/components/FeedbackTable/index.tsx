@@ -7,7 +7,7 @@ import { Feedback } from 'api'
 import { Fragment } from 'utils'
 import { toDetails, Link } from 'Router'
 import * as Skeleton from 'components/Skeleton'
-import * as Rating from 'components/Rating'
+import { RatingMarkStatic, RatingMarkSkeleton } from 'components/RatingMark'
 import { ReactComponent as EmptyTableIcon } from './empty-table.svg'
 
 export type FeedbackTableItem = Feedback<Array<Fragment>>
@@ -128,7 +128,7 @@ const ViewItem: FC<{
 }> = React.memo(({ item }) => (
   <StyledItemLink data-cy="feedback-table__item" to={toDetails(item.id)}>
     <ViewItemProperty label="Rating">
-      <Rating.Static rating={item.rating} />
+      <RatingMarkStatic rating={item.rating} />
     </ViewItemProperty>
 
     <StyledItemComment>
@@ -248,7 +248,7 @@ const SkeletonItemProperty: FC = () => (
 const SkeletonItem: FC = React.memo(() => (
   <StyledItem>
     <ViewItemProperty label={<Skeleton.Text />}>
-      <Rating.Skeleton inline />
+      <RatingMarkSkeleton inline />
     </ViewItemProperty>
 
     <StyledItemComment>
