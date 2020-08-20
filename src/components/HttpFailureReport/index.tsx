@@ -1,8 +1,9 @@
 import React from 'react'
 import styled from '@emotion/styled/macro'
+import { Error as DecodeError } from 'frctl/Json/Decode'
 
 import theme from 'theme'
-import * as Http from 'frctl/Http'
+import { ResponseError } from 'api'
 
 const StyledTryAgain = styled.button`
   box-sizing: border-box;
@@ -72,85 +73,56 @@ const StyledRoot = styled.div`
   overflow-y: auto;
 `
 
+const ViewDecodeError: React.FC<{
+  decodeError: DecodeError
+}> = ({ decodeError }) => (
+  <>
+    <StyledTitle>You are facing an unexpected Response Body Error!</StyledTitle>
+
+    <StyledDescription>
+      Something went wrong and our apps seems don't communicate well...
+    </StyledDescription>
+
+    <StyledPre>
+      {decodeError
+        .stringify(4)
+        .replace(/\\"/g, '"')
+        .replace(/\s{2}\s+"/, '\n\n"')
+        .replace(/\\n/g, '\n')}
+    </StyledPre>
+  </>
+)
+
+const ViewStringError: React.FC<{
+  message: string
+  onTryAgain(): void
+}> = ({ message, onTryAgain }) => (
+  <>
+    <StyledTitle>You are facing HTTP Error</StyledTitle>
+
+    <StyledDescription>{message}</StyledDescription>
+
+    <ViewTryAgain onTryAgain={onTryAgain} />
+  </>
+)
+
 export type HttpFailureReportProps = React.HTMLAttributes<HTMLDivElement> & {
-  error: Http.Error
+  error: ResponseError
   onTryAgain(): void
 }
 
-const HttpFailureReport: React.FC<HttpFailureReportProps> = React.memo(
-  ({ error, onTryAgain, ...props }) =>
-    error.cata({
-      NetworkError: () => (
-        <StyledRoot {...props}>
-          <StyledTitle>You are facing a Network Error</StyledTitle>
-          <StyledDescription>
-            Pleace check your Internet connection and try again.
-          </StyledDescription>
-
-          <ViewTryAgain onTryAgain={onTryAgain} />
-        </StyledRoot>
-      ),
-
-      Timeout: () => (
-        <StyledRoot {...props}>
-          <StyledTitle>You are facing a Timeout issue</StyledTitle>
-          <StyledDescription>
-            It takes too long to get a response so please check your Internect
-            connection and try again.
-          </StyledDescription>
-
-          <ViewTryAgain onTryAgain={onTryAgain} />
-        </StyledRoot>
-      ),
-
-      BadUrl: url => (
-        <StyledRoot {...props}>
-          <StyledTitle>Oops... we broke something...</StyledTitle>
-          <StyledDescription>
-            It looks like the app hits a wrong endpoint <code>{url}</code>.
-          </StyledDescription>
-          <StyledDescription>We are fixing the issue.</StyledDescription>
-        </StyledRoot>
-      ),
-
-      BadStatus: ({ statusCode }) => {
-        const [side, role] =
-          statusCode < 500 ? ['Client', 'frontend'] : ['Server', 'backend']
-
-        return (
-          <StyledRoot {...props}>
-            <StyledTitle>
-              You are facing an unexpected {side}&nbsp;side&nbsp;Error&nbsp;
-              {statusCode}!
-            </StyledTitle>
-
-            <StyledDescription>
-              Our {role} developers are fixing the issue.
-            </StyledDescription>
-          </StyledRoot>
-        )
-      },
-
-      BadBody: decoderError => (
-        <StyledRoot {...props}>
-          <StyledTitle>
-            You are facing an unexpected Response Body Error!
-          </StyledTitle>
-
-          <StyledDescription>
-            Something went wrong and our apps seems don't communicate well...
-          </StyledDescription>
-
-          <StyledPre>
-            {decoderError
-              .stringify(4)
-              .replace(/\\"/g, '"')
-              .replace(/\s{2}\s+"/, '\n\n"')
-              .replace(/\\n/g, '\n')}
-          </StyledPre>
-        </StyledRoot>
-      )
-    })
+const HttpFailureReport: React.FC<HttpFailureReportProps> = ({
+  error,
+  onTryAgain,
+  ...props
+}) => (
+  <StyledRoot {...props}>
+    {typeof error === 'string' ? (
+      <ViewStringError message={error} onTryAgain={onTryAgain} />
+    ) : (
+      <ViewDecodeError decodeError={error} />
+    )}
+  </StyledRoot>
 )
 
 export default HttpFailureReport

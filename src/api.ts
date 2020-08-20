@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios'
+import axios from 'axios'
 import dayjs, { Dayjs } from 'dayjs'
 import Decode from 'frctl/Json/Decode'
 import { nonEmptyString } from 'utils'
@@ -11,6 +11,13 @@ const request = axios.create({
   baseURL: API_URL,
   timeout: HTTP_TIMEOUT
 })
+
+request.interceptors.response.use(
+  response => response.data,
+  error => Promise.reject(error.message)
+)
+
+export type ResponseError = string | Decode.Error
 
 /**
  * Users' browser who left a feedback
@@ -216,25 +223,17 @@ const findDetailedFeedbackByIdDecoder = (
  * Http request builder to retrieve Array<Feedback>
  */
 export const getFeedbackList = (): Promise<Array<Feedback>> => {
-  return request
-    .get(`/example/apidemo.json`, {
-      transformResponse: body => {
-        return Decode.field('items')
-          .list(feedbackDecoder)
-          .decodeJSON(body)
-          .fold<string | Array<Feedback>>(
-            decodeError => decodeError.stringify(4),
-            feedback => feedback
-          )
-      }
-    })
-    .then(({ data }: AxiosResponse<string | Array<Feedback>>) => {
-      if (typeof data === 'string') {
-        return Promise.reject(data)
-      }
-
-      return data
-    })
+  return request.get(`/example/apidemo.json`, {
+    transformResponse: body => {
+      return Decode.field('items')
+        .list(feedbackDecoder)
+        .decodeJSON(body)
+        .fold(
+          error => Promise.reject(error),
+          value => Promise.resolve(value)
+        )
+    }
+  })
 }
 
 /**
@@ -249,28 +248,20 @@ export const getFeedbackById = (
   feedbackId: string
 ): Promise<null | FeedbackDetailed> => {
   // keep id for e2e mocking
-  return request
-    .get(`/example/apidemo.json?id=${feedbackId}`, {
-      transformResponse: body => {
-        return Decode.field('items')
-          .list(Decode.value)
-          .chain(list => {
-            return Decode.field('items').of(
-              findDetailedFeedbackByIdDecoder(0, list.length, feedbackId)
-            )
-          })
-          .decodeJSON(body)
-          .fold<string | null | FeedbackDetailed>(
-            decodeError => decodeError.stringify(4),
-            feedback => feedback
+  return request.get(`/example/apidemo.json?id=${feedbackId}`, {
+    transformResponse: body => {
+      return Decode.field('items')
+        .list(Decode.value)
+        .chain(list => {
+          return Decode.field('items').of(
+            findDetailedFeedbackByIdDecoder(0, list.length, feedbackId)
           )
-      }
-    })
-    .then(({ data }: AxiosResponse<string | null | FeedbackDetailed>) => {
-      if (typeof data === 'string') {
-        return Promise.reject(data)
-      }
-
-      return data
-    })
+        })
+        .decodeJSON(body)
+        .fold(
+          error => Promise.reject(error),
+          value => Promise.resolve(value)
+        )
+    }
+  })
 }

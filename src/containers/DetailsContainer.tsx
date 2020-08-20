@@ -4,8 +4,7 @@ import { ThunkDispatch } from 'redux-thunk'
 import { useSelector, useDispatch } from 'react-redux'
 import { createAction, createReducer } from '@reduxjs/toolkit'
 
-import { FeedbackDetailed, getFeedbackById } from 'api'
-import Screen from 'components/Screen'
+import { ResponseError, FeedbackDetailed, getFeedbackById } from 'api'
 import Page404 from 'components/Page404'
 import {
   Details,
@@ -18,7 +17,7 @@ type Dispatch = ThunkDispatch<never, never, Action>
 // S T A T E
 
 export type State = {
-  detailedFeedbackError: null | string
+  detailedFeedbackError: null | ResponseError
   detailedFeedbackData: null | FeedbackDetailed
   notFound: boolean
 }
@@ -31,7 +30,7 @@ export const initial: State = {
 
 // A C T I O N S
 
-const Reset = createAction('Details/Reset')
+const LoadFeedbackStart = createAction('Details/LoadFeedbackStart')
 const LoadFeedbackFail = createAction<string>('Details/LoadFeedbackFail')
 const LoadFeedbackDone = createAction<null | FeedbackDetailed>(
   'Details/LoadFeedbackDone'
@@ -39,7 +38,7 @@ const LoadFeedbackDone = createAction<null | FeedbackDetailed>(
 
 export const reducer = createReducer<State>(initial, builder => {
   builder
-    .addCase(Reset, () => initial)
+    .addCase(LoadFeedbackStart, () => initial)
 
     .addCase(LoadFeedbackFail, (state, { payload: detailedFeedbackError }) => ({
       ...state,
@@ -56,7 +55,7 @@ export const reducer = createReducer<State>(initial, builder => {
 // T H U N K S
 
 const LoadFeedback = (feedbackId: string) => (dispatch: Dispatch): void => {
-  dispatch(Reset())
+  dispatch(LoadFeedbackStart())
 
   getFeedbackById(feedbackId)
     .then(feedback => dispatch(LoadFeedbackDone(feedback)))
@@ -67,17 +66,15 @@ const LoadFeedback = (feedbackId: string) => (dispatch: Dispatch): void => {
 
 const ViewFailureReport: React.FC<{
   feedbackId: string
-  error: any
+  error: ResponseError
 }> = ({ feedbackId, error }) => {
   const dispatch: Dispatch = useDispatch()
 
   return (
-    <Screen header={null}>
-      <DetailsFailureReport
-        error={error}
-        onTryAgain={() => dispatch(LoadFeedback(feedbackId))}
-      />
-    </Screen>
+    <DetailsFailureReport
+      error={error}
+      onTryAgain={() => dispatch(LoadFeedback(feedbackId))}
+    />
   )
 }
 
@@ -87,13 +84,10 @@ const DetailsContainer: React.FC<{
 }> = ({ feedbackId, selector }) => {
   const dispatch: Dispatch = useDispatch()
 
-  React.useEffect(() => {
-    dispatch(LoadFeedback(feedbackId))
-
-    return () => {
-      dispatch(Reset())
-    }
-  }, [dispatch, feedbackId])
+  React.useEffect(() => dispatch(LoadFeedback(feedbackId)), [
+    dispatch,
+    feedbackId
+  ])
 
   const { detailedFeedbackError, detailedFeedbackData, notFound } = useSelector(
     selector

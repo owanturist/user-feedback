@@ -49,7 +49,7 @@ export const Skeleton: React.FC = () => <DashboardSkeleton />
 
 export const Failure: React.FC = () => (
   <DashboardFailureReport
-    error={null as any}
+    error={text('Error message', 'Request failed with status code 403')}
     onTryAgain={action('onTryAgain')}
   />
 )

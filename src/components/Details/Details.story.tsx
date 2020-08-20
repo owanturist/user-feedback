@@ -80,7 +80,10 @@ export default {
 export const Skeleton: React.FC = () => <DetailsSkeleton />
 
 export const Failure: React.FC = () => (
-  <DetailsFailureReport error={null as any} onTryAgain={action('onTryAgain')} />
+  <DetailsFailureReport
+    error={text('Error message', 'Request failed with status code 403')}
+    onTryAgain={action('onTryAgain')}
+  />
 )
 
 export const Succeed: React.FC = () => <Details feedback={feedbackKnob()} />

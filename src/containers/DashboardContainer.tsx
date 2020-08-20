@@ -4,7 +4,7 @@ import { ThunkDispatch } from 'redux-thunk'
 import { useSelector, useDispatch } from 'react-redux'
 import { createAction, createReducer } from '@reduxjs/toolkit'
 
-import { Rating, Feedback, getFeedbackList } from 'api'
+import { ResponseError, Rating, Feedback, getFeedbackList } from 'api'
 import { Fragment, fragmentize } from 'utils'
 import {
   Dashboard,
@@ -17,7 +17,7 @@ type Dispatch = ThunkDispatch<never, never, Action>
 // S T A T E
 
 export type State = {
-  feedbackError: null | string
+  feedbackError: null | ResponseError
   feedbackData: null | Array<Feedback>
 }
 
@@ -84,7 +84,7 @@ const filterMapFeedback = (
 }
 
 const ViewFailureReport: React.FC<{
-  error: any
+  error: ResponseError
 }> = ({ error }) => {
   const dispatch: Dispatch = useDispatch()
 
