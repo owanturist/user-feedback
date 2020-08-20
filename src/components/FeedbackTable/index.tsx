@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react'
+import React, { ReactNode } from 'react'
 import styled from '@emotion/styled/macro'
 
 import theme from 'theme'
@@ -43,7 +43,7 @@ const StyledItemComment = styled(StyledItemProperty)`
   }
 `
 
-const ViewItemProperty: FC<{
+const ViewItemProperty: React.FC<{
   label: ReactNode
 }> = ({ label, children }) => (
   <StyledItemProperty>
@@ -62,7 +62,7 @@ const StyledMatchedFragment = styled.span`
   background: rgb(255, 253, 59);
 `
 
-const ViewFragments: FC<{
+const ViewFragments: React.FC<{
   fragments: Array<Fragment>
 }> = ({ fragments }) =>
   fragments.length === 0 ? (
@@ -123,7 +123,7 @@ const StyledItemLink = styled(StyledItem)`
   }
 `.withComponent(Link)
 
-const ViewItem: FC<{
+const ViewItem: React.FC<{
   item: FeedbackTableItem
 }> = React.memo(({ item }) => (
   <StyledItemLink data-cy="feedback-table__item" to={toDetails(item.id)}>
@@ -176,7 +176,7 @@ const StyledHeader = styled.div`
   }
 `
 
-const ViewHeader: FC = React.memo(() => (
+const ViewHeader: React.FC = React.memo(() => (
   <StyledHeader>
     <StyledHeaderCell>Rating</StyledHeaderCell>
     <StyledHeaderCell className="text-left">Comment</StyledHeaderCell>
@@ -201,12 +201,14 @@ const StyledEmpty = styled.div`
   text-align: center;
 `
 
-const ViewEmpty: FC<{ className?: string }> = React.memo(({ className }) => (
-  <StyledEmpty className={className}>
-    <StyledEmptyTableIcon />
-    No Data
-  </StyledEmpty>
-))
+const ViewEmpty: React.FC<{ className?: string }> = React.memo(
+  ({ className }) => (
+    <StyledEmpty className={className}>
+      <StyledEmptyTableIcon />
+      No Data
+    </StyledEmpty>
+  )
+)
 
 const StyledRoot = styled.div`
   width: 100%;
@@ -220,7 +222,7 @@ const StyledRoot = styled.div`
   }
 `
 
-export const FeedbackTable: FC<{
+export const FeedbackTable: React.FC<{
   className?: string
   items: Array<FeedbackTableItem>
 }> = React.memo(({ className, items }) =>
@@ -239,13 +241,13 @@ export const FeedbackTable: FC<{
 
 // S K E L E T O N
 
-const SkeletonItemProperty: FC = () => (
+const SkeletonItemProperty: React.FC = () => (
   <ViewItemProperty label={<SkeletonText />}>
     <SkeletonText />
   </ViewItemProperty>
 )
 
-const SkeletonItem: FC = React.memo(() => (
+const SkeletonItem: React.FC = React.memo(() => (
   <StyledItem>
     <ViewItemProperty label={<SkeletonText />}>
       <RatingMarkSkeleton inline />
@@ -266,7 +268,7 @@ const SkeletonItem: FC = React.memo(() => (
   </StyledItem>
 ))
 
-export const FeedbackTableSkeleton: FC<{
+export const FeedbackTableSkeleton: React.FC<{
   className?: string
   count?: number
 }> = React.memo(({ className, count = 1 }) => (

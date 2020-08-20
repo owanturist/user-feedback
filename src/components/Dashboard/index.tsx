@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React from 'react'
 import styled from '@emotion/styled/macro'
 import { css } from 'emotion/macro'
 
@@ -28,7 +28,7 @@ const StyledHeader = styled.div`
   align-items: center;
 `
 
-const ViewScreen: FC<Omit<ScreenProps, 'header'>> = props => (
+const ViewScreen: React.FC<Omit<ScreenProps, 'header'>> = props => (
   <Screen
     header={
       <StyledHeader>
@@ -47,7 +47,7 @@ const cssFilters = css`
   }
 `
 
-export const Dashboard: FC<{
+export const Dashboard: React.FC<{
   items: Array<FeedbackTableItem>
   search: string
   excludeRatings: Record<number, boolean>
@@ -83,7 +83,7 @@ export const DashboardFailureReport: React.FC<HttpFailureReportProps> = props =>
 
 // S K E L E T O N
 
-export const DashboardSkeleton: FC = React.memo(() => (
+export const DashboardSkeleton: React.FC = React.memo(() => (
   <ViewScreen data-cy="dashboard__skeleton">
     <FiltersSkeleton className={cssFilters} />
 
