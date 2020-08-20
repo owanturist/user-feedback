@@ -40,7 +40,7 @@ const StyledRoot = styled.div<StyledRootProps>`
   width: ${props => props.width}px;
 `
 
-export const View: FC<{
+const ViewportScreen: FC<{
   selected: Selection
   viewport: api.Viewport
   screen: api.Screen
@@ -96,7 +96,9 @@ export const View: FC<{
   }
 )
 
-export const Skeleton: FC<{ width?: number }> = React.memo(
+export default ViewportScreen
+
+export const ViewportScreenSkeleton: FC<{ width?: number }> = React.memo(
   ({ width = DEFAULT_MAXIMUM_WIDTH }) => (
     <StyledRoot width={width}>
       <Skelet.Rect width="100%" height={Math.round((2 / 3) * width)} />

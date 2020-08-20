@@ -4,11 +4,11 @@ import { number } from '@storybook/addon-knobs'
 import { action } from '@storybook/addon-actions'
 
 import * as api from 'api'
-import * as ViewportScreen from './index'
+import ViewportScreen, { Selection, ViewportScreenSkeleton } from '.'
 
 export default {
-  title: 'Details . ViewportScreen',
-  component: ViewportScreen.View
+  title: 'ViewportScreen',
+  component: ViewportScreen
 }
 
 const rangeKnob = (label: string, max: number, start: number): number => {
@@ -32,12 +32,12 @@ const StyledContainer = styled.div`
   border: 10px solid #ccc;
 `
 
-export const Skeleton: FC = () => <ViewportScreen.Skeleton />
+export const Skeleton: FC = () => <ViewportScreenSkeleton />
 
 export const ViewportIsWiderAndHigher: FC = () => (
   <StyledContainer>
-    <ViewportScreen.View
-      selected={ViewportScreen.Selection.None}
+    <ViewportScreen
+      selected={Selection.None}
       viewport={viewportKnob({
         width: 300,
         height: 200
@@ -55,8 +55,8 @@ export const ViewportIsWiderAndHigher: FC = () => (
 
 export const ViewportIsWiderButNotHigher: FC = () => (
   <StyledContainer>
-    <ViewportScreen.View
-      selected={ViewportScreen.Selection.None}
+    <ViewportScreen
+      selected={Selection.None}
       viewport={viewportKnob({
         width: 300,
         height: 200
@@ -74,8 +74,8 @@ export const ViewportIsWiderButNotHigher: FC = () => (
 
 export const ViewportIsNotWiderButHigher: FC = () => (
   <StyledContainer>
-    <ViewportScreen.View
-      selected={ViewportScreen.Selection.None}
+    <ViewportScreen
+      selected={Selection.None}
       viewport={viewportKnob({
         width: 300,
         height: 200
@@ -93,8 +93,8 @@ export const ViewportIsNotWiderButHigher: FC = () => (
 
 export const ViewportIsNotWiderAndNotHigher: FC = () => (
   <StyledContainer>
-    <ViewportScreen.View
-      selected={ViewportScreen.Selection.None}
+    <ViewportScreen
+      selected={Selection.None}
       viewport={viewportKnob({
         width: 300,
         height: 200
