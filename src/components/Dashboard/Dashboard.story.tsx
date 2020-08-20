@@ -1,10 +1,10 @@
-import React, { FC } from 'react'
+import React from 'react'
 import { text, boolean } from '@storybook/addon-knobs'
 import { action } from '@storybook/addon-actions'
 
 import { Feedback, Rating } from 'api'
 import { Fragment, fragmentize } from 'utils'
-import { Dashboard, DashboardSkeleton } from './index'
+import { Dashboard, DashboardSkeleton, DashboardFailureReport } from '.'
 
 const ratingsKnob = (
   active: Array<Rating>
@@ -45,9 +45,16 @@ export default {
   component: Dashboard
 }
 
-export const Loading: FC = () => <DashboardSkeleton />
+export const Skeleton: React.FC = () => <DashboardSkeleton />
 
-export const Success: FC = () => {
+export const Failure: React.FC = () => (
+  <DashboardFailureReport
+    error={null as any}
+    onTryAgain={action('onTryAgain')}
+  />
+)
+
+export const Success: React.FC = () => {
   const search = text('search', '')
 
   return (

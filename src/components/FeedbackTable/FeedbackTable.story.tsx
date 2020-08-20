@@ -1,13 +1,9 @@
-import React, { FC } from 'react'
+import React from 'react'
 import { number, text } from '@storybook/addon-knobs'
 
 import { Feedback } from 'api'
 import { fragmentize } from 'utils'
-import {
-  FeedbackTableItem,
-  FeedbackTable,
-  FeedbackTableSkeleton
-} from './index'
+import { FeedbackTableItem, FeedbackTable, FeedbackTableSkeleton } from '.'
 
 const addFragment = (
   pattern: string,
@@ -57,13 +53,13 @@ export default {
   title: 'FeedbackTable'
 }
 
-export const Skeleton: FC = () => (
+export const Skeleton: React.FC = () => (
   <FeedbackTableSkeleton count={number('Count', 10)} />
 )
 
-export const Empty: FC = () => <FeedbackTable items={[]} />
+export const Empty: React.FC = () => <FeedbackTable items={[]} />
 
-export const CSRF: FC = () => (
+export const CSRF: React.FC = () => (
   <FeedbackTable
     items={[
       {
@@ -81,11 +77,11 @@ export const CSRF: FC = () => (
   />
 )
 
-export const Normal: FC = () => (
+export const Normal: React.FC = () => (
   <FeedbackTable items={feedbackItems.map(item => addFragment('', item))} />
 )
 
-export const Overflowed: FC = () => {
+export const Overflowed: React.FC = () => {
   const search = text('Search', '')
 
   return (

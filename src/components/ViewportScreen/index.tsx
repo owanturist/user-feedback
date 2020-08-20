@@ -2,8 +2,8 @@ import React from 'react'
 import styled from '@emotion/styled/macro'
 
 import theme from 'theme'
-import * as api from 'api'
-import * as Skelet from 'components/Skeleton'
+import { Viewport as ViewportData, Screen as ScreenData } from 'api'
+import { SkeletonRect } from 'components/Skeleton'
 
 export enum Selection {
   None,
@@ -42,8 +42,8 @@ const StyledRoot = styled.div<StyledRootProps>`
 
 const ViewportScreen: React.FC<{
   selected: Selection
-  viewport: api.Viewport
-  screen: api.Screen
+  viewport: ViewportData
+  screen: ScreenData
   width?: number
   onSelect(selection: Selection): void
 }> = React.memo(
@@ -101,7 +101,7 @@ export default ViewportScreen
 export const ViewportScreenSkeleton: React.FC<{ width?: number }> = React.memo(
   ({ width = DEFAULT_MAXIMUM_WIDTH }) => (
     <StyledRoot width={width}>
-      <Skelet.Rect width="100%" height={Math.round((2 / 3) * width)} />
+      <SkeletonRect width="100%" height={Math.round((2 / 3) * width)} />
     </StyledRoot>
   )
 )

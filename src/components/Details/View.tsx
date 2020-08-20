@@ -3,7 +3,7 @@ import styled from '@emotion/styled/macro'
 import { Map as ReactMapboxGl, Marker } from 'react-mapbox-gl'
 
 import theme from 'theme'
-import * as breakpoints from 'breakpoints'
+import breakpoints from 'breakpoints'
 import { Geo, Viewport, Screen, Browser, FeedbackDetailed } from 'api'
 import { Link, toDashboard } from 'Router'
 import ViewportScreen, { Selection } from 'components/ViewportScreen'

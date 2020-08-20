@@ -1,11 +1,11 @@
-import React, { FC } from 'react'
+import React from 'react'
 import styled from '@emotion/styled/macro'
 import { css } from 'emotion/macro'
 
 import theme from 'theme'
-import * as breakpoints from 'breakpoints'
+import breakpoints from 'breakpoints'
 import { Rating } from 'api'
-import * as Skeleton from 'components/Skeleton'
+import { SkeletonRect } from 'components/Skeleton'
 import RatingMark, { RatingMarkSkeleton } from 'components/RatingMark'
 
 const RATINGS_RANGE = [
@@ -40,7 +40,7 @@ const StyledRatings = styled.span`
   }
 `
 
-const ViewRating: FC<{
+const ViewRating: React.FC<{
   rating: Rating
   excludeRatings: Record<number, boolean>
   onToggleRating(rating: Rating): void
@@ -87,7 +87,7 @@ const StyledRoot = styled.div`
   flex-flow: row wrap;
 `
 
-export const Filters: FC<{
+export const Filters: React.FC<{
   className?: string
   search: string
   excludeRatings: Record<number, boolean>
@@ -124,12 +124,12 @@ export const Filters: FC<{
 
 // S K E L E T O N
 
-export const FiltersSkeleton: FC<{
+export const FiltersSkeleton: React.FC<{
   className?: string
 }> = React.memo(({ className }) => (
   <StyledRoot className={className}>
     <StyledInputContainer>
-      <Skeleton.Rect width="100%" height="40px" />
+      <SkeletonRect width="100%" height="40px" />
     </StyledInputContainer>
 
     <StyledRatings>

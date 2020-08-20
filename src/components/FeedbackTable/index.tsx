@@ -2,11 +2,11 @@ import React, { FC, ReactNode } from 'react'
 import styled from '@emotion/styled/macro'
 
 import theme from 'theme'
-import * as breakpoints from 'breakpoints'
+import breakpoints from 'breakpoints'
 import { Feedback } from 'api'
 import { Fragment } from 'utils'
 import { toDetails, Link } from 'Router'
-import * as Skeleton from 'components/Skeleton'
+import { SkeletonText } from 'components/Skeleton'
 import { RatingMarkStatic, RatingMarkSkeleton } from 'components/RatingMark'
 import { ReactComponent as EmptyTableIcon } from './empty-table.svg'
 
@@ -240,22 +240,22 @@ export const FeedbackTable: FC<{
 // S K E L E T O N
 
 const SkeletonItemProperty: FC = () => (
-  <ViewItemProperty label={<Skeleton.Text />}>
-    <Skeleton.Text />
+  <ViewItemProperty label={<SkeletonText />}>
+    <SkeletonText />
   </ViewItemProperty>
 )
 
 const SkeletonItem: FC = React.memo(() => (
   <StyledItem>
-    <ViewItemProperty label={<Skeleton.Text />}>
+    <ViewItemProperty label={<SkeletonText />}>
       <RatingMarkSkeleton inline />
     </ViewItemProperty>
 
     <StyledItemComment>
       <StyledLabel>
-        <Skeleton.Text />
+        <SkeletonText />
       </StyledLabel>
-      <Skeleton.Text count={2} />
+      <SkeletonText count={2} />
     </StyledItemComment>
 
     <SkeletonItemProperty />
@@ -273,19 +273,19 @@ export const FeedbackTableSkeleton: FC<{
   <StyledRoot className={className}>
     <StyledHeader>
       <StyledHeaderCell>
-        <Skeleton.Text />
+        <SkeletonText />
       </StyledHeaderCell>
       <StyledHeaderCell className="text-left">
-        <Skeleton.Text />
+        <SkeletonText />
       </StyledHeaderCell>
       <StyledHeaderCell>
-        <Skeleton.Text />
+        <SkeletonText />
       </StyledHeaderCell>
       <StyledHeaderCell>
-        <Skeleton.Text />
+        <SkeletonText />
       </StyledHeaderCell>
       <StyledHeaderCell>
-        <Skeleton.Text />
+        <SkeletonText />
       </StyledHeaderCell>
     </StyledHeader>
 

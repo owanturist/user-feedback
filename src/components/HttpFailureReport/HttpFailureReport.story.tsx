@@ -1,38 +1,38 @@
-import React, { FC } from 'react'
+import React from 'react'
 import { text, number } from '@storybook/addon-knobs'
 import { action } from '@storybook/addon-actions'
 import Decode from 'frctl/Json/Decode'
 import * as Http from 'frctl/Http'
 
-import HttpFailureReport from './index'
+import HttpFailureReport from '.'
 
 export default {
   title: 'HttpFailureReport',
   component: HttpFailureReport
 }
 
-export const NetworkError: FC = () => (
+export const NetworkError: React.FC = () => (
   <HttpFailureReport
     error={Http.Error.NetworkError}
     onTryAgain={action('onTryAgain')}
   />
 )
 
-export const Timeout: FC = () => (
+export const Timeout: React.FC = () => (
   <HttpFailureReport
     error={Http.Error.Timeout}
     onTryAgain={action('onTryAgain')}
   />
 )
 
-export const BadUrl: FC = () => (
+export const BadUrl: React.FC = () => (
   <HttpFailureReport
     error={Http.Error.BadUrl(text('Url', 'wrongurl'))}
     onTryAgain={action('onTryAgain')}
   />
 )
 
-export const BadStatus500: FC = () => (
+export const BadStatus500: React.FC = () => (
   <HttpFailureReport
     error={Http.Error.BadStatus({
       url: text('Url', 'https://google.com'),
@@ -45,7 +45,7 @@ export const BadStatus500: FC = () => (
   />
 )
 
-export const BadStatus400: FC = () => (
+export const BadStatus400: React.FC = () => (
   <HttpFailureReport
     error={Http.Error.BadStatus({
       url: text('Url', 'https://google.com'),
@@ -58,7 +58,7 @@ export const BadStatus400: FC = () => (
   />
 )
 
-export const BadBody: FC = () => (
+export const BadBody: React.FC = () => (
   <HttpFailureReport
     error={Http.Error.BadBody(
       Decode.Error.Field(

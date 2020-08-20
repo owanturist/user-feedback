@@ -3,7 +3,7 @@ import styled from '@emotion/styled/macro'
 import { number } from '@storybook/addon-knobs'
 import { action } from '@storybook/addon-actions'
 
-import * as api from 'api'
+import { Viewport, Screen } from 'api'
 import ViewportScreen, { Selection, ViewportScreenSkeleton } from '.'
 
 export default {
@@ -15,12 +15,12 @@ const rangeKnob = (label: string, max: number, start: number): number => {
   return number(label, start, { range: true, min: 0, max, step: 1 })
 }
 
-const viewportKnob = (viewport: api.Viewport): api.Viewport => ({
+const viewportKnob = (viewport: Viewport): Viewport => ({
   width: rangeKnob(`Viewport Width`, 500, viewport.width),
   height: rangeKnob(`Viewport Height`, 300, viewport.height)
 })
 
-const screenKnob = (screen: api.Screen): api.Screen => ({
+const screenKnob = (screen: Screen): Screen => ({
   availableWidth: rangeKnob(`Screen Width`, 500, screen.availableWidth),
   availableHeight: rangeKnob(`Screen Height`, 300, screen.availableHeight),
   availableLeft: rangeKnob(`Screen Left`, 100, screen.availableLeft),

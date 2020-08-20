@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React from 'react'
 import styled from '@emotion/styled/macro'
 import { css, cx, keyframes } from 'emotion/macro'
 
@@ -23,7 +23,7 @@ const animationGlow = keyframes`
   }
 `
 
-export const background = css`
+const background = css`
   animation: ${animationGlow} 1.2s ease-in-out infinite;
   background: ${COLOR_BASE} no-repeat;
   background-size: 200px 100%;
@@ -49,7 +49,7 @@ const StyledText = styled.span`
  *
  * @param [count=1] optional count of text rows
  */
-export const Text: FC<{
+export const SkeletonText: React.FC<{
   count?: number
 }> = ({ count = 1 }) =>
   count > 0 ? (
@@ -85,7 +85,7 @@ const StyledBlock = styled.span<StyledBlockProp>`
  * @param width px in number or any other value via string
  * @param height px in number or any other value via string
  */
-export const Rect: FC<{
+export const SkeletonRect: React.FC<{
   className?: string
   inline?: boolean
   width: number | string
@@ -108,7 +108,7 @@ export const Rect: FC<{
  * @param [inline] use display 'inline' instead of 'block'
  * @param size px in number or any other value via string
  */
-export const Circle: FC<{
+export const SkeletonCircle: React.FC<{
   className?: string
   inline?: boolean
   size: number | string

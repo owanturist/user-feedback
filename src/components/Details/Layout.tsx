@@ -1,10 +1,10 @@
-import React, { FC, ReactNode } from 'react'
+import React, { ReactNode } from 'react'
 import styled from '@emotion/styled/macro'
 import { css } from 'emotion/macro'
 
 import theme from 'theme'
-import * as breakpoints from 'breakpoints'
-import * as Skeleton from 'components/Skeleton'
+import breakpoints from 'breakpoints'
+import { SkeletonText, SkeletonRect } from 'components/Skeleton'
 import { ViewportScreenSkeleton } from 'components/ViewportScreen'
 
 // V I E W
@@ -32,7 +32,10 @@ export const StyledSection = styled.section`
   word-break: break-word;
 `
 
-export const ViewSection: FC<{ title?: ReactNode }> = ({ title, children }) => (
+export const ViewSection: React.FC<{ title?: ReactNode }> = ({
+  title,
+  children
+}) => (
   <StyledSection>
     {title && <StyledSectionTitle>{title}</StyledSectionTitle>}
     {children}
@@ -56,7 +59,7 @@ const StyledTable = styled.table`
   }
 `
 
-export const ViewPairs: FC = ({ children }) => (
+export const ViewPairs: React.FC = ({ children }) => (
   <StyledTable>
     <tbody>{children}</tbody>
   </StyledTable>
@@ -92,42 +95,42 @@ export const StyledRoot = styled.div`
 
 // S K E L E T O N
 
-const SkeletonPairs: FC<{ count: number }> = React.memo(({ count }) => (
+const SkeletonPairs: React.FC<{ count: number }> = React.memo(({ count }) => (
   <ViewPairs>
     {new Array(count).fill(null).map((_, i) => (
       <tr key={i}>
         <td>
-          <Skeleton.Text />
+          <SkeletonText />
         </td>
       </tr>
     ))}
   </ViewPairs>
 ))
 
-export const LayoutSkeleton: FC = React.memo(() => (
+export const LayoutSkeleton: React.FC = React.memo(() => (
   <StyledRoot data-cy="details__skeleton">
     <StyledInfo>
       <StyledBackLink>
-        <Skeleton.Text />
+        <SkeletonText />
       </StyledBackLink>
 
       <ViewSection>
         <SkeletonPairs count={3} />
       </ViewSection>
 
-      <ViewSection title={<Skeleton.Text />}>
+      <ViewSection title={<SkeletonText />}>
         <SkeletonPairs count={4} />
       </ViewSection>
 
-      <ViewSection title={<Skeleton.Text />}>
+      <ViewSection title={<SkeletonText />}>
         <ViewportScreenSkeleton />
       </ViewSection>
     </StyledInfo>
 
-    <ViewSection title={<Skeleton.Text />}>
+    <ViewSection title={<SkeletonText />}>
       <SkeletonPairs count={2} />
 
-      <Skeleton.Rect className={cssMap} width="100%" height="450px" />
+      <SkeletonRect className={cssMap} width="100%" height="450px" />
     </ViewSection>
   </StyledRoot>
 ))

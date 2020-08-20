@@ -1,8 +1,8 @@
-import React, { FC } from 'react'
+import React from 'react'
 import styled from '@emotion/styled/macro'
 import { number } from '@storybook/addon-knobs'
 
-import * as Skeleton from './index'
+import { SkeletonText, SkeletonRect, SkeletonCircle } from '.'
 
 export default {
   title: 'Skeleton'
@@ -15,23 +15,20 @@ const StyledContainer = styled.div<{
   font-size: ${props => props.font}px;
 `
 
-export const Text: FC = () => (
+export const Text: React.FC = () => (
   <StyledContainer font={number('Font size', 14)}>
-    <Skeleton.Text count={number('Count', 10)} />
+    <SkeletonText count={number('Count', 10)} />
   </StyledContainer>
 )
 
-export const Rect: FC = () => (
+export const Rect: React.FC = () => (
   <StyledContainer font={number('Font size', 14)}>
-    <Skeleton.Rect
-      width={number('Width', 200)}
-      height={number('Height', 100)}
-    />
+    <SkeletonRect width={number('Width', 200)} height={number('Height', 100)} />
   </StyledContainer>
 )
 
-export const Circle: FC = () => (
+export const Circle: React.FC = () => (
   <StyledContainer font={number('Font size', 14)}>
-    <Skeleton.Circle size={number('Size', 200)} />
+    <SkeletonCircle size={number('Size', 200)} />
   </StyledContainer>
 )

@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React from 'react'
 import styled from '@emotion/styled/macro'
 
 import theme from 'theme'
@@ -28,7 +28,7 @@ const StyledTryAgain = styled.button`
   }
 `
 
-const ViewTryAgain: FC<{ onTryAgain(): void }> = ({ onTryAgain }) => (
+const ViewTryAgain: React.FC<{ onTryAgain(): void }> = ({ onTryAgain }) => (
   <StyledTryAgain
     data-cy="http__retry"
     autoFocus
@@ -77,7 +77,7 @@ export type HttpFailureReportProps = React.HTMLAttributes<HTMLDivElement> & {
   onTryAgain(): void
 }
 
-const HttpFailureReport: FC<HttpFailureReportProps> = React.memo(
+const HttpFailureReport: React.FC<HttpFailureReportProps> = React.memo(
   ({ error, onTryAgain, ...props }) =>
     error.cata({
       NetworkError: () => (

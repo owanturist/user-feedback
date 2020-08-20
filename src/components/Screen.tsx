@@ -1,7 +1,7 @@
-import React, { FC, ReactNode } from 'react'
+import React, { ReactNode } from 'react'
 import styled from '@emotion/styled/macro'
 
-import * as breakpoints from 'breakpoints'
+import breakpoints from 'breakpoints'
 
 const StyledHeader = styled.header`
   box-sizing: border-box;
@@ -48,7 +48,11 @@ const StyledRoot = styled.div`
   height: 100%;
 `
 
-const Screen: FC<{ header: ReactNode }> = ({ header, children, ...props }) => (
+const Screen: React.FC<{ header: ReactNode }> = ({
+  header,
+  children,
+  ...props
+}) => (
   <StyledRoot {...props}>
     <StyledHeader>{header}</StyledHeader>
 
