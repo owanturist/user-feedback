@@ -12,6 +12,7 @@ import { Provider } from 'react-redux'
 import { reducer, selectDashboard, selectDetails } from 'store'
 import Dashboard from 'containers/DashboardContainer'
 import Details from 'containers/DetailsContainer'
+import Page404 from 'components/Page404'
 
 const App: React.FC = () => (
   <BrowserRouter>
@@ -31,6 +32,8 @@ const App: React.FC = () => (
           />
         )}
       />
+
+      <Route component={Page404} />
     </Switch>
   </BrowserRouter>
 )
