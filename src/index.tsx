@@ -3,16 +3,30 @@ import './index.css'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { BrowserRouter, Switch, Route } from 'react-router-dom'
+import {
+  BrowserRouter,
+  Switch,
+  Route,
+  RouteComponentProps
+} from 'react-router-dom'
 import { createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
-import { composeWithDevTools } from 'redux-devtools-extension'
+import { composeWithDevTools } from 'redux-devtools-extension/logOnlyInProduction'
 import { Provider } from 'react-redux'
 
 import { reducer, selectDashboard, selectDetails } from 'store'
 import Dashboard from 'containers/DashboardContainer'
 import Details from 'containers/DetailsContainer'
 import Page404 from 'components/Page404'
+
+const RouteDetails: React.FC<RouteComponentProps<{
+  feedbackId: string
+}>> = props => (
+  <Details
+    feedbackId={props.match.params.feedbackId}
+    selector={selectDetails}
+  />
+)
 
 const App: React.FC = () => (
   <BrowserRouter>
@@ -25,12 +39,7 @@ const App: React.FC = () => (
         exact
         strict
         path="/details/:feedbackId"
-        render={props => (
-          <Details
-            feedbackId={props.match.params.feedbackId}
-            selector={selectDetails}
-          />
-        )}
+        component={RouteDetails}
       />
 
       <Route component={Page404} />
