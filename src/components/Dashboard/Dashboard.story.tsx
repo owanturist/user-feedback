@@ -4,7 +4,7 @@ import { action } from '@storybook/addon-actions'
 
 import { Feedback, Rating } from 'api'
 import { Fragment, fragmentize } from 'utils'
-import { Dashboard, DashboardHeader, DashboardSkeleton } from './index'
+import { Dashboard, DashboardSkeleton } from './index'
 
 const ratingsKnob = (
   active: Array<Rating>
@@ -44,8 +44,6 @@ export default {
   title: 'Dashboard',
   component: Dashboard
 }
-
-export const Header: FC = () => <DashboardHeader />
 
 export const Loading: FC = () => <DashboardSkeleton />
 

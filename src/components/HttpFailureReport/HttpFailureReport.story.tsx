@@ -4,33 +4,36 @@ import { action } from '@storybook/addon-actions'
 import Decode from 'frctl/Json/Decode'
 import * as Http from 'frctl/Http'
 
-import FailureReport from './index'
+import HttpFailureReport from './index'
 
 export default {
   title: 'HttpFailureReport',
-  component: FailureReport
+  component: HttpFailureReport
 }
 
 export const NetworkError: FC = () => (
-  <FailureReport
+  <HttpFailureReport
     error={Http.Error.NetworkError}
     onTryAgain={action('onTryAgain')}
   />
 )
 
 export const Timeout: FC = () => (
-  <FailureReport error={Http.Error.Timeout} onTryAgain={action('onTryAgain')} />
+  <HttpFailureReport
+    error={Http.Error.Timeout}
+    onTryAgain={action('onTryAgain')}
+  />
 )
 
 export const BadUrl: FC = () => (
-  <FailureReport
+  <HttpFailureReport
     error={Http.Error.BadUrl(text('Url', 'wrongurl'))}
     onTryAgain={action('onTryAgain')}
   />
 )
 
 export const BadStatus500: FC = () => (
-  <FailureReport
+  <HttpFailureReport
     error={Http.Error.BadStatus({
       url: text('Url', 'https://google.com'),
       statusCode: number('Status Code', 501),
@@ -43,7 +46,7 @@ export const BadStatus500: FC = () => (
 )
 
 export const BadStatus400: FC = () => (
-  <FailureReport
+  <HttpFailureReport
     error={Http.Error.BadStatus({
       url: text('Url', 'https://google.com'),
       statusCode: number('Status Code', 404),
@@ -56,7 +59,7 @@ export const BadStatus400: FC = () => (
 )
 
 export const BadBody: FC = () => (
-  <FailureReport
+  <HttpFailureReport
     error={Http.Error.BadBody(
       Decode.Error.Field(
         'items',

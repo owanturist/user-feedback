@@ -1,6 +1,6 @@
 import React, { FC } from 'react'
 
-import { Page404 } from './index'
+import Page404 from './index'
 
 export default {
   title: 'Page404',

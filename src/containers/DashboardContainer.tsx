@@ -6,12 +6,10 @@ import { createAction, createReducer } from '@reduxjs/toolkit'
 
 import { Rating, Feedback, getFeedbackList } from 'api'
 import { Fragment, fragmentize } from 'utils'
-import Screen from 'components/Screen'
 import {
   Dashboard,
-  FailureReport,
-  DashboardSkeleton,
-  DashboardHeader
+  DashboardFailureReport,
+  DashboardSkeleton
 } from 'components/Dashboard'
 
 type Dispatch = ThunkDispatch<never, never, Action>
@@ -37,9 +35,10 @@ const LoadFeedbackDone = createAction<Array<Feedback>>(
 )
 
 export const reducer = createReducer<State>(initial, builder => {
-  return builder
-
-    .addCase(LoadFeedbackStart, () => initial)
+  builder
+    .addCase(LoadFeedbackStart, state =>
+      state.feedbackError === null ? state : initial
+    )
 
     .addCase(LoadFeedbackFail, (state, { payload: feedbackError }) => ({
       ...state,
@@ -52,17 +51,14 @@ export const reducer = createReducer<State>(initial, builder => {
     }))
 })
 
-// E F F E C T S
+// T H U N K S
 
 const LoadFeedback = (dispatch: Dispatch): void => {
+  dispatch(LoadFeedbackStart())
+
   getFeedbackList()
     .then(feedback => dispatch(LoadFeedbackDone(feedback)))
     .catch(error => dispatch(LoadFeedbackFail(error)))
-}
-
-const RetryLoadFeedback = (dispatch: Dispatch): void => {
-  dispatch(LoadFeedbackStart)
-  dispatch(LoadFeedback)
 }
 
 // V I E W
@@ -93,16 +89,16 @@ const ViewFailureReport: React.FC<{
   const dispatch: Dispatch = useDispatch()
 
   return (
-    <FailureReport
+    <DashboardFailureReport
       error={error}
-      onTryAgain={() => dispatch(RetryLoadFeedback)}
+      onTryAgain={() => dispatch(LoadFeedback)}
     />
   )
 }
 
 const ViewDashboard: React.FC<{
   feedback: Array<Feedback>
-}> = ({ feedback }) => {
+}> = React.memo(({ feedback }) => {
   const [search, setSearch] = React.useState('')
   const [excludeRatings, setExcludeRatings] = React.useState<
     Record<number, boolean>
@@ -131,32 +127,26 @@ const ViewDashboard: React.FC<{
       onToggleRating={onToggleRating}
     />
   )
-}
+})
 
-const ViewContent: React.FC<{
-  state: State
-}> = ({ state }) => {
+const DashboardContainer: React.FC<{
+  selector(glob: unknown): State
+}> = ({ selector }) => {
   const dispatch: Dispatch = useDispatch()
 
   React.useEffect(() => dispatch(LoadFeedback), [dispatch])
 
-  if (state.feedbackError !== null) {
-    return <ViewFailureReport error={state.feedbackError} />
+  const { feedbackError, feedbackData } = useSelector(selector)
+
+  if (feedbackError !== null) {
+    return <ViewFailureReport error={feedbackError} />
   }
 
-  if (state.feedbackData !== null) {
-    return <ViewDashboard feedback={state.feedbackData} />
+  if (feedbackData !== null) {
+    return <ViewDashboard feedback={feedbackData} />
   }
 
   return <DashboardSkeleton />
 }
-
-const DashboardContainer: React.FC<{
-  selector(glob: unknown): State
-}> = ({ selector }) => (
-  <Screen header={<DashboardHeader />}>
-    <ViewContent state={useSelector(selector)} />
-  </Screen>
-)
 
 export default DashboardContainer

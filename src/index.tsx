@@ -6,25 +6,43 @@ import ReactDOM from 'react-dom'
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
 import { createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
+import { composeWithDevTools } from 'redux-devtools-extension'
 import { Provider } from 'react-redux'
 
-import { toDashboard } from 'Router'
-import { State, reducer } from 'store'
+import { reducer, selectDashboard, selectDetails } from 'store'
 import Dashboard from 'containers/DashboardContainer'
+import Details from 'containers/DetailsContainer'
 
 const App: React.FC = () => (
   <BrowserRouter>
     <Switch>
-      <Route path={toDashboard}>
-        <Dashboard selector={(state: State) => state.dashboard} />
+      <Route exact strict path="/">
+        <Dashboard selector={selectDashboard} />
       </Route>
+
+      <Route
+        exact
+        strict
+        path="/details/:feedbackId"
+        render={props => (
+          <Details
+            feedbackId={props.match.params.feedbackId}
+            selector={selectDetails}
+          />
+        )}
+      />
     </Switch>
   </BrowserRouter>
 )
 
+const store = createStore(
+  reducer,
+  composeWithDevTools(applyMiddleware(thunkMiddleware))
+)
+
 ReactDOM.render(
   <React.StrictMode>
-    <Provider store={createStore(reducer, applyMiddleware(thunkMiddleware))}>
+    <Provider store={store}>
       <App />
     </Provider>
   </React.StrictMode>,

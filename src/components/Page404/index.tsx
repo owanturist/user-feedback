@@ -2,6 +2,7 @@ import React from 'react'
 import styled from '@emotion/styled/macro'
 
 import theme from 'theme'
+import Screen from 'components/Screen'
 import { Link, toDashboard } from 'Router'
 
 const StyledBackLink = styled.div`
@@ -19,6 +20,10 @@ const StyledCode = styled.big`
   font-size: 72px;
 `
 
+const StyledHeader = styled.div`
+  text-align: center;
+`
+
 const StyledRoot = styled.div`
   box-sizing: border-box;
   margin: 0 auto;
@@ -30,22 +35,21 @@ const StyledRoot = styled.div`
   text-align: center;
 `
 
-export const Page404: React.FC = React.memo(() => (
-  <StyledRoot data-cy="page404__root">
-    <StyledCode>404</StyledCode>
-    <StyledExplanation>This page is missing</StyledExplanation>
-    <StyledBackLink>
-      <Link data-cy="page404__dashboard-link" to={toDashboard}>
-        Go Dashboard
-      </Link>
-    </StyledBackLink>
-  </StyledRoot>
+const Page404: React.FC = React.memo(() => (
+  <Screen
+    data-cy="page404__root"
+    header={<StyledHeader>Page Not Found</StyledHeader>}
+  >
+    <StyledRoot>
+      <StyledCode>404</StyledCode>
+      <StyledExplanation>This page is missing</StyledExplanation>
+      <StyledBackLink>
+        <Link data-cy="page404__dashboard-link" to={toDashboard}>
+          Go Dashboard
+        </Link>
+      </StyledBackLink>
+    </StyledRoot>
+  </Screen>
 ))
 
-const StyledHeader = styled.div`
-  text-align: center;
-`
-
-export const Header: React.FC = React.memo(() => (
-  <StyledHeader>Page Not Found</StyledHeader>
-))
+export default Page404

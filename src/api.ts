@@ -247,17 +247,30 @@ export const getFeedbackList = (): Promise<Array<Feedback>> => {
  */
 export const getFeedbackById = (
   feedbackId: string
-): Promise<FeedbackDetailed> => {
+): Promise<null | FeedbackDetailed> => {
   // keep id for e2e mocking
-  return request.get(`$/example/apidemo.json?id=${feedbackId}`, {
-    transformResponse: data => {
-      return Decode.field('items')
-        .list(Decode.value)
-        .chain(list => {
-          return Decode.field('items').of(
-            findDetailedFeedbackByIdDecoder(0, list.length, feedbackId)
+  return request
+    .get(`/example/apidemo.json?id=${feedbackId}`, {
+      transformResponse: body => {
+        return Decode.field('items')
+          .list(Decode.value)
+          .chain(list => {
+            return Decode.field('items').of(
+              findDetailedFeedbackByIdDecoder(0, list.length, feedbackId)
+            )
+          })
+          .decodeJSON(body)
+          .fold<string | null | FeedbackDetailed>(
+            decodeError => decodeError.stringify(4),
+            feedback => feedback
           )
-        })
-    }
-  })
+      }
+    })
+    .then(({ data }: AxiosResponse<string | null | FeedbackDetailed>) => {
+      if (typeof data === 'string') {
+        return Promise.reject(data)
+      }
+
+      return data
+    })
 }
